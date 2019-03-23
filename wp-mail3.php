@@ -25,7 +25,7 @@ exit();
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link href="https://fonts.googleapis.com/css?family=Montserrat|Roboto" rel="stylesheet">
 	<link rel="icon" href="https://i.imgur.com/5ivJdmN.png">
-	<title>Mailer Inbox - Xwanted</title>
+	<title>Mailer Inbox - Dr.Inj3ction</title>
 	<style>
 	body{
 		margin: 0;
@@ -124,7 +124,7 @@ exit();
 <body>
 <form action="" method="post">
 <div class="main" style="margin-top: 100px;">
-	<h1 id="title">Mailer Inbox - Xwanted</h1>
+	<h1 id="title">Mailer Inbox - Dr.Inj3ction</h1>
 	<div>
 		<input type="text" name="from" id="from" placeholder="From Email">
 		<input type="text" name="name" id="name" placeholder="From Name">
