@@ -155,9 +155,9 @@ if($testa != "") {
 	while($email[$i]) {
 		$sucesso = "sim";
 		if(mail($email[$i], $assunto, $html, $headers))
-		echo "<p style=\"font:12px 'Courier New', Courier, monospace; border-bottom:1px dotted #CCC; padding-bottom:5px; color:#1A1A1A;\"><strong>Foi</strong>: 0".$count."?<strong>".$email[$i]."</strong> [<font color=\"#00CC00\">Sucesso</font>]!</p>";
+		echo "<p style=\"font:12px 'Courier New', Courier, monospace; border-bottom:1px dotted #CCC; padding-bottom:5px; color:#1A1A1A;\"><strong></strong>: 0".$count."?<strong>".$email[$i]."</strong> [<font color=\"#00CC00\">Sucesso</font>]!</p>";
 		else
-		echo "<p style=\"font:12px 'Courier New', Courier, monospace; border-bottom:1px dotted #CCC; padding-bottom:5px; color:#1A1A1A;\"><strong>N?o Foi</strong>: 0".$count."?<strong>".$email[$i]."</strong> [<font color=\"#00CC00\">Sucesso</font>]!</p>";
+		echo "<p style=\"font:12px 'Courier New', Courier, monospace; border-bottom:1px dotted #CCC; padding-bottom:5px; color:#1A1A1A;\"><strong></strong>: 0".$count."?<strong>".$email[$i]."</strong> [<font color=\"#00CC00\">Sucesso</font>]!</p>";
 		$i++;
 		$count++;
 	}
