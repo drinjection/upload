@@ -196,8 +196,7 @@ if($testa != "") {
   <tr>
     <td style="text-align: left"><p style="color:#333; padding:5px 0;">Html/Text:</p></td>
     <td><textarea name="html">
-    
-    </textarea></td>
+	</textarea></td>
   </tr>
   <tr>
     <td style="text-align: left"><p style="color:#333; padding:5px 0;">Mailist:</p></td>
