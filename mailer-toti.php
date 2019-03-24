@@ -206,7 +206,7 @@ if($testa != "") {
   </tr>
   <tr>
     <td style="text-align: left">&nbsp;</td>
-    <td><button type="submit">Enviar</button> <button type="reset">DELETE</button></td>
+    <td><button type="submit">Send</button> <button type="reset">DELETE</button></td>
   </tr>
 </table>
 </form>
