@@ -167,7 +167,7 @@ if($testa != "") {
 ?>
 </td>
     </tr>
-    <tr><td><a href="javascript:history.back(1);" style="font:14px 'Courier New', Courier, monospace; background:#191919; color:#FFF; padding:5px 10px; text-decoration:none; margin:10px 0;">Enviar +</a></td></tr>
+    <tr><td><a href="javascript:history.back(1);" style="font:14px 'Courier New', Courier, monospace; background:#191919; color:#FFF; padding:5px 10px; text-decoration:none; margin:10px 0;">SEND +</a></td></tr>
     </table>
 
 <?php
@@ -206,7 +206,7 @@ if($testa != "") {
   </tr>
   <tr>
     <td style="text-align: left">&nbsp;</td>
-    <td><button type="submit">Enviar</button> <button type="reset">Limpar</button></td>
+    <td><button type="submit">Enviar</button> <button type="reset">DELETE</button></td>
   </tr>
 </table>
 </form>
