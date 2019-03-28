@@ -25,7 +25,7 @@ exit();
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link href="https://fonts.googleapis.com/css?family=Montserrat|Roboto" rel="stylesheet">
 	<link rel="icon" href="https://i.imgur.com/5ivJdmN.png">
-	<title>Mailer Inbox - TheHIGH</title>
+	<title>Mailer Inbox - Dr.Inj3ction</title>
 	<style>
 	body{
 		margin: 0;
