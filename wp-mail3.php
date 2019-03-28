@@ -10,9 +10,9 @@ $headers .= "From: ".$_POST['name']."<".$_POST['from'].">";
 $send = mail($to,$subject,$msg,$headers);
 
 if ($send) {
-	echo "<p id='success'>??  $to</p>";
+	echo "<p id='success'>$to</p>";
 }else{
-	echo "<p id='error'>?  $to</p>";
+	echo "<p id='error'>$to</p>";
 }
 exit();
 }
