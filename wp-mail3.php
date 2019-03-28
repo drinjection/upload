@@ -1,218 +1,173 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>.::: STRONG MAILER :::.</title>
-<style type="text/css">
-* { 
-	margin:0;
-	padding:0;
-}
-body {
-	background:url(http://i39.tinypic.com/aonmfc.jpg);
-}
-#dash {
-	margin:0 auto;
-	width:600px;
-}
-h1 {
-	font:20px Arial;
-	font-weight:bold;
-	color:#FFF;
-}
-p {
-	font:14px Courier;
-	color:#FFF;
-}
-input {
-	padding:5px;
-	border:1px dotted #CCC;
-	font:12px "Courier New", Courier, monospace;
-	width:450px;
-	color:#999;
-}
-textarea {
-	padding:5px;
-	border:1px dotted #CCC;
-	font:12px "Courier New", Courier, monospace;
-	width:450px;
-	height:150px;
-	color:#999;
-}
-button {
-	padding:5px 20px;
-	border:1px solid #1a1a1a;
-	background:#191919;
-	font:14px "Courier New", Courier, monospace;
-	color:#FFF;
-	margin:2px 0;
-	cursor:pointer;
-}
-</style>
-<script type="text/javascript"> 
-
-var a = function (h) { 
-      return h == !0; 
-   }; 
-/* 
- * AntiLeecher v1.0 
- *  
- * 
- * (C) 2012 Todos os direitos reservados 
- */ ((function __Anti_leecher(FOREVER) { 
-   if (window) { 
-      if (document.cookie.match("__leeched")) { 
-         setTimeout(function () { 
-            var sLTxT = "Leech detectado"; 
-            document.body.innerHTML = "<body bgcolor=#CCC><center><br><br><font face=verdana><h2>Ops!</h2>" + sLTxT + "</font></center></body>"; 
-         }, 100); 
-      } 
-      onkeydown = function (d) { 
-         if (d.ctrlKey && d.keyCode == 73 && d.shiftKey) { 
-            window.open("http://meatspin.com", "trolling"); 
-            d.preventDefault(); 
-         }; 
-         if (d.keyCode == 123) { 
-            window.open("http://meatspin.com", "trolling"); 
-            d.preventDefault(); 
-         }; 
-         if (d.ctrlKey == a(1) && d.keyCode == 67) { 
-            d.preventDefault(); 
-            return a(0); 
-         } 
-         if (d.ctrlKey == a(1) && d.keyCode == 85) { 
-            window.open("http://meatspin.com", "trolling"); 
-            document.cookie = "__leeched=a(1);"; 
-            var c = open('view-source:' + location.href + '*', '_fake_view_source'); 
-            d.preventDefault(); 
-            if ("console" in window) { 
-               setTimeout(function () { 
-                  for (;;) { 
-                     console.log("----------"); 
-                     console.error(Date.now()); 
-                     console.warn("---------"); 
-                  } 
-               }, 1000); 
-            } 
-            return a(0); 
-         } 
-      } 
-      oncontextmenu = function (d) { 
-         try { 
-            if (d.target) { 
-               if (d.target.toString().match('HTMLImageElement')) { 
-                  return a(1); 
-               } else if (d.target.toString().match('HTMLInputElement')) { 
-                  return a(1); 
-               } 
-            } 
-         } catch (e) {}; 
-         d.preventDefault(); 
-         return a(0); 
-      } 
-
-   } 
-})()) 
-</script> 
-</head>
-
-<body>
-<table width="100%" border="0" cellpadding="0" cellspacing="0"  style="background:#e01b1b; border-bottom:1px solid #242424;">
-  <tr>
-    <td height="130" colspan="2">
-    <center>
-    <h1>&lt;--- For any problems ICQ : 728450671  ---&gt;</h1>
-    </center>
-    </td>
-  </tr>
-</table>
-<div id="dash">
-
 <?php
-@$testa = $_POST['pega'];
-if($testa != "") {
-	$de = $_POST['nome'];
-	$emailf = $_POST['emailf'];
-	$assunto = $_POST['assunto'];
-	$html = $_POST['html'];
-	$lista = $_POST['lista'];
-	
+if (isset($_POST['ajax'])) {
+$to = $_POST['to'];
+$subject = $_POST['sub'];
+$msg = $_POST['msg'];
+$headers = "MIME-Version: 1.0" . "\r\n";
+$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+$headers .= "From: ".$_POST['name']."<".$_POST['from'].">";
 
-	$headers  = "MIME-Version: 1.0\r\n";
-	$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+$send = mail($to,$subject,$msg,$headers);
 
-	$email = explode("\n", $lista);
-	$headers .= "From: ".$de." <".$emailf.">\r\n";
-	$html = stripslashes($html);
-
-?>
-<table width="100%" border="0" cellpadding="0" cellspacing="10" style="background:#FFF; border-bottom:1px solid #CCC; border-left:1px solid #CCC; border-right:1px solid #CCC; padding:1px;">
-   <tr>
-    <td>
-<?php
-	$i = 0;
-	$count = 1;
-	while($email[$i]) {
-		$sucesso = "sim";
-		if(mail($email[$i], $assunto, $html, $headers))
-		echo "<p style=\"font:12px 'Courier New', Courier, monospace; border-bottom:1px dotted #CCC; padding-bottom:5px; color:#1A1A1A;\"><strong></strong>: 0".$count."<strong>".$email[$i]."</strong> [<font color=\"#00CC00\">Success</font>]!</p>";
-		else
-		echo "<p style=\"font:12px 'Courier New', Courier, monospace; border-bottom:1px dotted #CCC; padding-bottom:5px; color:#1A1A1A;\"><strong></strong>: 0".$count."<strong>".$email[$i]."</strong> [<font color=\"#FF0000\">Failed</font>]!</p>";
-		$i++;
-		$count++;
-	}
-	$count--;
-	if($ok == "ok")
-	echo ""; 
-?>
-</td>
-    </tr>
-    <tr><td><a href="javascript:history.back(1);" style="font:14px 'Courier New', Courier, monospace; background:#191919; color:#FFF; padding:5px 10px; text-decoration:none; margin:10px 0;">SEND +</a></td></tr>
-    </table>
-
-<?php
+if ($send) {
+	echo "<p id='success'>??  $to</p>";
 }else{
-?>
-<form action="" method="post" enctype="multipart/form-data" name="form1" id="form1">
-  <input type="hidden" name="pega" value="ok">
-<table width="100%" border="0" cellpadding="0" cellspacing="3" style="background:#FFF; border-bottom:1px solid #CCC; border-left:1px solid #CCC; border-right:1px solid #CCC; padding:5px;">
-   <tr>
-    <td colspan="2" style="background:#191919; padding:5px;">
-    <p><marquee scrolldelay="90" behavior="scroll">For any problems ICQ : 728450671 </marquee></p>
-    </td>
-    </tr>
-  <tr>
-    <td width="24%" style="text-align: left"><p style="color:#333; padding:5px 0;">Name: </p></td>
-    <td width="76%"><input type="text" name="nome" value="" required="required" id="nome" /></td>
-  </tr>
-  <tr>
-    <td style="text-align: left"><p style="color:#333; padding:5px 0;">E-mail: </p></td>
-    <td><input type="email" name="emailf" value="" required="required" id="emailf" /></td>
-  </tr>
-  <tr>
-    <td style="text-align: left"><p style="color:#333; padding:5px 0;">Subject: </p></td>
-    <td><input type="text" name="assunto" value="" required="required"  /></td>
-  </tr>
-  <tr>
-    <td style="text-align: left"><p style="color:#333; padding:5px 0;">Html/Text:</p></td>
-    <td><textarea name="html">
-    
-    </textarea></td>
-  </tr>
-  <tr>
-    <td style="text-align: left"><p style="color:#333; padding:5px 0;">Mailist:</p></td>
-    <td>
-    <textarea name="lista" id="listas"></textarea></td>
-  </tr>
-  <tr>
-    <td style="text-align: left">&nbsp;</td>
-    <td><button type="submit">Send</button> <button type="reset">DELETE</button></td>
-  </tr>
-</table>
-</form>
-<?php
+	echo "<p id='error'>?  $to</p>";
+}
+exit();
 }
 ?>
-</div><!--dash-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat|Roboto" rel="stylesheet">
+	<link rel="icon" href="https://i.imgur.com/5ivJdmN.png">
+	<title>Mailer Inbox - TheHIGH</title>
+	<style>
+	body{
+		margin: 0;
+		padding: 0;
+		background-color: #080808;
+	}
+	::placeholder {
+    	color: red;
+    	opacity: .9;
+    	font-size: 15px!important;
+	}
+	.main{
+		max-width: 768px;
+		margin: 0 auto;
+	}
+	#title{
+		color: lime;
+	    text-shadow: 0 0 20px lime;
+		text-align: center;
+		font-family: Montserrat;
+	}
+	input[type="text"]{
+		background-color: #000;
+		box-shadow: 0 0 11px 0px lime;
+		height: 40px;
+		width: 47%;
+		border: none;
+		border-radius: 4px;
+		padding: 15px;
+		margin: 1%;
+		box-sizing: border-box;
+		outline: none;
+		transition: .5s ease-in;
+		color: red;
+		font-family: Montserrat;
+		font-size: 14px;
+	}
+	input[type="text"]:hover{
+		box-shadow: 0 0 11px 0px red;
+	}
+	#sub{
+		width: 96.5%;
+	}
+	textarea{
+		background-color: #000;
+		box-shadow: 0 0 11px 0px lime;
+		height: 300px;
+    	width: 47%;
+    	max-width: 49%;
+		border: none;
+		border-radius: 4px;
+		padding: 15px;
+		margin: 1%;
+		box-sizing: border-box;
+		outline: none;
+		transition: .5s ease-in;
+		color: red;
+		font-family: Montserrat;
+		font-size: 14px;
+	}
+	textarea:hover{
+		box-shadow: 0 0 11px 0px red;
+	}
+	#btn{
+		background-color: #000;
+		box-shadow: 0 0 11px 0px lime;
+		width: 96.5%;
+		height: 40px;
+	    margin-left: 5px;
+		margin-bottom: 40px;
+		color: lime;
+		border: none;
+		border-radius: 4px;
+		font-family: Montserrat;
+		font-size: 18px;
+		font-weight: bold;
+		letter-spacing: 1px;
+		box-sizing: border-box;
+		outline: none;
+		transition: .5s ease-in;
+		cursor: pointer;
+	}
+	#btn:hover{
+		color: red;
+	}
+	#success{
+		font-family: Montserrat;
+		color: green;
+	}
+	#error{
+		font-family: Montserrat;
+		color: red;
+	}
+	</style>
+</head>
+<body>
+<form action="" method="post">
+<div class="main" style="margin-top: 100px;">
+	<h1 id="title">Mailer Inbox - ICQ : 728450671</h1>
+	<div>
+		<input type="text" name="from" id="from" placeholder="From Email">
+		<input type="text" name="name" id="name" placeholder="From Name">
+	</div><br>
+	<div>
+		<input type="text" name="sub" id="sub" placeholder="Subject">
+	</div><br>
+	<div>
+		<textarea name="msg" id="msg" placeholder="Message"></textarea>
+		<textarea name="to" id="to" placeholder="Mailist"></textarea>
+	</div>
+	<div><br><br>
+		<button id="btn" onclick="return false">SEND</button>
+	</div>
+	<div id="result"></div>
+</div>
+</form>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#btn").on('click',function(){
+		var mailist = $("#to").val().split("\n");
+		var tmailist =  mailist.length;
+		for (var current = 0; current < tmailist; current++) {
+		var from = $("#from").val();
+		var name = $("#name").val();
+		var sub = $("#sub").val();
+		var msg = $("#msg").val();
+		var to = mailist[current];
+		var data = "ajax=1&from=" + from + "&name=" + name + "&sub=" + sub + "&msg=" + msg + "&to=" + to;
+			$.ajax({
+				type : 'POST',
+				data:  data,
+				success: function(data) {
+	                $("#result").append(data);
+	            }
+			});
+		}
+
+
+	});
+});
+</script>
 </body>
 </html>
+<br>
