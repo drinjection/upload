@@ -1,420 +1,139 @@
 <?php
-
-# Created By Mister Klio Strong and protected by password ...
-# Contact For More Mister-klio@hotmail.com ...
-# Fb.com/IzzAdiine
-
-// Add login/password pairs below, like described above
-// NOTE: all rows except last must have comma "," at the end of line
-$MisterklioProtect = array(
-  '' => 'PowerMailerInbox' /// Pw Default = PowerMailerInbox
-);
-
-// request login? true - show login and password boxes, false - password box only
-define('USE_USERNAME', true);
-
-// User will be redirected to this page after logout
-define('LOGOUT_URL', '?home');
-
-// time out after NN minutes of inactivity. Set to 0 to not timeout
-define('TIMEOUT_MINUTES', 0);
-
-// This parameter is only useful when TIMEOUT_MINUTES is not zero
-// true - timeout time from last activity, false - timeout time from login
-define('TIMEOUT_CHECK_ACTIVITY', true);
-
-///////////////////////////////////////////////////////
-// do not change code below
-///////////////////////////////////////////////////////
-
-// timeout in seconds
-$timeout = (TIMEOUT_MINUTES == 0 ? 0 : time() + TIMEOUT_MINUTES * 60);
-
-// logout?
-if(isset($_GET['logout'])) {
-  setcookie("cookies", '', $timeout, '/'); // clear password;
-  header('Location: ' . LOGOUT_URL);
-  
-  exit();
-}
-
-if(!function_exists('showLoginPasswordProtect')) {
-
-// show login form
-function showLoginPasswordProtect($error_msg) {
-?>
-<html>
-<head>
-  <meta charset="utf-8">
-<!-- Page title -->
-<title> | Log In | Power Mailer Inbox By Mister klio</title>
-<!-- Gotsta have that favicon-->
-<link rel="icon" type="image/png" href="https://cdn0.iconfinder.com/data/icons/kameleon-free-pack-rounded/110/Paper-Plane-512.png" />
-<link rel="shortcut icon" type="image/x-icon" href="https://cdn0.iconfinder.com/data/icons/kameleon-free-pack-rounded/110/Paper-Plane-512.png" />
-<!-- CRACKER CHECKER PAYPAL VALID EMAIL -->
-<meta name="viewport" content="width=480">
-<!-- Stylesheet -->
-  <link href="http://unirest.io/styles/library.css" rel="stylesheet" type="text/css" data-inprogress="" />
-  <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet" />
-</head>
-<body>
-<div class="page-container">
-<style>
-body ,a{
-	font-family: 'Titillium Web';
-	text-decoration:none;
-	background: #113042;
-	color:white;
-	
-}
-
-textarea {
-width: 85%;
-border: none;
-height:20%;
-margin: 0;
-padding: 0;
-}
-input {
-border: none;
-height:10%;
-margin: 0;
-padding: 0;
-}
-
-.MK-footer a {color:#14C1d7;}
-
-.btn {
-   background: #0c2330;
-  background-image: -webkit-linear-gradient(top, #0c2330, #08344d);
-  background-image: -moz-linear-gradient(top, #0c2330, #08344d);
-  background-image: -ms-linear-gradient(top, #0c2330, #08344d);
-  background-image: -o-linear-gradient(top, #0c2330, #08344d);
-  background-image: linear-gradient(to bottom, #0c2330, #08344d);
-  -webkit-border-radius: 12;
-  -moz-border-radius: 12;
-  border-radius: 12px;
-  font-family: 'Titillium Web';
-  color: #ffffff;
-  font-size: 15px;
-  padding: 8px 22px 10px 18px;
-  text-decoration: none;
-}
-
-.btn:hover {
-    background: #071a24;
-  background-image: -webkit-linear-gradient(top, #071a24, #04476b);
-  background-image: -moz-linear-gradient(top, #071a24, #04476b);
-  background-image: -ms-linear-gradient(top, #071a24, #04476b);
-  background-image: -o-linear-gradient(top, #071a24, #04476b);
-  background-image: linear-gradient(to bottom, #071a24, #04476b);
-  text-decoration: none;
-}
-  </style>
-  <div align="center">
-  <br>
-  <div style="width:500px; margin-left:auto; margin-right:auto; text-align:center">
-  <? $MyRight = "MISTERKLIO" ; ?>
-  <form method="post">
-<h1 style="color:#ffffff;">
-	<a id="user-content-installation" class="anchor" href="#installation" aria-hidden="true">
-<span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome To Power Mailer Inbox <code style="font-size:12px;color:#0bc4d1;">v2.1 </code> </h1>
-<p style="font-size:13px;color:#ffffff;">
- <code style="font-size:12px;color:#0bc4d1;"> Function Power Mailer Inbox v2.1</code>
-<br>All Message Header Fields on
-<br>Name Message Fixed To >service<
-<br>Random Email Automaticly Change
-<br>Use it with a good server No  <code style="font-size:12px;color:#0bc4d1;"> #Blacklist </code>
-</p>
-<?php if (USE_USERNAME) echo ''; ?>
-<?
-$ii = base64_encode ('<p>
-
-
-<div class="input-group input-icon right">
-<span class="input-group-addon"><i class="fa fa-key"></i></span>
-<input type="password" name="access_password" class="highlight highlight-source-json" value="" placeholder="Password"/>
-</div>
-</p>'); echo base64_decode ($ii) ;
-?>
-<p>
-<input type="submit" name="Submit" value=" LOG IN " class="btn"/>
-</p>
-
-</form>
-</div>
-
- 
-<div>
-	 <p><footer class='MK-footer'>
-	 <p></p><p></p>
-<p style="font-size:12px;color:#ffffff;">&copy; 2017 CODED BY <? echo $MyRight ;?> | <a href="https://github.com/Misterklio/Power-Mailer-Inbox-v2-/" target="black"> DOWNLOAD SCRIPT </a> |</p>
-<p></p><p></p>
-<br> <br>
-</div>
-</div>
-</body>
-</html>
-
-
-<?php
-  // stop at this point
-  die();
-}
-}
-// user provided password
-if (isset($_POST['access_password'])) {
-
-  $login = isset($_POST['access_login']) ? $_POST['access_login'] : '';
-  $pass = $_POST['access_password'];
-  if (!USE_USERNAME && !in_array($pass, $MisterklioProtect)
-  || (USE_USERNAME && ( !array_key_exists($login, $MisterklioProtect) || $MisterklioProtect[$login] != $pass ) ) 
-  ) {
-    showLoginPasswordProtect('<div class="alert alert-danger" role="alert"><i class="fa fa-thumbs-down"></i>
-					<strong>Oh snap!</strong> Incorrect password ! up and try submitting again.</div>');
-  }
-  else {
-    // set cookie if password was validated
-    setcookie("cookies", md5($login.'%'.$pass), $timeout, '/');
-    // Some programs (like Form1 Bilder) check $_POST array to see if parameters passed
-    // So need to clear password protector variables
-    unset($_POST['access_login']);
-    unset($_POST['access_password']);
-    unset($_POST['Submit']);
-  }
-}
-else {
-  // check if password cookies is set
-  if (!isset($_COOKIE['cookies'])) {
-    showLoginPasswordProtect('');
-  }
-  // check if cookie is good
-  $found = false;
-  foreach($MisterklioProtect as $key=>$val) {
-    $lp = (USE_USERNAME ? $key : '') .'%'.$val;
-    if ($_COOKIE['cookies'] == md5($lp)) {
-      $found = true;
-      // prolong timeout
-      if (TIMEOUT_CHECK_ACTIVITY) {
-        setcookie("cookies", md5($lp), $timeout, '/');
-      }
-      break;
-    }
-  }
-  if (!$found) {
-    showLoginPasswordProtect('');
-  }
-}
-/// end
-/// D'ont Add
-?>
-
-
- <html>
-<head>
-  <meta charset="utf-8">
-<!-- Page title -->
-<title>Power Mailer Inbox By Mister klio</title>
-<!-- Gotsta have that favicon-->
-<link rel="icon" type="image/png" href="https://cdn0.iconfinder.com/data/icons/kameleon-free-pack-rounded/110/Paper-Plane-512.png" />
-<link rel="shortcut icon" type="image/x-icon" href="https://cdn0.iconfinder.com/data/icons/kameleon-free-pack-rounded/110/Paper-Plane-512.png" />
-<!-- CRACKER CHECKER PAYPAL VALID EMAIL -->
-<meta name="viewport" content="width=480">
-<!-- Stylesheet -->
-  <link href="http://unirest.io/styles/library.css" rel="stylesheet" type="text/css" data-inprogress="" />
-  <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet" />
-</head>
-<style>
-body ,a{
-	font-family: 'Titillium Web';
-	text-decoration:none;
-	background: #113042;
-	color:white;
-	
-}
-textarea {
-width: 85%;
-border: none;
-height:10%;
-margin: 0;
-padding: 0;
-}
-input {
-border: none;
-height:10%;
-margin: 0;
-padding: 0;
-}
-.btn {
-   background: #0c2330;
-  background-image: -webkit-linear-gradient(top, #0c2330, #08344d);
-  background-image: -moz-linear-gradient(top, #0c2330, #08344d);
-  background-image: -ms-linear-gradient(top, #0c2330, #08344d);
-  background-image: -o-linear-gradient(top, #0c2330, #08344d);
-  background-image: linear-gradient(to bottom, #0c2330, #08344d);
-  -webkit-border-radius: 12;
-  -moz-border-radius: 12;
-  border-radius: 12px;
-  font-family: 'Titillium Web';
-  color: #ffffff;
-  font-size: 15px;
-  padding: 8px 22px 10px 18px;
-  text-decoration: none;
-}
-
-.btn:hover {
-    background: #071a24;
-  background-image: -webkit-linear-gradient(top, #071a24, #04476b);
-  background-image: -moz-linear-gradient(top, #071a24, #04476b);
-  background-image: -ms-linear-gradient(top, #071a24, #04476b);
-  background-image: -o-linear-gradient(top, #071a24, #04476b);
-  background-image: linear-gradient(to bottom, #071a24, #04476b);
-  text-decoration: none;
-}
-input[type=submit] {
-    border: none;
-    border-radius: 0px;
-    cursor: pointer;
-	font-family: 'Titillium Web';
-}
-</style>
-
-</head>
-<body>
-<? $MyRight = "MISTERKLIO" ; ?>
-<div align="center"><h2 style="color:#ffffff;">
-	<a id="user-content-installation" class="anchor" href="#installation" aria-hidden="true">
-<span aria-hidden="true" class="octicon octicon-link"></span></a> Power Mailer Inbox <code style="font-size:12px;color:#0bc4d1;">v2.1 </code> </h2>
-<p style="font-size:12px;color:#ffffff;"> Good Server Send Inbox Use My Script With a Good Server </p>
-<div style="font-size:14px;color:#ffffff;" >
-<a href="?home" class="MISTERKLIO-B"> Home </a> 
-|| <a href="?Mister=spam" class="MISTERKLIO-B"> Spam Messages </a> 
-|| <a href="?logout" class="MISTERKLIO-B"> Logout</a></div>
-<? //// Info
-if ($_GET['Mister'] == 'spam') { ?>
-<br><br>
- <code style="font-size:16px;color:#0bc4d1;"> 
- #This message has a horrible spam-rating of 34.7. It's definitely a spam message. </code>
-<br><br>
-<br>   1 - It was received via a relay (mail server), listed on a blacklist.
-<br>   2 - It contains a URL in the message-body, listed in several blocklists
-<br>   3 - The message format has errors
-<br><br>
-<? 
-exit;} 
-//// END
-?>
-<p></p>
-<? $RandomMail = substr(str_shuffle(str_repeat('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',50)),20,10); ?>
-<? $RandomMail2 = substr(str_shuffle(str_repeat('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',10)),0,10); ?>
-
-
-<form action="" method="post" enctype="multipart/form-data" name="form1"  target="_self">
-  <input type="hidden" name="Power" value="sim">
- <? $subject = "subject"; ?>
-<span style="font-size:13px;color:#ffffff;"><? echo $subject ?></span>
-
-			<input name="sub" type="text" value="Your account access will be limited in 24h." class="highlight highlight-source-json" 
-			id="sub" style="border-radius: 15px; width:100%" placeholder="Subject">
-  <? $Email = "Email"; ?>			
-<span style="font-size:13px;color:#ffffff;"><? echo $Email ?></span>
-
-			<input name="Service" type="text" value="<?php 
-echo "noreply@care.com';  # eg result: -Service@Random.com
-?>" class="highlight highlight-source-json" id="Service" style="border-radius: 15px; width:100%" placeholder="Email">
-
-  <? $Letter = "Letter"; ?>
-<span style="font-size:13px;color:#ffffff;"><? echo $Letter ?></span>
-
-             <textarea name="html" style="border-radius: 15px; width:100%" rows="8" wrap="VIRTUAL" class="highlight highlight-source-json" 
-			 id="html" placeholder="html letter"></textarea><font color="#113042">
-  <? $Mailist = "Mailist"; ?>
-<span style="font-size:13px;color:#ffffff;"><? echo $Mailist ?></span>
-
-              <textarea name="emails" style="border-radius: 15px; width:100%" rows="8" wrap="VIRTUAL" class="highlight highlight-source-json" 
-			  id="emails" placeholder="your@mailer.com"></textarea>
-            
-			<input type="submit" name="Submit" id="Power" value="Send Message" class="btn" style=" -webkit-border-radius: 12;
-  -moz-border-radius: 12;
-  border-radius: 12px;
-  font-family: 'Titillium Web';" dir="ltr"><p></p>
-
-<?php
- 
-
-
-$Misterklio = $_POST['Power'];
-if($Misterklio != "") {
+@set_time_limit(0);
+if(isset($_POST['send']))
+{
 	$message = $_POST['html'];
-	$subject = $_POST['sub'];
-	$Service = $_POST['Service'];
-	$Sendedto = $_POST['Sendedto'];
-	$to = $_POST['emails'];
- ///// RANDOM SERVICE
- 
-	$email = explode("\n", $to);
+	$subject = $_POST['ursubject'];
+	$uremail = $_POST['uremail'];
+	$urname = $_POST['realname'];
+	$email = $_POST['email'];
+
+	$message = urlencode($message);
+	$message = ereg_replace("%5C%22", "%22", $message);
+	$message = urldecode($message);
 	$message = stripslashes($message);
 
-	$Inbox = 0;
-	$Number = 1;
-	while($email[$Inbox]) {
-		$PowerMailerInbox = "PowerMailerInbox";
-		//// Version
-		$headers  = "MIME-Version: 1.0\n";
-		//// Html Letter 
-        $headers .= "Content-type: text/html; charset=iso-8859-1\n";
-		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-		//// PHPMailer True
-		$headers .= "X-Mailer: PHP/" . phpversion();
-		$headers .= "X-Mailer: Microsoft Office Outlook, Build 17.551210\n";
-	    $headers .= "X-Mailer: Gmail \n";
-		$headers .= "X-Mailer: Yahoo \n";
-		$headers .= "X-Mailer: mail.ru \n";
-		
-		/// Random Mail
-		$headers .= "From:"noreply@paypal.com" <noreply@care.com>";
-		//// to
-		if(mail($email[$Inbox], $subject, $message, $headers))
-			
-		
-		//// Done
-		echo '
-	<!-- Stylesheet -->
-  <link href="http://unirest.io/styles/library.css" rel="stylesheet" type="text/css" data-inprogress="" />
-  <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet" />
-	<div class="highlight highlight-source-json" style="font-size:12px;color:#ffffff;"><code> &#9829; </code>  NUMBER : '.$Number.' 
-	<b>'.$email[$Inbox].'</b> <font color=green>DONE....!</div><br>';
-		else
-		
-	//// Erur
-	echo '
-	<!-- Stylesheet -->
-  <link href="http://unirest.io/styles/library.css" rel="stylesheet" type="text/css" data-inprogress="" />
-  <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet" />
-	<div class="highlight highlight-source-json" style="font-size:12px;color:#ffffff;"><code> &#935; </code> NUMBER : '.$Number.' 
-	<b>'.$email[$Inbox].'</b> <font color=red>NOT ....!</div><br>';
-		$Inbox++;
-		$Number++;
-	}
-	
-	$Number--;
-	if($PowerMailerInbox == "PowerMailerInbox")
-		
-	///// End 
-	echo '<div align="center"><h3 style="color:#ffffff;">
-	<a id="user-content-installation" class="anchor" href="#installation" aria-hidden="true">
-<span aria-hidden="true" class="octicon octicon-link"></span></a> The End </h3></div>';
-
-}	
+}else{
+	$testa ="";
+	$message = "";
+	$subject = "";
+	$urname = "";
+	$uremail = "";
+	$email = "";
+}
 ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="SHORTCUT ICON" href="http://www.smt.org//images/favicon.ico">
+<title> Mailer 2k17&trade;</title>
+<style type="text/css">
+<!--
+.form {font-family: "Courier New", Courier, monospace;border:none, background-color:#000000;}
+.send {font-family: "Courier New", Courier, monospace;border:none; font-size:18px; background-color:#FFFFFF; font-black:bold}
+#Layer1 {	position:absolute;
+	left:203px;
+	top:109px;
+	width:829px;
+	height:483px;
+	z-index:1;
+	margin-top: 0.5%;
+	margin-right: 5%;
+	right: 20%;
+	bottom: 200%;
+	margin-bottom: 10%;
+	margin-left: 5%;
+	border: thin solid #000;
+}
 
+-->
+</style>
+</head>
+
+<body>
+<form action="" method="post" name="codered">
+<div align="center" id="Layer1">
+  <table width="87%" height="77%" border="0" cellspacing="10">
+    <tbody><tr>
+      <td height="23" colspan="2"><div align="center" class="form">Mailer 2k17 </div></td>
+    </tr>
+    <tr>
+      <td width="53%" height="24"><div align="center">
+        <input name="uremail" type="text" class="form" id="uremail" size="30" value="" placeholder="Your E-mail">
+      </div></td>
+      <td width="47%"><div align="center">
+        <input name="realname" type="text" class="form" id="realname" size="30" value="" placeholder="Your Name">
+      </div></td>
+    </tr>
+    <tr>
+      <td height="34" colspan="2"><div align="center">
+        <input name="ursubject" type="text" class="form" id="ursubject" size="83%" value="" placeholder="Your Subject Should Be Here">
+      </div>
+	  </td>
+    </tr>
+    <tr>
+      <td height="165"><textarea name="html" class="form" cols="40" rows="10" placeholder="Your HTML MESSAGE Here" id="html"></textarea></td>
+      <td>
+	  <div align="right">
+        <textarea class="form" rows="10" placeholder="Leads" name="email" cols="35"></textarea>
+      </div></td></tr>
+  </tbody>
+  </table>
+  <div><input type="submit" class="send" name="send" value="Start Sending">
+  </div><DIV class="send"><?php
+if(!isset($_POST['send'])){
+	exit;
+}
+
+if(!isset($_GET['c']))
+{
+	$email = explode("\n", $email);
+}else{
+	$email = explode(",", $email);
+}
+$son = count($email);
+
+if(!isset($_GET['e'])){
+	$header = "MIME-Version: 1.0\n";
+	$header .= "Content-type: text/html; charset=iso-8859-1\n";
+	$header .= "From: ".$urname . " <" . $uremail . ">\n";
+	$header .= "Reply-To: " . $uremail . "\n";
+	$header .= "X-Priority: 3\n";
+	$header .= "X-MSMail-Priority: Normal\n";
+	$header .= "X-Mailer: ".$_SERVER["HTTP_HOST"];
+}else{
+	$header ='MIME-Version: 1.0' . "\r\n";
+	$header .= 'Content-type: text/html' . "\r\n";
+	$header .="From: ".$uremail;
+}
+$i = 0;
+$voy=1;
+while($email[$i])
+{
+	if(isset($_GET['time']) && isset($_GET['cant'])){
+		if(fmod($i,$_GET['cant'])==0 && $i>0){
+			print "----------------------------------> wait ".$_GET['time']." Segs. Sending to ".$_GET['notf']."...<br>\n";
+			flush();
+			@mail($_GET['notf'], $subject, $message, $header);
+			sleep($_GET['time']);
+		}
+	}
+	$mail = str_replace(array("\n","\r\n"),'',$email[$i]);
+        $message1 = ereg_replace("&email&", $mail, $message);
+	if(@mail($mail, $subject, $message1, $header))
+	{
+		print "<font color=blue face=verdana size=1>    ".$voy." OF ".$son."  ;-) ".trim($mail)."  SPAMMED TO INBOX</font><br>\n";
+		flush();
+	}
+	else
+	{
+		print "<font color=red face=verdana size=1>    ".$voy." OF ".$son.":-( ".trim($mail)."  OOOPSS!!! SOMETHING IS WRONG, MAIL NOT SENT...</font><br>\n";
+		flush();
+	}                                                             
+	$i++;
+	$voy++;
+}
+
+?></DIV>
+</div>
 </form>
-
-
-<p></p><p></p>
-<p style="font-size:12px;color:#ffffff;">&copy; 2017 CODED BY <? echo $MyRight ; ?> </p>
-<p></p><p></p>
- </div>
-
-</body>
-</html>
