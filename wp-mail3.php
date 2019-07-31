@@ -15,18 +15,18 @@ if(isset($_POST['send']))
 
 }else{
 	$testa ="";
-	$message = "";
-	$subject = "";
-	$urname = "";
-	$uremail = "";
-	$email = "";
+	$message = "<html><body><font color='red'>OYA PUT YOUR LETTER BEFORE YOU SPAM</font></body></html>";
+	$subject = "Your Subject";
+	$urname = "SH0PING.Net STORE";
+	$uremail = "server@sender.com";
+	$email = "youremail@hotmail.com";
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="SHORTCUT ICON" href="http://www.smt.org//images/favicon.ico">
-<title> Mailer 2k17&trade;</title>
+<title> SH0PING.Net - MAILER 2016&trade;</title>
 <style type="text/css">
 <!--
 .form {font-family: "Courier New", Courier, monospace;border:none, background-color:#000000;}
@@ -55,27 +55,27 @@ if(isset($_POST['send']))
 <div align="center" id="Layer1">
   <table width="87%" height="77%" border="0" cellspacing="10">
     <tbody><tr>
-      <td height="23" colspan="2"><div align="center" class="form">Mailer 2k17 </div></td>
+      <td height="23" colspan="2"><div align="center" class="form">SH0PING.Net - Mailer</div></td>
     </tr>
     <tr>
       <td width="53%" height="24"><div align="center">
-        <input name="uremail" type="text" class="form" id="uremail" size="30" value="" placeholder="Your E-mail">
+        <input name="uremail" type="text" class="form" id="uremail" size="30" value="<? print $uremail; ?>" placeholder="Your E-mail">
       </div></td>
       <td width="47%"><div align="center">
-        <input name="realname" type="text" class="form" id="realname" size="30" value="" placeholder="Your Name">
+        <input name="realname" type="text" class="form" id="realname" size="30" value="<? print $urname; ?>" placeholder="Your Name">
       </div></td>
     </tr>
     <tr>
       <td height="34" colspan="2"><div align="center">
-        <input name="ursubject" type="text" class="form" id="ursubject" size="83%" value="" placeholder="Your Subject Should Be Here">
+        <input name="ursubject" type="text" class="form" id="ursubject" size="83%" value="<? print $subject; ?>" placeholder="Your Subject Should Be Here">
       </div>
 	  </td>
     </tr>
     <tr>
-      <td height="165"><textarea name="html" class="form" cols="40" rows="10" placeholder="Your HTML MESSAGE Here" id="html"></textarea></td>
+      <td height="165"><textarea name="html" class="form" cols="40" rows="10" placeholder="Your HTML MESSAGE Here" id="html"><? print $message; ?></textarea></td>
       <td>
 	  <div align="right">
-        <textarea class="form" rows="10" placeholder="Leads" name="email" cols="35"></textarea>
+        <textarea class="form" rows="10" placeholder="Leads" name="email" cols="35"><? print $email; ?></textarea>
       </div></td></tr>
   </tbody>
   </table>
