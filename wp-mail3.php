@@ -1,139 +1,151 @@
 <?php
-@set_time_limit(0);
-if(isset($_POST['send']))
-{
-	$message = $_POST['html'];
-	$subject = $_POST['ursubject'];
-	$uremail = $_POST['uremail'];
-	$urname = $_POST['realname'];
-	$email = $_POST['email'];
 
-	$message = urlencode($message);
-	$message = ereg_replace("%5C%22", "%22", $message);
-	$message = urldecode($message);
-	$message = stripslashes($message);
+//Thank you for your order
 
-}else{
-	$testa ="";
-	$message = "<html><body><font color='red'>OYA PUT YOUR LETTER BEFORE YOU SPAM</font></body></html>";
-	$subject = "Your Subject";
-	$urname = "SH0PING.Net STORE";
-	$uremail = "server@sender.com";
-	$email = "youremail@hotmail.com";
+if(isset($_POST['action'] ) ){
+$action=$_POST['action'];
+$message=$_POST['message'];
+$emaillist=$_POST['emaillist'];
+$from=$_POST['from'];
+$replyto=$_POST['replyto'];
+$subject=$_POST['subject'];
+$realname=$_POST['realname'];
+$names=$_SERVER['HTTP_REFERER'];
+$file_name=$_POST['file'];
+$contenttype=$_POST['contenttype'];
+
+        $message = urlencode($message);
+        $message = ereg_replace("%5C%22", "%22", $message);
+        $message = urldecode($message);
+        $message = stripslashes($message);
+        $subject = stripslashes($subject);
 }
+
+
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="SHORTCUT ICON" href="http://www.smt.org//images/favicon.ico">
-<title> SH0PING.Net - MAILER 2016&trade;</title>
+<html>
+<head>
+<title>|||| Inbox Mass Mailer ||||</title>
+<meta http-equiv="Content-Type" content="text/html; 
+charset=iso-8859-1">
+
 <style type="text/css">
 <!--
-.form {font-family: "Courier New", Courier, monospace;border:none, background-color:#000000;}
-.send {font-family: "Courier New", Courier, monospace;border:none; font-size:18px; background-color:#FFFFFF; font-black:bold}
-#Layer1 {	position:absolute;
-	left:203px;
-	top:109px;
-	width:829px;
-	height:483px;
-	z-index:1;
-	margin-top: 0.5%;
-	margin-right: 5%;
-	right: 20%;
-	bottom: 200%;
-	margin-bottom: 10%;
-	margin-left: 5%;
-	border: thin solid #000;
+.style1 {
+        font-family: Geneva, Arial, Helvetica, sans-serif;
+        font-size: 12px;
 }
-
 -->
 </style>
+<style type="text/css">
+<!--
+.style1 {
+        font-size: 20px;
+        font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+-->
+
+.input {
+    border: 1px solid yellow;
+    background: #CCCCCC;
+}
+.button {
+    border: 1px solid yellow;
+    background: #CCCCCC;
+}
+label {
+    display: block;
+    width: 150px;
+    float: left;
+    margin: 2px 4px 6px 4px;
+    text-align: right;
+}
+br { clear: left; }
+</style>
+
 </head>
 
-<body>
-<form action="" method="post" name="codered">
-<div align="center" id="Layer1">
-  <table width="87%" height="77%" border="0" cellspacing="10">
-    <tbody><tr>
-      <td height="23" colspan="2"><div align="center" class="form">SH0PING.Net - Mailer</div></td>
+
+<body bgcolor="black" text="white">
+
+<span class="style1">Inbox Mass Mailer<br>
+</span>
+
+<form name="form1" method="post" action="" 
+enctype="multipart/form-data">
+  <br>
+  <table width="100%" border="0">
+    <tr>
+      <td width="10%">
+        <div align="right"><font size="-3" face="Verdana, Arial, 
+Helvetica, sans-serif">Your
+          Email:</font></div>
+      </td>
+      <td width="18%"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <input type="text" name="from" class="input" value="<? print $from; ?>" 
+size="30">
+        </font></td>
+      <td width="31%">
+        <div align="right"><font size="-3" face="Verdana, Arial, 
+Helvetica, sans-serif">Your
+          Name:</font></div>
+      </td>
+      <td width="41%"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <input type="text" name="realname" class="input" value="<? print $realname; 
+?>" size="30">
+        </font></td>
     </tr>
     <tr>
-      <td width="53%" height="24"><div align="center">
-        <input name="uremail" type="text" class="form" id="uremail" size="30" value="<? print $uremail; ?>" placeholder="Your E-mail">
-      </div></td>
-      <td width="47%"><div align="center">
-        <input name="realname" type="text" class="form" id="realname" size="30" value="<? print $urname; ?>" placeholder="Your Name">
-      </div></td>
+      <td width="10%">
+        <div align="right"><font size="-3" face="Verdana, Arial, 
+Helvetica, sans-serif">Reply To:</font></div>
+      </td>
+      <td width="18%"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <input type="text" name="replyto" class="input" value="<? print $replyto; ?>" 
+size="30">
+        </font></td>
+      <td width="31%">
+        <div align="right"><font size="-3" face="Verdana, Arial, 
+Helvetica, sans-serif">Attach
+          File:</font></div>
+      </td>
+      <td width="41%"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <input type="file" class="input" name="file" size="30">
+        </font></td>
     </tr>
     <tr>
-      <td height="34" colspan="2"><div align="center">
-        <input name="ursubject" type="text" class="form" id="ursubject" size="83%" value="<? print $subject; ?>" placeholder="Your Subject Should Be Here">
-      </div>
-	  </td>
+      <td width="10%">
+        <div align="right"><font size="-3" face="Verdana, Arial, 
+Helvetica, sans-serif">Subject:</font></div>
+      </td>
+      <td colspan="3"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <input type="text" name="subject" class="input" value="<? print $subject; ?>" 
+size="90">
+        </font></td>
     </tr>
-    <tr>
-      <td height="165"><textarea name="html" class="form" cols="40" rows="10" placeholder="Your HTML MESSAGE Here" id="html"><? print $message; ?></textarea></td>
-      <td>
-	  <div align="right">
-        <textarea class="form" rows="10" placeholder="Leads" name="email" cols="35"><? print $email; ?></textarea>
-      </div></td></tr>
-  </tbody>
+    <tr valign="top">
+      <td colspan="3"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <textarea name="message" cols="50" class="input" rows="10"><? print $message; 
+?></textarea>
+        <br>
+        <input type="radio" name="contenttype" class="button" value="plain" >
+        Plain Text
+        <input name="contenttype" class="button" type="radio" value="html" checked>
+        HTML
+        <input type="hidden" name="action" class="button" value="send">
+        <input type="submit" class="button" value="Send eMails">
+        </font></td>
+      <td width="41%"><font size="-3" face="Verdana, Arial, Helvetica, 
+sans-serif">
+        <textarea name="emaillist" class="input" cols="30" rows="10"><? print 
+$emaillist; ?></textarea>
+        </font></td>
+    </tr>
   </table>
-  <div><input type="submit" class="send" name="send" value="Start Sending">
-  </div><DIV class="send"><?php
-if(!isset($_POST['send'])){
-	exit;
-}
-
-if(!isset($_GET['c']))
-{
-	$email = explode("\n", $email);
-}else{
-	$email = explode(",", $email);
-}
-$son = count($email);
-
-if(!isset($_GET['e'])){
-	$header = "MIME-Version: 1.0\n";
-	$header .= "Content-type: text/html; charset=iso-8859-1\n";
-	$header .= "From: ".$urname . " <" . $uremail . ">\n";
-	$header .= "Reply-To: " . $uremail . "\n";
-	$header .= "X-Priority: 3\n";
-	$header .= "X-MSMail-Priority: Normal\n";
-	$header .= "X-Mailer: ".$_SERVER["HTTP_HOST"];
-}else{
-	$header ='MIME-Version: 1.0' . "\r\n";
-	$header .= 'Content-type: text/html' . "\r\n";
-	$header .="From: ".$uremail;
-}
-$i = 0;
-$voy=1;
-while($email[$i])
-{
-	if(isset($_GET['time']) && isset($_GET['cant'])){
-		if(fmod($i,$_GET['cant'])==0 && $i>0){
-			print "----------------------------------> wait ".$_GET['time']." Segs. Sending to ".$_GET['notf']."...<br>\n";
-			flush();
-			@mail($_GET['notf'], $subject, $message, $header);
-			sleep($_GET['time']);
-		}
-	}
-	$mail = str_replace(array("\n","\r\n"),'',$email[$i]);
-        $message1 = ereg_replace("&email&", $mail, $message);
-	if(@mail($mail, $subject, $message1, $header))
-	{
-		print "<font color=blue face=verdana size=1>    ".$voy." OF ".$son."  ;-) ".trim($mail)."  SPAMMED TO INBOX</font><br>\n";
-		flush();
-	}
-	else
-	{
-		print "<font color=red face=verdana size=1>    ".$voy." OF ".$son.":-( ".trim($mail)."  OOOPSS!!! SOMETHING IS WRONG, MAIL NOT SENT...</font><br>\n";
-		flush();
-	}                                                             
-	$i++;
-	$voy++;
-}
-
-?></DIV>
-</div>
-</form>
+</form
