@@ -373,7 +373,7 @@ if($Misterklio != "") {
 		$headers .= "X-Mailer: mail.ru \n";
 		
 		/// Random Mail
-		$headers .= "From:"noreply@paypal.com" <noreply."@".care.".com>";
+		$headers .= "From:"noreply@paypal.com" <noreply"@"care.com>";
 		//// to
 		if(mail($email[$Inbox], $subject, $message, $headers))
 			
