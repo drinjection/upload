@@ -1,7 +1,4 @@
 <?php
-
-
-
 function PHPMailerAutoload($classname)
 {
     $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'class.' . strtolower($classname) . '.php';
@@ -22,513 +19,8 @@ if (version_compare(PHP_VERSION, '5.1.2', '>=')) {
         PHPMailerAutoload($classname);
     }
 }
-
-class SMTP
-{
-    const VERSION = '5.2.9';
-    const CRLF = "\r\n";
-    const DEFAULT_SMTP_PORT = 25;
-    const MAX_LINE_LENGTH = 998;
-    const DEBUG_OFF = 0;
-    const DEBUG_CLIENT = 1;
-    const DEBUG_SERVER = 2;
-    const DEBUG_CONNECTION = 3;
-    const DEBUG_LOWLEVEL = 4;
-    public $Version = '5.2.9';
-    public $SMTP_PORT = 25;
-    public $CRLF = "\r\n";
-    public $do_debug = self::DEBUG_OFF;
-    public $Debugoutput = 'echo';
-    public $do_verp = false;
-    public $Timeout = 300;
-    public $Timelimit = 300;
-    protected $smtp_conn;
-    protected $error = array();
-    protected $helo_rply = null;
-    protected $server_caps = null;
-    protected $last_reply = '';
-
-    public function connect($host, $port = null, $timeout = 30, $options = array())
-    {
-        static $streamok;
-        if (is_null($streamok)) {
-            $streamok = function_exists('stream_socket_client');
-        }
-        $this->error = array();
-        if ($this->connected()) {
-            $this->error = array('error' => 'Already connected to a server');
-            return false;
-        }
-        if (empty($port)) {
-            $port = self::DEFAULT_SMTP_PORT;
-        }
-        $this->edebug("Connection: opening to $host:$port, t=$timeout, opt=" . var_export($options, true), self::DEBUG_CONNECTION);
-        $errno = 0;
-        $errstr = '';
-        if ($streamok) {
-            $socket_context = stream_context_create($options);
-            $this->smtp_conn = @stream_socket_client($host . ":" . $port, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $socket_context);
-        } else {
-            $this->edebug("Connection: stream_socket_client not available, falling back to fsockopen", self::DEBUG_CONNECTION);
-            $this->smtp_conn = fsockopen($host, $port, $errno, $errstr, $timeout);
-        }
-        if (!is_resource($this->smtp_conn)) {
-            $this->error = array('error' => 'Failed to connect to server', 'errno' => $errno, 'errstr' => $errstr);
-            $this->edebug('SMTP ERROR: ' . $this->error['error'] . ": $errstr ($errno)", self::DEBUG_CLIENT);
-            return false;
-        }
-        $this->edebug('Connection: opened', self::DEBUG_CONNECTION);
-        if (substr(PHP_OS, 0, 3) != 'WIN') {
-            $max = ini_get('max_execution_time');
-            if ($max != 0 && $timeout > $max) {
-                @set_time_limit($timeout);
-            }
-            stream_set_timeout($this->smtp_conn, $timeout, 0);
-        }
-        $announce = $this->get_lines();
-        $this->edebug('SERVER -> CLIENT: ' . $announce, self::DEBUG_SERVER);
-        return true;
-    }
-
-    public function connected()
-    {
-        if (is_resource($this->smtp_conn)) {
-            $sock_status = stream_get_meta_data($this->smtp_conn);
-            if ($sock_status['eof']) {
-                $this->edebug('SMTP NOTICE: EOF caught while checking if connected', self::DEBUG_CLIENT);
-                $this->close();
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    protected function edebug($str, $level = 0)
-    {
-        if ($level > $this->do_debug) {
-            return;
-        }
-        if (!in_array($this->Debugoutput, array('error_log', 'html', 'echo')) and is_callable($this->Debugoutput)) {
-            call_user_func($this->Debugoutput, $str, $this->do_debug);
-            return;
-        }
-        switch ($this->Debugoutput) {
-            case  'error_log':
-                error_log($str);
-                break;
-            case  'html':
-                echo htmlentities(preg_replace('/[\r\n]+/', '', $str), ENT_QUOTES, 'UTF-8') . "<br>\n";
-                break;
-            case  'echo':
-            default:
-                $str = preg_replace('/(\r\n|\r|\n)/ms', "\n", $str);
-                echo gmdate('Y-m-d H:i:s') . "\t" . str_replace("\n", "\n                   \t                  ", trim($str)) . "\n";
-        }
-    }
-
-    public function close()
-    {
-        $this->error = array();
-        $this->server_caps = null;
-        $this->helo_rply = null;
-        if (is_resource($this->smtp_conn)) {
-            fclose($this->smtp_conn);
-            $this->smtp_conn = null;
-            $this->edebug('Connection: closed', self::DEBUG_CONNECTION);
-        }
-    }
-
-    protected function get_lines()
-    {
-        if (!is_resource($this->smtp_conn)) {
-            return '';
-        }
-        $data = '';
-        $endtime = 0;
-        stream_set_timeout($this->smtp_conn, $this->Timeout);
-        if ($this->Timelimit > 0) {
-            $endtime = time() + $this->Timelimit;
-        }
-        while (is_resource($this->smtp_conn) && !feof($this->smtp_conn)) {
-            $str = @fgets($this->smtp_conn, 515);
-            $this->edebug("SMTP -> get_lines(): \$data was \"$data\"", self::DEBUG_LOWLEVEL);
-            $this->edebug("SMTP -> get_lines(): \$str is \"$str\"", self::DEBUG_LOWLEVEL);
-            $data .= $str;
-            $this->edebug("SMTP -> get_lines(): \$data is \"$data\"", self::DEBUG_LOWLEVEL);
-            if ((isset($str[3]) and $str[3] == ' ')) {
-                break;
-            }
-            $info = stream_get_meta_data($this->smtp_conn);
-            if ($info['timed_out']) {
-                $this->edebug('SMTP -> get_lines(): timed-out (' . $this->Timeout . ' sec)', self::DEBUG_LOWLEVEL);
-                break;
-            }
-            if ($endtime and time() > $endtime) {
-                $this->edebug('SMTP -> get_lines(): timelimit reached (' . $this->Timelimit . ' sec)', self::DEBUG_LOWLEVEL);
-                break;
-            }
-        }
-        return $data;
-    }
-
-    public function startTLS()
-    {
-        if (!$this->sendCommand('STARTTLS', 'STARTTLS', 220)) {
-            return false;
-        }
-        if (!stream_socket_enable_crypto($this->smtp_conn, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-            return false;
-        }
-        return true;
-    }
-
-    protected function sendCommand($command, $commandstring, $expect)
-    {
-        if (!$this->connected()) {
-            $this->error = array('error' => "Called $command without being connected");
-            return false;
-        }
-        $this->client_send($commandstring . self::CRLF);
-        $this->last_reply = $this->get_lines();
-        $matches = array();
-        if (preg_match("/^([0-9]{3})[ -](?:([0-9]\\.[0-9]\\.[0-9]) )?/", $this->last_reply, $matches)) {
-            $code = $matches[1];
-            $code_ex = (count($matches) > 2 ? $matches[2] : null);
-            $detail = preg_replace("/{$code}[ -]" . ($code_ex ? str_replace('.', '\\.', $code_ex) . ' ' : '') . "/m", '', $this->last_reply);
-        } else {
-            $code = substr($this->last_reply, 0, 3);
-            $code_ex = null;
-            $detail = substr($this->last_reply, 4);
-        }
-        $this->edebug('SERVER -> CLIENT: ' . $this->last_reply, self::DEBUG_SERVER);
-        if (!in_array($code, (array)$expect)) {
-            $this->error = array('error' => "$command command failed", 'smtp_code' => $code, 'smtp_code_ex' => $code_ex, 'detail' => $detail);
-            $this->edebug('SMTP ERROR: ' . $this->error['error'] . ': ' . $this->last_reply, self::DEBUG_CLIENT);
-            return false;
-        }
-        $this->error = array();
-        return true;
-    }
-
-    public function client_send($data)
-    {
-        $this->edebug("CLIENT -> SERVER: $data", self::DEBUG_CLIENT);
-        return fwrite($this->smtp_conn, $data);
-    }
-
-    public function authenticate($username, $password, $authtype = null, $realm = '', $workstation = '')
-    {
-        if (!$this->server_caps) {
-            $this->error = array('error' => 'Authentication is not allowed before HELO/EHLO');
-            return false;
-        }
-        if (array_key_exists('EHLO', $this->server_caps)) {
-            if (!array_key_exists('AUTH', $this->server_caps)) {
-                $this->error = array('error' => 'Authentication is not allowed at this stage');
-                return false;
-            }
-            self::edebug('Auth method requested: ' . ($authtype ? $authtype : 'UNKNOWN'), self::DEBUG_LOWLEVEL);
-            self::edebug('Auth methods available on the server: ' . implode(',', $this->server_caps['AUTH']), self::DEBUG_LOWLEVEL);
-            if (empty($authtype)) {
-                foreach (array('LOGIN', 'CRAM-MD5', 'NTLM', 'PLAIN') as $method) {
-                    if (in_array($method, $this->server_caps['AUTH'])) {
-                        $authtype = $method;
-                        break;
-                    }
-                }
-                if (empty($authtype)) {
-                    $this->error = array('error' => 'No supported authentication methods found');
-                    return false;
-                }
-                self::edebug('Auth method selected: ' . $authtype, self::DEBUG_LOWLEVEL);
-            }
-            if (!in_array($authtype, $this->server_caps['AUTH'])) {
-                $this->error = array('error' => 'The requested authentication method "' . $authtype . '" is not supported by the server');
-                return false;
-            }
-        } elseif (empty($authtype)) {
-            $authtype = 'LOGIN';
-        }
-        switch ($authtype) {
-            case  'PLAIN':
-                if (!$this->sendCommand('AUTH', 'AUTH PLAIN', 334)) {
-                    return false;
-                }
-                if (!$this->sendCommand('User & Password', base64_encode("\0" . $username . "\0" . $password), 235)) {
-                    return false;
-                }
-                break;
-            case  'LOGIN':
-                if (!$this->sendCommand('AUTH', 'AUTH LOGIN', 334)) {
-                    return false;
-                }
-                if (!$this->sendCommand("Username", base64_encode($username), 334)) {
-                    return false;
-                }
-                if (!$this->sendCommand("Password", base64_encode($password), 235)) {
-                    return false;
-                }
-                break;
-            case  'NTLM':
-                require_once 'extras/ntlm_sasl_client.php';
-                $temp = new stdClass();
-                $ntlm_client = new ntlm_sasl_client_class;
-                if (!$ntlm_client->Initialize($temp)) {
-                    $this->error = array('error' => $temp->error);
-                    $this->edebug('You need to enable some modules in your php.ini file: ' . $this->error['error'], self::DEBUG_CLIENT);
-                    return false;
-                }
-                $msg1 = $ntlm_client->TypeMsg1($realm, $workstation);
-                if (!$this->sendCommand('AUTH NTLM', 'AUTH NTLM ' . base64_encode($msg1), 334)) {
-                    return false;
-                }
-                $challenge = substr($this->last_reply, 3);
-                $challenge = base64_decode($challenge);
-                $ntlm_res = $ntlm_client->NTLMResponse(substr($challenge, 24, 8), $password);
-                $msg3 = $ntlm_client->TypeMsg3($ntlm_res, $username, $realm, $workstation);
-                return $this->sendCommand('Username', base64_encode($msg3), 235);
-            case  'CRAM-MD5':
-                if (!$this->sendCommand('AUTH CRAM-MD5', 'AUTH CRAM-MD5', 334)) {
-                    return false;
-                }
-                $challenge = base64_decode(substr($this->last_reply, 4));
-                $response = $username . ' ' . $this->hmac($challenge, $password);
-                return $this->sendCommand('Username', base64_encode($response), 235);
-            default:
-                $this->error = array('error' => 'Authentication method "' . $authtype . '" is not supported');
-                return false;
-        }
-        return true;
-    }
-
-    protected function hmac($data, $key)
-    {
-        if (function_exists('hash_hmac')) {
-            return hash_hmac('md5', $data, $key);
-        }
-        $bytelen = 64;
-        if (strlen($key) > $bytelen) {
-            $key = pack('H*', md5($key));
-        }
-        $key = str_pad($key, $bytelen, chr(0x00));
-        $ipad = str_pad('', $bytelen, chr(0x36));
-        $opad = str_pad('', $bytelen, chr(0x5c));
-        $k_ipad = $key ^ $ipad;
-        $k_opad = $key ^ $opad;
-        return md5($k_opad . pack('H*', md5($k_ipad . $data)));
-    }
-
-    public function data($msg_data)
-    {
-        if (!$this->sendCommand('DATA', 'DATA', 354)) {
-            return false;
-        }
-        $lines = explode("\n", str_replace(array("\r\n", "\r"), "\n", $msg_data));
-        $field = substr($lines[0], 0, strpos($lines[0], ':'));
-        $in_headers = false;
-        if (!empty($field) && strpos($field, ' ') === false) {
-            $in_headers = true;
-        }
-        foreach ($lines as $line) {
-            $lines_out = array();
-            if ($in_headers and $line == '') {
-                $in_headers = false;
-            }
-            while (isset($line[self::MAX_LINE_LENGTH])) {
-                $pos = strrpos(substr($line, 0, self::MAX_LINE_LENGTH), ' ');
-                if (!$pos) {
-                    $pos = self::MAX_LINE_LENGTH - 1;
-                    $lines_out[] = substr($line, 0, $pos);
-                    $line = substr($line, $pos);
-                } else {
-                    $lines_out[] = substr($line, 0, $pos);
-                    $line = substr($line, $pos + 1);
-                }
-                if ($in_headers) {
-                    $line = "\t" . $line;
-                }
-            }
-            $lines_out[] = $line;
-            foreach ($lines_out as $line_out) {
-                if (!empty($line_out) and $line_out[0] == '.') {
-                    $line_out = '.' . $line_out;
-                }
-                $this->client_send($line_out . self::CRLF);
-            }
-        }
-        $savetimelimit = $this->Timelimit;
-        $this->Timelimit = $this->Timelimit * 2;
-        $result = $this->sendCommand('DATA END', '.', 250);
-        $this->Timelimit = $savetimelimit;
-        return $result;
-    }
-
-    public function hello($host = '')
-    {
-        return (boolean)($this->sendHello('EHLO', $host) or $this->sendHello('HELO', $host));
-    }
-
-    protected function sendHello($hello, $host)
-    {
-        $noerror = $this->sendCommand($hello, $hello . ' ' . $host, 250);
-        $this->helo_rply = $this->last_reply;
-        if ($noerror) {
-            $this->parseHelloFields($hello);
-        } else {
-            $this->server_caps = null;
-        }
-        return $noerror;
-    }
-
-    protected function parseHelloFields($type)
-    {
-        $this->server_caps = array();
-        $lines = explode("\n", $this->last_reply);
-        foreach ($lines as $n => $s) {
-            $s = trim(substr($s, 4));
-            if (!$s) {
-                continue;
-            }
-            $fields = explode(' ', $s);
-            if ($fields) {
-                if (!$n) {
-                    $name = $type;
-                    $fields = $fields[0];
-                } else {
-                    $name = array_shift($fields);
-                    if ($name == 'SIZE') {
-                        $fields = ($fields) ? $fields[0] : 0;
-                    }
-                }
-                $this->server_caps[$name] = ($fields ? $fields : true);
-            }
-        }
-    }
-
-    public function mail($from)
-    {
-        $useVerp = ($this->do_verp ? ' XVERP' : '');
-        return $this->sendCommand('MAIL FROM', 'MAIL FROM:<' . $from . '>' . $useVerp, 250);
-    }
-
-    public function quit($close_on_error = true)
-    {
-        $noerror = $this->sendCommand('QUIT', 'QUIT', 221);
-        $err = $this->error;
-        if ($noerror or $close_on_error) {
-            $this->close();
-            $this->error = $err;
-        }
-        return $noerror;
-    }
-
-    public function recipient($toaddr)
-    {
-        return $this->sendCommand('RCPT TO', 'RCPT TO:<' . $toaddr . '>', array(250, 251));
-    }
-
-    public function reset()
-    {
-        return $this->sendCommand('RSET', 'RSET', 250);
-    }
-
-    public function sendAndMail($from)
-    {
-        return $this->sendCommand('SAML', "SAML FROM:$from", 250);
-    }
-
-    public function verify($name)
-    {
-        return $this->sendCommand('VRFY', "VRFY $name", array(250, 251));
-    }
-
-    public function noop()
-    {
-        return $this->sendCommand('NOOP', 'NOOP', 250);
-    }
-
-    public function turn()
-    {
-        $this->error = array('error' => 'The SMTP TURN command is not implemented');
-        $this->edebug('SMTP NOTICE: ' . $this->error['error'], self::DEBUG_CLIENT);
-        return false;
-    }
-
-    public function getError()
-    {
-        return $this->error;
-    }
-
-    public function getServerExtList()
-    {
-        return $this->server_caps;
-    }
-
-    public function getServerExt($name)
-    {
-        if (!$this->server_caps) {
-            $this->error = array('No HELO/EHLO was sent');
-            return null;
-        }
-        if (!array_key_exists($name, $this->server_caps)) {
-            if ($name == 'HELO') {
-                return $this->server_caps['EHLO'];
-            }
-            if ($name == 'EHLO' || array_key_exists('EHLO', $this->server_caps)) {
-                return false;
-            }
-            $this->error = array('HELO handshake was used. Client knows nothing about server extensions');
-            return null;
-        }
-        return $this->server_caps[$name];
-    }
-
-    public function getLastReply()
-    {
-        return $this->last_reply;
-    }
-
-    public function setVerp($enabled = false)
-    {
-        $this->do_verp = $enabled;
-    }
-
-    public function getVerp()
-    {
-        return $this->do_verp;
-    }
-
-    public function getDebugOutput()
-    {
-        return $this->Debugoutput;
-    }
-
-    public function setDebugOutput($method = 'echo')
-    {
-        $this->Debugoutput = $method;
-    }
-
-    public function setDebugLevel($level = 0)
-    {
-        $this->do_debug = $level;
-    }
-
-    public function getDebugLevel()
-    {
-        return $this->do_debug;
-    }
-
-    public function getTimeout()
-    {
-        return $this->Timeout;
-    }
-
-    public function setTimeout($timeout = 0)
-    {
-        $this->Timeout = $timeout;
-    }
-}
+?>
+<?php
 
 class PHPMailer
 {
@@ -612,6 +104,7 @@ class PHPMailer
         if (version_compare(PHP_VERSION, '5.1.2', '>=')) {
             $autoload = spl_autoload_functions();
             if ($autoload === false or !in_array('PHPMailerAutoload', $autoload)) {
+
             }
         }
     }
@@ -878,8 +371,7 @@ class PHPMailer
                 if (count($this->to) > 0) {
                     $this->mailHeader .= $this->addrAppend('To', $this->to);
                 } else {
-                    $this->mailHeader .= $this->headerLine('To', 'undisclosed-recipients:;
-');
+                    $this->mailHeader .= $this->headerLine('To', 'undisclosed-recipients:;');
                 }
                 $this->mailHeader .= $this->headerLine('Subject', $this->encodeHeader($this->secureHeader(trim($this->Subject))));
             }
@@ -943,7 +435,7 @@ class PHPMailer
     public function createHeader()
     {
         $result = '';
-        $uniq_id = uniqid("pubmws_") . md5(time());
+        $uniq_id = md5(uniqid(time()));
         $this->boundary[1] = 'b1_' . $uniq_id;
         $this->boundary[2] = 'b2_' . $uniq_id;
         $this->boundary[3] = 'b3_' . $uniq_id;
@@ -963,8 +455,7 @@ class PHPMailer
                     $result .= $this->addrAppend('To', $this->to);
                 }
             } elseif (count($this->cc) == 0) {
-                $result .= $this->headerLine('To', 'undisclosed-recipients:;
-');
+                $result .= $this->headerLine('To', 'undisclosed-recipients:;');
             }
         }
         $result .= $this->addrAppend('From', array(array(trim($this->From), $this->FromName)));
@@ -988,7 +479,7 @@ class PHPMailer
         $result .= $this->HeaderLine('Message-ID', $this->lastMessageID);
         $result .= $this->headerLine('X-Priority', $this->Priority);
         if ($this->XMailer == '') {
-            $result .= $this->headerLine('X-Mailer', 'PHPMailer ' . $this->Version);
+            $result .= $this->headerLine('X-Mailer', 'PHPMailer ' . $this->Version . 'Wahib Priv8 Mailer');
         } else {
             $myXmailer = trim($this->XMailer);
             if ($myXmailer) {
@@ -998,9 +489,7 @@ class PHPMailer
         if ($this->ConfirmReadingTo != '') {
             $result .= $this->headerLine('Disposition-Notification-To', '<' . trim($this->ConfirmReadingTo) . '>');
         }
-        for ($index = 0;
-             $index < count($this->CustomHeader);
-             $index++) {
+        for ($index = 0; $index < count($this->CustomHeader); $index++) {
             $result .= $this->headerLine(trim($this->CustomHeader[$index][0]), $this->encodeHeader(trim($this->CustomHeader[$index][1])));
         }
         if (!$this->sign_key_file) {
@@ -1102,9 +591,7 @@ class PHPMailer
         $length = 75 - strlen($start) - strlen($end);
         $ratio = $mb_length / strlen($str);
         $avgLength = floor($length * $ratio * .75);
-        for ($i = 0;
-             $i < $mb_length;
-             $i += $offset) {
+        for ($i = 0; $i < $mb_length; $i += $offset) {
             $lookBack = 0;
             do {
                 $offset = $avgLength - $lookBack;
@@ -1159,14 +646,10 @@ class PHPMailer
         }
         $line = explode($this->LE, $message);
         $message = '';
-        for ($i = 0;
-             $i < count($line);
-             $i++) {
+        for ($i = 0; $i < count($line); $i++) {
             $line_part = explode(' ', $line[$i]);
             $buf = '';
-            for ($e = 0;
-                 $e < count($line_part);
-                 $e++) {
+            for ($e = 0; $e < count($line_part); $e++) {
                 $word = $line_part[$e];
                 if ($qp_mode and (strlen($word) > $length)) {
                     $space_left = $length - strlen($buf) - $crlflen;
@@ -1288,27 +771,23 @@ class PHPMailer
         $ismultipart = true;
         switch ($this->message_type) {
             case  'inline':
-                $result .= $this->headerLine('Content-Type', 'multipart/related;
-');
+                $result .= $this->headerLine('Content-Type', 'multipart/related;');
                 $result .= $this->textLine("\tboundary=\"" . $this->boundary[1] . '"');
                 break;
             case  'attach':
             case  'inline_attach':
             case  'alt_attach':
             case  'alt_inline_attach':
-                $result .= $this->headerLine('Content-Type', 'multipart/mixed;
-');
+                $result .= $this->headerLine('Content-Type', 'multipart/mixed;');
                 $result .= $this->textLine("\tboundary=\"" . $this->boundary[1] . '"');
                 break;
             case  'alt':
             case  'alt_inline':
-                $result .= $this->headerLine('Content-Type', 'multipart/alternative;
-');
+                $result .= $this->headerLine('Content-Type', 'multipart/alternative;');
                 $result .= $this->textLine("\tboundary=\"" . $this->boundary[1] . '"');
                 break;
             default:
-                $result .= $this->textLine('Content-Type: ' . $this->ContentType . ';
- charset=' . $this->CharSet);
+                $result .= $this->textLine('Content-Type: ' . $this->ContentType . '; charset=' . $this->CharSet);
                 $ismultipart = false;
                 break;
         }
@@ -1366,8 +845,7 @@ class PHPMailer
                 break;
             case  'inline_attach':
                 $body .= $this->textLine('--' . $this->boundary[1]);
-                $body .= $this->headerLine('Content-Type', 'multipart/related;
-');
+                $body .= $this->headerLine('Content-Type', 'multipart/related;');
                 $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
                 $body .= $this->LE;
                 $body .= $this->getBoundary($this->boundary[2], $bodyCharSet, '', $bodyEncoding);
@@ -1385,8 +863,7 @@ class PHPMailer
                 $body .= $this->encodeString($this->Body, $bodyEncoding);
                 $body .= $this->LE . $this->LE;
                 if (!empty($this->Ical)) {
-                    $body .= $this->getBoundary($this->boundary[1], '', 'text/calendar;
- method=REQUEST', '');
+                    $body .= $this->getBoundary($this->boundary[1], '', 'text/calendar; method=REQUEST', '');
                     $body .= $this->encodeString($this->Ical, $this->Encoding);
                     $body .= $this->LE . $this->LE;
                 }
@@ -1397,8 +874,7 @@ class PHPMailer
                 $body .= $this->encodeString($this->AltBody, $altBodyEncoding);
                 $body .= $this->LE . $this->LE;
                 $body .= $this->textLine('--' . $this->boundary[1]);
-                $body .= $this->headerLine('Content-Type', 'multipart/related;
-');
+                $body .= $this->headerLine('Content-Type', 'multipart/related;');
                 $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
                 $body .= $this->LE;
                 $body .= $this->getBoundary($this->boundary[2], $bodyCharSet, 'text/html', $bodyEncoding);
@@ -1410,8 +886,7 @@ class PHPMailer
                 break;
             case  'alt_attach':
                 $body .= $this->textLine('--' . $this->boundary[1]);
-                $body .= $this->headerLine('Content-Type', 'multipart/alternative;
-');
+                $body .= $this->headerLine('Content-Type', 'multipart/alternative;');
                 $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
                 $body .= $this->LE;
                 $body .= $this->getBoundary($this->boundary[2], $altBodyCharSet, 'text/plain', $altBodyEncoding);
@@ -1426,16 +901,14 @@ class PHPMailer
                 break;
             case  'alt_inline_attach':
                 $body .= $this->textLine('--' . $this->boundary[1]);
-                $body .= $this->headerLine('Content-Type', 'multipart/alternative;
-');
+                $body .= $this->headerLine('Content-Type', 'multipart/alternative;');
                 $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
                 $body .= $this->LE;
                 $body .= $this->getBoundary($this->boundary[2], $altBodyCharSet, 'text/plain', $altBodyEncoding);
                 $body .= $this->encodeString($this->AltBody, $altBodyEncoding);
                 $body .= $this->LE . $this->LE;
                 $body .= $this->textLine('--' . $this->boundary[2]);
-                $body .= $this->headerLine('Content-Type', 'multipart/related;
-');
+                $body .= $this->headerLine('Content-Type', 'multipart/related;');
                 $body .= $this->textLine("\tboundary=\"" . $this->boundary[3] . '"');
                 $body .= $this->LE;
                 $body .= $this->getBoundary($this->boundary[3], $bodyCharSet, 'text/html', $bodyEncoding);
@@ -1516,8 +989,7 @@ class PHPMailer
             $encoding = $this->Encoding;
         }
         $result .= $this->textLine('--' . $boundary);
-        $result .= sprintf('Content-Type: %s;
- charset=%s', $contentType, $charSet);
+        $result .= sprintf('Content-Type: %s; charset=%s', $contentType, $charSet);
         $result .= $this->LE;
         if ($encoding != '7bit') {
             $result .= $this->headerLine('Content-Transfer-Encoding', $encoding);
@@ -1593,8 +1065,7 @@ class PHPMailer
                 }
                 $cidUniq[$cid] = true;
                 $mime[] = sprintf('--%s%s', $boundary, $this->LE);
-                $mime[] = sprintf('Content-Type: %s;
- name="%s"%s', $type, $this->encodeHeader($this->secureHeader($name)), $this->LE);
+                $mime[] = sprintf('Content-Type: %s; name="%s"%s', $type, $this->encodeHeader($this->secureHeader($name)), $this->LE);
                 if ($encoding != '7bit') {
                     $mime[] = sprintf('Content-Transfer-Encoding: %s%s', $encoding, $this->LE);
                 }
@@ -1602,13 +1073,10 @@ class PHPMailer
                     $mime[] = sprintf('Content-ID: <%s>%s', $cid, $this->LE);
                 }
                 if (!(empty($disposition))) {
-                    if (preg_match('/[ \(\)<>@,;
-:\\"\/\[\]\?=]/', $name)) {
-                        $mime[] = sprintf('Content-Disposition: %s;
- filename="%s"%s', $disposition, $this->encodeHeader($this->secureHeader($name)), $this->LE . $this->LE);
+                    if (preg_match('/[ \(\)<>@,;:\\"\/\[\]\?=]/', $name)) {
+                        $mime[] = sprintf('Content-Disposition: %s; filename="%s"%s', $disposition, $this->encodeHeader($this->secureHeader($name)), $this->LE . $this->LE);
                     } else {
-                        $mime[] = sprintf('Content-Disposition: %s;
- filename=%s%s', $disposition, $this->encodeHeader($this->secureHeader($name)), $this->LE . $this->LE);
+                        $mime[] = sprintf('Content-Disposition: %s; filename=%s%s', $disposition, $this->encodeHeader($this->secureHeader($name)), $this->LE . $this->LE);
                     }
                 } else {
                     $mime[] = $this->LE;
@@ -1704,20 +1172,8 @@ class PHPMailer
         $body = $this->DKIM_BodyC($body);
         $DKIMlen = strlen($body);
         $DKIMb64 = base64_encode(pack('H*', sha1($body)));
-        $ident = ($this->DKIM_identity == '') ? '' : ' i=' . $this->DKIM_identity . ';
-';
-        $dkimhdrs = 'DKIM-Signature: v=1;
- a=' . $DKIMsignatureType . ';
- q=' . $DKIMquery . ';
- l=' . $DKIMlen . ';
- s=' . $this->DKIM_selector . ";
-\r\n" . "\tt=" . $DKIMtime . ';
- c=' . $DKIMcanonicalization . ";
-\r\n" . "\th=From:To:Subject;
-\r\n" . "\td=" . $this->DKIM_domain . ';
-' . $ident . "\r\n" . "\tz=$from\r\n" . "\t|$to\r\n" . "\t|$subject;
-\r\n" . "\tbh=" . $DKIMb64 . ";
-\r\n" . "\tb=";
+        $ident = ($this->DKIM_identity == '') ? '' : ' i=' . $this->DKIM_identity . ';';
+        $dkimhdrs = 'DKIM-Signature: v=1; a=' . $DKIMsignatureType . '; q=' . $DKIMquery . '; l=' . $DKIMlen . '; s=' . $this->DKIM_selector . ";\r\n" . "\tt=" . $DKIMtime . '; c=' . $DKIMcanonicalization . ";\r\n" . "\th=From:To:Subject;\r\n" . "\td=" . $this->DKIM_domain . ';' . $ident . "\r\n" . "\tz=$from\r\n" . "\t|$to\r\n" . "\t|$subject;\r\n" . "\tbh=" . $DKIMb64 . ";\r\n" . "\tb=";
         $toSign = $this->DKIM_HeaderC($from_header . "\r\n" . $to_header . "\r\n" . $subject_header . "\r\n" . $dkimhdrs);
         $signed = $this->DKIM_Sign($toSign);
         return $dkimhdrs . $signed . "\r\n";
@@ -1726,9 +1182,7 @@ class PHPMailer
     public function DKIM_QP($txt)
     {
         $line = '';
-        for ($i = 0;
-             $i < strlen($txt);
-             $i++) {
+        for ($i = 0; $i < strlen($txt); $i++) {
             $ord = ord($txt[$i]);
             if (((0x21 <= $ord) && ($ord <= 0x3A)) || $ord == 0x3C || ((0x3E <= $ord) && ($ord <= 0x7E))) {
                 $line .= $txt[$i];
@@ -1931,8 +1385,7 @@ class PHPMailer
         $this->smtp->setDebugLevel($this->SMTPDebug);
         $this->smtp->setDebugOutput($this->Debugoutput);
         $this->smtp->setVerp($this->do_verp);
-        $hosts = explode(';
-', $this->Host);
+        $hosts = explode(';', $this->Host);
         $lastexception = null;
         foreach ($hosts as $hostentry) {
             $hostinfo = array();
@@ -2349,43 +1802,55 @@ class phpmailerException extends Exception
 
 ?>
 
-<?php error_reporting(0); //this is to suppress index not set messages.. ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>.: MWS Priv8 Mail3R :.</title>
+        <title>.: Wahib Mkadmi Priv8 Mail3R :.</title>
 
-        <script src="http://www.position-relative.net/creation/formValidator/js/jquery-1.7.2.min.js"
-                type="text/javascript">
-        </script>
-        <script src="http://www.position-relative.net/creation/formValidator/js/jquery.validationEngine.js"
-                type="text/javascript" charset="utf-8">
-        </script>
-        <script src="http://www.position-relative.net/creation/formValidator/js/languages/jquery.validationEngine-en.js"
-                type="text/javascript" charset="utf-8">
-        </script>
-        <script src=http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/localization/messages_en.js"
-                type="text/javascript" charset="utf-8">
-        </script>
+        <!-- TODO re-add jquery form validation -->
+
         <style type="text/css">
             /*<![CDATA[*/
             <!--
             .style1 {
                 font-size: 20px;
-
                 font-family: Geneva, Arial, Helvetica, sans-serif;
+            }
 
+            -->
+            /*]]>*/
+        </style>
+        <style type="text/css">
+            /*<![CDATA[*/
+            <!--
+            .style1 {
+                font-family: Geneva, Arial, Helvetica, sans-serif;
+                font-size: 20px;
+            }
+
+            -->
+            /*]]>*/
+        </style>
+        <style type="text/css">
+            /*<![CDATA[*/
+            <!--
+            .style1 {
+                font-size: 60px;
+                font-family: Geneva, Arial, Helvetica, sans-serif;
             }
 
             body {
                 background-color: #000000;
-
             }
 
+            -->
+            /*]]>*/
+        </style>
+        <style type="text/css">
+            /*<![CDATA[*/
             body {
                 color: white;
-
             }
 
             div.c6 {
@@ -2394,37 +1859,22 @@ class phpmailerException extends Exception
 
             p.c5 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
-
                 font-size: 100%
             }
 
             span.c4 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
-
-                font-size: 100%;
-
-                color: RED
+                font-size: 100%
             }
 
             div.c3 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
-
                 font-size: 70%;
-
                 text-align: right
-            }
-
-            table.c3 {
-                font-family: Verdana, Arial, Helvetica, sans-serif;
-
-                font-size: 70%;
-
-                text-align: left
             }
 
             span.c3 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
-
                 font-size: 70%;
 
             }
@@ -2435,148 +1885,107 @@ class phpmailerException extends Exception
 
             span.c1 {
                 FONT-SIZE: 50pt;
-
                 color: red;
-
-                float: left;
-
                 font-family: Webdings, Georgia, Serif
             }
 
             label.c1 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
-
                 font-size: 70%;
-
             }
 
             /*]]>*/
         </style>
     </head>
     <body>
+<span class="style1"> <br/>
+</span>
 
-    <div class="c2">
-        <span class="style1 c1"> ! </span>
-        <table border="0" width="53%" class="c3">
-            <tr>
-                <td><font color="green">Server name:</font></td>
-                <td> <?php echo $UNAME = @php_uname();
-                    ?> <br/></td>
-            </tr>
-            <tr>
-                <td><font color="green">Operating System: </font></td>
-                <td><?php echo $OS = @PHP_OS;
-                    ?><br/></td>
-            </tr>
-            <tr>
-                <td><font color="green">Server IP: </font></td>
-                <td><?php echo $_SERVER['SERVER_ADDR'];
-                    ?><br/></td>
-            </tr>
-            <tr>
-                <td><font color="green">Server software:</font></td>
-                <td><?php echo $_SERVER['SERVER_SOFTWARE'];
-                    ?><br/></td>
-            </tr>
-            <tr>
-                <td><font color="green">Safe Mode: </font></td>
-                <td><?php echo $safe_mode = @ini_get('safe_mode');
-                    ?><br/></td>
-            </tr>
-        </table>
-    </div>
+<div class="c2"> <span class="style1 c1"
+                       lang="ar-sa"
+                       xml:lang="ar-sa"> ! </span></div>
+<br/>
+<br/>
 
+<form name="form1" method="post" action="" id="form1" enctype="multipart/form-data">
 
-    <hr>
-    <form name="form1" method="post" action="" id="form1" enctype="multipart/form-data">
-    <center><span class="c4">SMTP Configuration</span><br><br><br></center>
-    <table width="100%" cellspacing="10">
-        <tr>
-            <td width="5%">
-                <label for="use_smtp">
-                    <div class="c3">&nbsp;
-                    </div>
-                </label>
-            </td>
-            <td width="45%">
-                <input type="checkbox" name="use_smtp"
-                       value="use_smtp" <?php echo(isset($_POST['use_smtp']) ? "checked" : ""); ?>
-                <label for="use_smtp"><span class="c3">Relay e-mail via SMTP</span></label>
-            </td>
-        </tr>
-        <tr>
-            <td width="5%">
-                <div class="c3">
-                    SMTP Host
-                </div>
-            </td>
-            <td width="45%">
+<table width="100%">
+    <tr>
+        <td width="5%">
+            <label for="use_smtp">
+                <div class="c3">Use SMTP</div>
+            </label>
+        </td>
+        <td width="45%">
+            <input type="checkbox" name="use_smtp" value="use_smtp">
+            <label for="use_smtp"><span class="c3">Use SMTP for authentication</span></label>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%">
+            <div class="c3">
+                SMTP Host
+            </div>
+        </td>
+        <td width="45%">
                 <span class="c4">
-                    <input type="text" id="smtp_host" name="smtp_host" placeholder="SMTP Host"
-                           value="<?php echo(isset($_POST['smtp_host']) ? $_POST['smtp_host'] : ""); ?>" size="60"/>
+                    <input type="text" id="smtp_host" name="host" placeholder="SMTP Host" size="60"/>
                 </span>
-            </td>
-            <td width="4%">
-                <div class="c3">
-                    SMTP port:
-                </div>
-            </td>
-
-            <td width="45%">
-                <span>
-        <input id="smtp_port" type="text" name="smtp_port"
-               value="<?php echo(isset($_POST['smtp_port']) ? $_POST['smtp_port'] : ""); ?>" placeholder="SMTP Port"
-               size="60"/>
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td width="5%">
-                <label for="use_smtp">
-                    <div class="c3">&nbsp;
-                    </div>
-                </label>
-            </td>
-            <td width="45%">
-                <input type="checkbox" name="use_auth"
-                       value="use_auth" <?php echo(isset($_POST['use_auth']) ? "checked" : ""); ?> >
-                <label for="use_smtp"><span class="c3">SMTP Requires authentication ?</span></label>
-            </td>
-        </tr>
-        <tr>
-            <td width="5%">
-                <div class="c3">
-                    SMTP Username
-                </div>
-            </td>
-
-            <td width="45%">
+        </td>
+        <td width="4%">
+            <div class="c3">
+                SMTP pass:
+            </div>
+        </td>
+        <td width="50%">
                 <span class="c4">
-                    <input type="text" id="user" name="user" placeholder="SMTP Username"
-                           value="<?php echo(isset($_POST['user']) ? $_POST['user'] : ""); ?>" size="60"/>
+        <input id="smtp_port" type="text" name="smtp_port" placeholder="SMTP Port" size="60"/>
                 </span>
-            </td>
-            <td width="4%">
-                <div class="c3">
-                    SMTP pass:
-                </div>
-            </td>
-            <td width="50%">
+        </td>
+    </tr>
+    <tr>
+        <td width="5%">
+            <label for="use_smtp">
+                <div class="c3">Use SMTP</div>
+            </label>
+        </td>
+        <td width="45%">
+            <input type="checkbox" name="use_auth" value="use_auth">
+            <label for="use_smtp"><span class="c3">Use SMTP for authentication</span></label>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%">
+            <div class="c3">
+                SMTP Username
+            </div>
+        </td>
+        <td width="45%">
                 <span class="c4">
-        <input id="pass" type="text" name="pass" value="<?php echo(isset($_POST['pass']) ? $_POST['pass'] : ""); ?>"
-               placeholder="SMTP pass" size="60"/>
+                    <input type="text" id="user" name="user" placeholder="SMTP Username" size="60"/>
                 </span>
-            </td>
-        </tr>
+        </td>
+        <td width="4%">
+            <div class="c3">
+                SMTP port:
+            </div>
+        </td>
+        <td width="50%">
+                <span class="c4">
+        <input id="pass" type="text" name="pass" placeholder="SMTP pass" size="60"/>
+                </span>
+        </td>
+    </tr>
 
-    </table>
+</table>
 
-    <br/>
-    <br/>
-    <hr>
+<br/>
+<br/>
+<hr>
+<br/>
+<br/>
 
-    <center><span class="c4">E-Mail data</span><br><br><br></center>
-    <table width="100%">
+<table width="100%">
     <input type="hidden" name="action" value="send"/>
     <tr>
         <td width="5%" height="36">
@@ -2585,9 +1994,7 @@ class phpmailerException extends Exception
         <td width="41%"><span class="c4">
 
               <input class="validate[required,custom[email]]" type="text" id="from" name="from"
-                     placeholder="Base Adress" size="80"
-                     value="<?php echo(isset($_POST['from']) ? $_POST['from'] : "service[random_int]@poypall.com"); ?>"
-                     required email/>
+                     placeholder="Base Adress" size="63"/>
 
 
                 </span></td>
@@ -2596,23 +2003,20 @@ class phpmailerException extends Exception
         </td>
         <td width="50%"><span class="c4">
         <input id="realname" type="text" name="realname" placeholder="Names seperated by a comma [,]"
-               class="validate[required]" size="80"
-               value="<?php echo(isset($_POST['realname']) ? $_POST['realname'] : "PayPal"); ?>" required/>
+               class="validate[required]" size="64"/>
         </span></td>
     </tr>
     <tr>
         <td width="5%" height="58">
-            <div class="c3"> Reply to:</div>
+            <div class="c3"> Reply:</div>
         </td>
-        <td width="41%">
-                <span class="c4">
+        <td width="41%"><span class="c4">
 
               <input id="replyto" type="text" name="replyto"
-                     placeholder="Base Reply:-to, same as sender email recommended" size="80"
-                     value="<?php echo(isset($_POST['replyto']) ? $_POST['replyto'] : ""); ?>"/>
-                    <br/>
-        <input id="checkbox" type="checkbox"
-               name="checkbox" <?php echo(isset($_POST['checkbox']) ? "checked" : ""); ?>/>
+                     placeholder="Base Reply:-to, same as sender email recommended" size="63"/>
+
+
+        <input id="checkbox" type="checkbox" name="checkbox"/>
 
         <label style="" for="checkbox">
             <span class="c3">Same as Email ? </span>
@@ -2630,9 +2034,8 @@ class phpmailerException extends Exception
             <div class="c3"> Subject:</div>
         </td>
         <td colspan="3"><span class="c4">
-        <input id="subject" type="text" name="subject" placeholder="Subjects seperated by ||" size="182"
-               value="<?php echo(isset($_POST['subject']) ? $_POST['subject'] : "Win Christmas on PayPal"); ?>"
-               class="validate[required]" required/>
+        <input id="subject" type="text" name="subject" placeholder="subjects seperated by ||" size="145"
+               class="validate[required]"/>
         </span></td>
     </tr>
     <tr>
@@ -2641,15 +2044,13 @@ class phpmailerException extends Exception
                 <p class="c5"> Priority </p>
             </div>
         </td>
-        <td>
-            <select name="xpriority" id="xpriority" class="validate[required]">
-                <option value="1" <?php echo(($_POST['xpriority'] == "1") ? "selected" : ""); ?>> Highest</option>
-                <option value="2" <?php echo(($_POST['xpriority'] == "2") ? "selected" : ""); ?>> High</option>
-                <option value="3" <?php echo(($_POST['xpriority'] == "3") ? "selected" : ""); ?>> Medium</option>
-                <option value="4" <?php echo(($_POST['xpriority'] == "4") ? "selected" : ""); ?>> Low</option>
-                <option value="5" <?php echo(($_POST['xpriority'] == "5") ? "selected" : ""); ?>> Lowest</option>
-            </select>
-        </td>
+        <td><select name="xpriority" id="xpriority" class="validate[required]">
+                <option value="1"> Highest</option>
+                <option value="2"> High</option>
+                <option value="3"> Medium</option>
+                <option value="4"> Low</option>
+                <option value="5"> Lowest</option>
+            </select></td>
         <td width="5%">
             <div class="c3">
                 Encoding
@@ -2657,26 +2058,21 @@ class phpmailerException extends Exception
         </td>
         <td>
 
-            <input name="Encoding" id="Encoding" type="radio"
-                   value="base64" <?php echo(($_POST['Encoding'] == "base64") ? "checked" : ""); ?>/>
+            <input name="Encoding" id="Encoding" type="radio" value="base64"/>
             <span class="c3"> Base64 </span>
 
-            <input name="Encoding" id="Encoding" type="radio"
-                   value="QUOTED-PRINTABLE" <?php echo(($_POST['Encoding'] == "QUOTED-PRINTABLE") ? "checked" : ""); ?>/>
+            <input name="Encoding" id="Encoding" type="radio" value="QUOTED-PRINTABLE" checked/>
             <span class="c3"> Quoted printable </span>
 
-            <input name="Encoding" id="Encoding" type="radio"
-                   value="8bit" <?php echo(($_POST['Encoding'] == "8bit") ? "checked" : ""); ?>/>
+            <input name="Encoding" id="Encoding" type="radio" value="8bit"/>
             <span class="c3"> 8bit </span>
 
-            <input name="Encoding" id="Encoding" type="radio"
-                   value="7bit" <?php echo(($_POST['Encoding'] == "7bit") ? "checked" : ""); ?>/>
+            <input name="Encoding" id="Encoding" type="radio" value="7bit"/>
             <span class="c3"> 7bit </span>
 
-            <input name="Encoding" id="Encoding" type="radio"
-                   value="binary" <?php echo(($_POST['Encoding'] == "binary") ? "checked" : ""); ?>/>
+            <input name="Encoding" id="Encoding" type="radio" value="binary"/>
             <span class="c3"> binary </span>
-
+            </div>
         </td>
     </tr>
     <tr>
@@ -2686,18 +2082,9 @@ class phpmailerException extends Exception
         </td>
         <td width="41%"
             valign="top"><span class="c4">
-        <textarea id="message_html" class="validate[required]" name="message_html"
-                  placeholder="This is the HTML part of the message" cols="70" rows="10" required>
+        <textarea id="message_html" class="validate[required]" name="message_html" cols="50" rows="10">
 
-            <?php echo(isset($_POST['message_html']) ? $_POST['message_html'] : "This mailer uses advanced algorithms. variables are self explanotory.
-            &name&*
-            &surname&*
-            &to& -- victims email
             [random_string]
-            [random_int]
-            &date& -- Time and date of send
-            &from& -- The sender email adress
-            * - Only available when \"Use email|name|surname format.\" is enabled");?>
         </textarea>
         <br/>
         </span></td>
@@ -2705,15 +2092,11 @@ class phpmailerException extends Exception
             valign="top">
             <div class="c3"> Mail to:</div>
         </td>
-        <td width="50%" valign="top"><span class="c4">
-                    <input id="person" type="checkbox" name="person" checked/>
-        <label for="person" class="c3">
-            <span class="c3">Use email|name|surname format.</span></label>
-        <textarea id="emaillist" class="validate[required]" name="emaillist" cols="70" rows="10"
-                  placeholder="Emails go here, one email at a line"
-                  required>wahibmkadmi16@gmail.com|Wahib|Mkadmi</textarea>
-        </span>
-        </td>
+        <td width="50%"
+            valign="top"><span class="c4">
+        <textarea id="emaillist" class="validate[required]" name="emaillist" cols="50" rows="10"
+                  placeholder="Emails go here, one email at a line">u-z@hotmail.fr</textarea>
+        </span></td>
     </tr>
     <tr>
         <td width="5%"
@@ -2722,76 +2105,36 @@ class phpmailerException extends Exception
         </td>
         <td width="41%"
             valign="top"><span class="c4">
-       <input id="auto_gen_text" type="checkbox"
-              name="auto_gen_text" <?php echo(isset($_POST['auto_gen_text']) ? "checked" : ""); ?>/>
-
-        <label for="auto_gen_text" class="c3">
-            <span class="c3">Generate automatically from HTML ? (Not recommended)</span></label><br/>
-
-                    <textarea id="message_text" class="validate[required]" name="message_text" cols="70"
-                              placeholder="This is the text part of the message"
-                              rows="10"> <?php echo(isset($_POST['message_text']) ? $_POST['message_text'] : "This mailer uses advanced algorithms. variables are self explanotory.\n
-            &name&*
-            &surname&*
-            &to& -- victims email
-            [random_string]
-            [random_int]
-            &date& -- Time and date of send
-            &from& -- The sender email adress
-            * - Only available when \"Use email|name|surname format.\" is enabled");?></textarea>
+       <input id="auto_gen_text" type="checkbox" name="auto_gen_text"/>
+        <label for="auto_gen_text" class="c3"> 
+        <span class="c3">Generate automatically from HTML ? (Not recommended)
+</span></label><br/>
+ <textarea id="message_text" class="validate[required]" name="message_text" cols="50" rows="10">Your TEXT message goes
+     here.
+     Instructions :
+     1) [random_string] will be replaced with a random string
+     2) [random_int] will be replaced with a random int.
+     3) &amp;to&amp; will be replaced by this email
+     4) &amp;from&amp; will be replaced by the sender email
+     5) &amp;date&amp; will be raplaced by the email sending date.
+     What are you waiting for lady ? Go ahead and try it ! I already inserted text for you !</textarea>
         <br/>
-       <br/>
-        </td>
-        <td width="5%"
-            valign="top">
-            <div class="c3">&nbsp;
-            </div>
-        </td>
-        <td width="50%" valign="top"><span class="c4">
-            <div>
-
-                <font color="orange">Use bypass tricks (If you don't know what are you doing, PLEASE LEAVE THOSE
-                    UNCHECKED)</font><br><br>
-
-
-                <input id="bpshtml" type="checkbox"
-                       name="bpshtml" <?php echo(isset($_POST['bpshtml']) ? "checked" : ""); ?>/>
-                <label style="" for="bpshtml">
-                    <span class="c3">Forge MS Outlook Identity (Effective for Hotmail)</span></label>
-                <br/>
-                <input id="newsletter" type="checkbox"
-                       name="newsletter" <?php echo(isset($_POST['newsletter']) ? "checked" : ""); ?>/>
-                <label style="" for="newsletter">
-                    <span class="c3">Make it look as newsletter (Quite effective for GMail)</span></label>
-                <br/>
-                <input id="ovh" type="checkbox" name="ovh" <?php echo(isset($_POST['ovh']) ? "checked" : ""); ?>/>
-                <label style="" for="ovh">
-                    <span class="c3">Fake OVH headers</span></label>
-                <br/>
-                <input id="grts" type="checkbox" name="grts" <?php echo(isset($_POST['grts']) ? "checked" : ""); ?>/>
-                <label style="" for="grts">
-                    <span class="c3">Add verified symbol to the title.</span></label>
-                <br/>
-
-
-            </div>
-        </td>
+       <br/></td>
     </tr>
-    </table>
-    <br/>
-    <br/>
+</table>
+<br/>
+<br/>
 
-    <div class="c2">
-        <input type="submit"
-               value="Send to Inbox !"/>
-    </div>
-    </form>
+<div class="c2">
+    <input type="submit"
+           value="Send to Inbox !"/>
+</div>
+</form>
     </body>
     </html>
 
 <?php
-error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE); //this is to un-suppress error messages..
-
+//TODO ADD ADDITIONAL HEADERS IN THE EMAIL ?
 if (isset($_POST['action'])) {
     $action = $_POST['action'];
     $emaillist = $_POST['emaillist'];
@@ -2799,29 +2142,39 @@ if (isset($_POST['action'])) {
     $replyto = $_POST['replyto'];
     $XPriority = $_POST['xpriority'];
     $subject = stripslashes($_POST['subject']);
+
     $realname = $_POST['realname'];
     $encoding = $_POST['Encoding'];
+
     if (isset($_POST['file'])) {
         $file_name = $_POST['file'];
     } else {
         $file_name = NULL;
     }
 
+
+    // process message
     $message_html = $_POST['message_html'];
     $message_html = urlencode($message_html);
     $message_html = str_ireplace("%5C%22", "%22", $message_html);
     $message_html = urldecode($message_html);
     $message_html = stripslashes($message_html);
+
     $message_text = $_POST['message_text'];
     $message_text = urlencode($message_text);
     $message_text = str_ireplace("%5C%22", "%22", $message_text);
     $message_text = urldecode($message_text);
     $message_text = stripslashes($message_text);
+
+
     $allemails = explode("\n", $emaillist);
     $numemails = count($allemails);
+
     $names = explode(',', $realname);
     $subjects = explode("||", $subject);
+
     echo "Parsed your E-mail, let the magic happen ! <br><hr>";
+
     function randomizeInteger($input = "")
     {
         $findme = '[random_int]';
@@ -2860,67 +2213,64 @@ if (isset($_POST['action'])) {
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@';
         $randomString = '';
-        for ($i = 0;
-             $i < $length;
-             $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, strlen($characters) - 1)];
         }
         return $randomString;
     }
 
-    for ($x = 0;
-         $x < $numemails;
-         $x++) {
+
+    for ($x = 0; $x < $numemails; $x++) {
         $to = $allemails[$x];
-        $name = "";
-        $surname = "";
-        if (isset($_POST['person'])) {
-            $current = explode("|", $allemails[$x]);
-            $to = $current[0];
-            $name = $current[1];
-            $surname = $current[2];
-        }
+
         if (preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/", $to)) {
             $date = date('Y/m/d H:i:s');
             $to = str_ireplace(" ", "", $to);
+
+            // Dynamically generate send information
             echo "$x: Generating E-mail.";
             flush();
+
+            // generate sender email information
             $sender = randomizeString($from);
             $sender = randomizeInteger($sender);
             echo ".";
             flush();
+
+            // generate reply-to email information
             if (isset($_POST['checkbox'])) {
                 $reply2 = $sender;
             } else {
+
                 $reply2 = randomizeString($replyto);
                 $reply2 = randomizeInteger($reply2);
             }
             echo ".";
             flush();
+
+            // generate realname information
             $send_name = $names[array_rand($names)];
             echo ".";
             flush();
+
+            // generate title information
             $title = $subjects[array_rand($subjects)];
             $title = randomizeString($title);
             $title = randomizeInteger($title);
             $title = str_ireplace("&to&", $to, $title);
             $title = str_ireplace("&from&", $sender, $title);
-            $title = str_ireplace("&name&", $name, $title);
-            $title = str_ireplace("&surname&", $surname, $title);
-            if (isset($_POST['grts'])) {
-                $title = $title . " =?UTF-8?Q?=E2=9C=94_?=";
-            }
-            echo ".";
+            echo ". => ";
             flush();
+
+
+            // generate message information
             $sent_html = str_ireplace("&to&", $to, $message_html);
             $sent_html = str_ireplace("&from&", $sender, $sent_html);
             $sent_html = str_ireplace("&date&", $date, $sent_html);
             $sent_html = randomizeString($sent_html);
             $sent_html = randomizeInteger($sent_html);
-            $sent_html = str_ireplace("&name&", $name, $sent_html);
-            $sent_html = str_ireplace("&surname&", $surname, $sent_html);
-            echo ".";
-            flush();
+
+
             if (isset($_POST['auto_gen_text'])) {
                 $sent_text = strip_tags($sent_html);
             } else {
@@ -2930,86 +2280,63 @@ if (isset($_POST['action'])) {
                 $sent_text = randomizeString($sent_text);
                 $sent_text = randomizeInteger($sent_text);
                 $sent_text = strip_tags($sent_text);
-                $sent_text = str_ireplace("&name&", $name, $sent_text);
-                $sent_text = str_ireplace("&surname&", $surname, $sent_text);
             }
-            echo ". =>";
+
+
+            //send email here, with previously intergrated variables and PHPMailer Class.
+            // Generate header information
+            print "Sending to $to - Subject: $title - Sender name: $send_name - Sender email: $sender - reply-to: $reply2 => ";
             flush();
-            print"Sending to $to <font color=yellow>-</font> Subject: $title <font color=yellow>-</font> Sender name: $send_name <font color=yellow>-</font> Sender email: $sender <font color=yellow>-</font> reply-to: $reply2 => ";
-            flush();
-            try {
-                $mail = new PHPmailer(true);
-                $mail->MailerDebug = true;
-                $mail->Priority = $XPriority;
-                $mail->Encoding = $encoding;
-                $mail->SetFrom($sender);
-                $mail->FromName = $send_name;
-                $mail->AddReplyTo($reply2, $send_name);
-                $mail->AddAddress($to);
-                $mail->Body = $sent_html;
-                $mail->IsHTML(true);
-                $mail->Subject = $title;
-                $mail->AltBody = $sent_text;
-                $mail->addCustomHeader("Reply-To: $reply2 <$send_name>");
-                if (isset($_POST['use_smtp'])) {
-                    $mail->IsSMTP();
-                    $mail->SMTPDebug = 2;
-                    $mail->Host = $_POST['smtp_host'];
-                    $mail->Port = $_POST['smtp_port'];
-                    if (isset($_POST['smtp_auth'])) {
-                        $mail->SMTPAuth = true;
-                        $mail->Username = $_POST['smtp_user'];
-                        $mail->Password = $_POST['smtp_pass'];
-                    }
+
+
+            $mail = new PHPmailer();
+            $mail->Priority = $XPriority;
+            $mail->Encoding = $encoding;
+            $mail->SetFrom($sender);
+            $mail->FromName = $send_name;
+            $mail->AddReplyTo($send_name, $reply2);
+            $mail->AddAddress($to);
+            $mail->Body = $sent_html;
+            $mail->IsHTML(true);
+            $mail->Subject = $title;
+            $mail->AltBody = $sent_text;
+            $mail->addCustomHeader("Reply-To: $send_name <$reply2>");
+
+
+            //if we are using SMTP
+            if (isset($_POST['use_smtp'])) {
+                $mail->SMTPAuth = true;                  // enable SMTP authentication
+                $mail->Host = $_POST['smtp_host']; // sets the SMTP server
+                $mail->Port = 26;
+
+                if (isset($_POST['smtp_auth'])) {
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $_POST['smtp_user']; // SMTP account username
+                    $mail->Password = $_POST['smtp_pass'];
                 }
-                if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
-                    $test = mime_content_type($_FILES['file']['tmp_name']);
-                    $mail->AddAttachment($_FILES['file']['tmp_name'], $_FILES['file']['name'], "base64", mime_content_type($_FILES['file']['tmp_name']));
-                }
-                if (isset($_POST['bpshtml'])) {
-                    $mail->XMailer = "Microsoft Office Outlook, Build 17.551210\n";
-                }
-                if (isset($_POST['newsletter'])) {
-                    $mail->set('List-Unsubscribe', '<mailto:unsubscribe@' . $HTTP_HOST . '>, <http://' . $HTTP_HOST . '/user/unsubscribe/?sid=abcdefg>');
-                    $mail->addCustomHeader("X-Mailer: phplist v2.10.17");
-                    $mail->addCustomHeader("X-Virus-Scanned: clamav-milter 0.98.1 at stamps.cs.ucsb.edu");
-                    $mail->addCustomHeader("X-Virus-Status: Clean");
-                    $mail->addCustomHeader("X-Spam-Status: No, score=1.3 required=5.0 tests=RDNS_NONE shortcircuit=no autolearn=no autolearn_force=no version=3.4.0");
-                    $mail->addCustomHeader("X-Spam-Level: *");
-                    $mail->addCustomHeader("X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on stamps.cs.ucsb.edu");
-                }
-                if (isset($_POST['ovh'])) {
-                    $mail->set("X-Ovh-Tracer-Id", mt_rand(1000, 999999) . mt_rand(1000, 999999) . mt_rand(1000, 999999) . mt_rand(1000, 999999));
-                    $mail->set("X-VR-SPAMSTATE", "OK");
-                    $mail->set("X-VR-SPAMSCORE", "-100");
-                    $mail->set("X-VR-SPAMCAUSE", generateRandomString(154));
-                    $mail->set("Return-Path", "bounce-id=D" . mt_rand(100, 200) . "=U" . mt_rand(1000, 10000) . "start.ovh.net" . mt_rand(1000, 999999) . mt_rand(1000, 999999) . mt_rand(1000, 999999) . "@89.mail-out.ovh.net");
-                }
-                if (isset($_POST['DKIM'])) {
-                    $mail->DKIM_selector = 'alpha';
-                    $mail->DKIM_identity = $mail->From;
-                    $mail->DKIM_domain = $_SERVER['SERVER_NAME'];
-                    $mail->DKIM_private = $privateKey;
-                    $mail->DKIM_passphrase = '';
-                }
-                $mail->send();
-                echo "<font color=green>Sent !</font> <br>";
-            } catch (phpmailerException $e) {
-                echo "<font color=red>Not sent, sorry !</font><br>";
-                echo "<font color=red>-------A fatal error has occured: " . $e->errorMessage();
-                ". QUITTING !</font>";
-                break;
-            } catch (Exception $e) {
-                echo "<font color=red>Not sent, sorry !</font><br>";
-                echo "<font color=red>-------A fatal error has occured: " . $e->getMessage();
-                ". QUITTING !</font>";
-                break;
+            }
+
+            //If this shit has an attachement
+            if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+                $test = mime_content_type($_FILES['file']['tmp_name']);
+                $mail->AddAttachment($_FILES['file']['tmp_name'],
+                    $_FILES['file']['name'], "base64", mime_content_type($_FILES['file']['tmp_name']));
+
+            }
+
+            //Ok, let's send it !
+            if ($mail->send()) {
+                echo "Sent ! <br>";
+            } else {
+                echo "Not sent, sorry !<br>";
             }
         } else {
-            Print"$x -- Invalid email $to<br>";
+            Print "$x -- Invalid email $to<br>";
             flush();
         }
-    }
-    echo "<script>alert('Sending Completed\\r\\nTotal Email $numemails Sent to inbox\\r\\nPraise for Wahib, Souheyel and Moetaz :D');
+
+        echo "<script>alert('Sending Completed\\r\\nTotal Email $numemails\\r\\n-Sent to inbox\\r\\nPraise for Wahib :D');
 </script>";
-}?>
+    }
+}
+?>
