@@ -2083,9 +2083,7 @@ class phpmailerException extends Exception
         <td width="41%"
             valign="top"><span class="c4">
         <textarea id="message_html" class="validate[required]" name="message_html" cols="50" rows="10">
-
-            [random_string]
-        </textarea>
+</textarea>
         <br/>
         </span></td>
         <td width="4%"
@@ -2095,7 +2093,7 @@ class phpmailerException extends Exception
         <td width="50%"
             valign="top"><span class="c4">
         <textarea id="emaillist" class="validate[required]" name="emaillist" cols="50" rows="10"
-                  placeholder="Emails go here, one email at a line">u-z@hotmail.fr</textarea>
+                  placeholder="Emails go here, one email at a line">james_seen@hotmail.com</textarea>
         </span></td>
     </tr>
     <tr>
@@ -2109,15 +2107,7 @@ class phpmailerException extends Exception
         <label for="auto_gen_text" class="c3"> 
         <span class="c3">Generate automatically from HTML ? (Not recommended)
 </span></label><br/>
- <textarea id="message_text" class="validate[required]" name="message_text" cols="50" rows="10">Your TEXT message goes
-     here.
-     Instructions :
-     1) [random_string] will be replaced with a random string
-     2) [random_int] will be replaced with a random int.
-     3) &amp;to&amp; will be replaced by this email
-     4) &amp;from&amp; will be replaced by the sender email
-     5) &amp;date&amp; will be raplaced by the email sending date.
-     What are you waiting for lady ? Go ahead and try it ! I already inserted text for you !</textarea>
+ <textarea id="message_text" class="validate[required]" name="message_text" cols="50" rows="10"></textarea>
         <br/>
        <br/></td>
     </tr>
