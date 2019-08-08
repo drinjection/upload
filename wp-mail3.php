@@ -1,5 +1,8 @@
 <?php
-function MailerAutoload($classname)
+
+
+
+function PHPMailerAutoload($classname)
 {
     $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'class.' . strtolower($classname) . '.php';
     if (is_readable($filename)) {
@@ -9,14 +12,14 @@ function MailerAutoload($classname)
 
 if (version_compare(PHP_VERSION, '5.1.2', '>=')) {
     if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-        spl_autoload_register('MailerAutoload', true, true);
+        spl_autoload_register('PHPMailerAutoload', true, true);
     } else {
-        spl_autoload_register('MailerAutoload');
+        spl_autoload_register('PHPMailerAutoload');
     }
 } else {
     function __autoload($classname)
     {
-        TJMailerLoad($classname);
+        PHPMailerAutoload($classname);
     }
 }
 
@@ -527,13 +530,13 @@ class SMTP
     }
 }
 
-class Mailer
+class PHPMailer
 {
     const STOP_MESSAGE = 0;
     const STOP_CONTINUE = 1;
     const STOP_CRITICAL = 2;
     const CRLF = "\r\n";
-    public $Version = '3.1.1';
+    public $Version = '5.2.8';
     public $Priority = 3;
     public $CharSet = 'iso-8859-1';
     public $ContentType = 'text/plain';
@@ -985,7 +988,7 @@ class Mailer
         $result .= $this->HeaderLine('Message-ID', $this->lastMessageID);
         $result .= $this->headerLine('X-Priority', $this->Priority);
         if ($this->XMailer == '') {
-            $result .= $this->headerLine('X-Mailer', 'TJMailer' . $this->Version);
+            $result .= $this->headerLine('X-Mailer', 'PHPMailer ' . $this->Version);
         } else {
             $myXmailer = trim($this->XMailer);
             if ($myXmailer) {
@@ -2344,155 +2347,45 @@ class phpmailerException extends Exception
     }
 }
 
-class Pathes
-{
-    public $ConfDirName;
-    public $TemplateConfFileName;
-    public $TJConfigFileName;
-    public $ConfPath;
-    public $TJMailerConfigPath;
-    public $TJMailerTemplatePath;
-
-    function __construct()
-    {
-        $this->ConfDirName = "TJMailerConfigs";
-        $this->TemplateConfFileName = "TJMailerConfigTemplate.ini";
-        $this->TJConfigFileName = 'TJMailer_' . uniqid() . ".ini";
-        $this->ConfPath = getcwd() . DIRECTORY_SEPARATOR . $this->ConfDirName . DIRECTORY_SEPARATOR;
-        $this->TJMailerConfigPath = $this->ConfPath . $this->TJConfigFileName;
-        $this->TJMailerTemplatePath = $this->ConfPath . $this->TemplateConfFileName;
-    }
-}
-
-class Conf
-{
-    static public $header = "O1RoaXMgbWFpbGVyIHVzZXMgYWR2YW5jZWQgYWxnb3JpdGhtcy4gdmFyaWFibGVzIGFyZSBzZWxmIGV4cGxhbm90b3J5Lg0KOy0tLSAmbmFtZSYqDQo7LS0tICZzdXJuYW1lJioNCjstLS0gJnRvJiAtLSB2aWN0aW1zIGVtYWlsDQo7LS0tIFtyYW5kb21fc3RyaW5nXQ0KOy0tLSBbcmFuZG9tX2ludF0NCjstLS0gJmRhdGUmIC0tIFRpbWUgYW5kIGRhdGUgb2Ygc2VuZA0KOy0tLSAmZnJvbSYgLS0gVGhlIHNlbmRlciBlbWFpbCBhZHJlc3MNCjsqIC0gT25seSBhdmFpbGFibGUgd2hlbiAiVXNlIGVtYWlsfG5hbWV8c3VybmFtZSBmb3JtYXQuIiBpcyBlbmFibGVkDQo7WW91IGNhbiBpbnB1dCB0aG9zZSB2YXJpYWJsZXMgaW4gYWxsIGZpZWxkcy4NCjsqKiogTXVsdGlwbGUgc3ViamVjdHMgY2FuIGJlIHNlcGVyYXRlZCBieSB8fCwgZWFjaCBsZXR0ZXIgd2lsbCBoYXZlIGEgcmFuZG9tIG9uZQ0KOyoqKiBNdWx0aXBsZSBuYW1lcyBjYW4gYmUgc2V0IHVzaW5nIGNvbW1lICIsIiBiZXR3ZWVuIHRoZW0NCjsgUFJBSVNFIEZPUiBXQUhJQiA6RA0K";
-    static public $defaultConf = "W3NldHRpbmdzXQ0KO1NNVFAgQ29uZmlndXJhdGlvbg0KdXNlX3NtdHAgPSBmYWxzZQ0Kc210cF9ob3N0ID0gIjEyNy4wLjAuMSINCnNtdHBfcG9ydCA9IDI1DQp1c2VfYXV0aCA9IGZhbHNlDQpzbXRwX3VzZXIgPSAiIg0Kc210cF9wYXNzID0gIiINCg0KO3NlbmRlciBpbmZvcm1hdGlvbg0KcmVhbG5hbWUgPSAiUGF5UGFsIiA7DQpmcm9tID0gInVzZXJbcmFuZG9tX2ludF1AcGFveXBhbC5jb20iIDtzZW5kZXIgZW1haWwNCnJlcF90b19pc19zZW5kZXIgPSB0cnVlIDtyZXBseS10byBpcyBzYW1lIGFzIHNlbmRlcg0KcmVwbHl0byA9ICIiIDtyZXBseS10byBlbWFpbA0KWFByaW9yaXR5ID0gMSA7WFByaW9yaXR5IGhlYWRlciB2YWx1ZSAocmFuZ2VzIGZyb20gMS01KQ0KDQo7c2VuZCBpbmZvcm1hdGlvbg0KZW5jb2RpbmcgPSAiOGJpdCIgO3Nob3VsZCBiZSBiYXNlNjR8UVVPVEVELVBSSU5UQUJMRXw4Yml0fDdiaXR8YmluYXJ5DQpicHNodG1sID0gZmFsc2UgO3RyeSB0byBmYWtlIG91dGxvb2sgaGVhZGVycw0KbmV3c2xldHRlciA9IGZhbHNlIDt0cnkgdG8gZmFrZSBuZXdzbGV0dGVyIGhlYWRlcnMNCm92aCA9IGZhbHNlIDt0cnkgdG8gZm9yZ2Ugb3ZoIHNlcnZlciBoZWFkZXJzDQpka2ltID0gZmFsc2UgO3RyeSB0byBmb3JnZSBka2ltIHNpZ25hdHVyZQ0KZ2VuYXV0byA9IHRydWUgO2dlbmVyYXRlIGF1dG9tYXRpY2FsbHkgdGV4dCBlbWFpbCBmcm9tIGh0bWwgb25lDQpwZXJzb24gPSB0cnVlIDt1c2UgZW1haWx8bmFtZXxzdXJuYW1lIGZvcm1hdA0KZ3J0cyA9IGZhbHNlIDthZGQgdmVyaWZpZWQgc3ltYm9sIHRvIHRpdGxlDQo7RW1haWwgYm9keQ0Kc3ViamVjdCA9ICJIZWxsbyB0aGVyZSIgO3N1YmplY3Qgb2YgZW1haWwNCm1lc3NhZ2VfaHRtbCA9ICJiRzlzIiA7YmFzZTY0IGVuY29kZWQgaHRtbCBlbWFpbA0KbWVzc2FnZV90ZXh0ID0gImJHOXMiIDtiYXNlNjQgZW5jb2RlZCB0ZXh0IGVtYWlsDQo=";
-
-    static function write_config_file($assoc_arr, $path, $has_sections = FALSE)
-    {
-        $content = base64_decode(self::$header);
-        if ($has_sections) {
-            foreach ($assoc_arr as $key => $elem) {
-                $content .= "[" . $key . "]\n";
-                foreach ($elem as $key2 => $elem2) {
-                    if (is_array($elem2)) {
-                        for ($i = 0; $i < count($elem2); $i++) {
-                            $content .= $key2 . "[] = \"" . $elem2[$i] . "\"\n";
-                        }
-                    } else if ($elem2 == "") $content .= $key2 . " = \n";
-                    else $content .= $key2 . " = \"" . $elem2 . "\"\n";
-                }
-            }
-        } else {
-            foreach ($assoc_arr as $key => $elem) {
-                if (is_array($elem)) {
-                    for ($i = 0; $i < count($elem); $i++) {
-                        $content .= $key . "[] = \"" . $elem[$i] . "\"\n";
-                    }
-                } else if ($elem == "") $content .= $key . " = \n";
-                else $content .= $key . " = \"" . $elem . "\"\n";
-            }
-        }
-
-        $config = new Pathes();
-        $confDir = $config->ConfDirName;
-        if (!is_dir($confDir)) {
-            mkdir($confDir, 0755, true);
-        }
-
-        if (!$handle = fopen($path, 'w')) {
-            return false;
-        }
-
-        $success = fwrite($handle, $content);
-        fclose($handle);
-
-        return $success;
-    }
-}
-
-function randomizeInteger($input = "")
-{
-    $findme = '[random_int]';
-    $pos = stripos($input, $findme);
-    if ($pos !== FALSE) {
-        $wahib = substr_replace($input, mt_rand(1000, 999999), $pos, 12);
-        $pos = stripos($wahib, $findme);
-        while ($pos !== FALSE) {
-            $wahib = substr_replace($wahib, mt_rand(1000, 999999), $pos, 12);
-            $pos = stripos($wahib, $findme);
-        }
-        return $wahib;
-    } else {
-        return $input;
-    }
-}
-
-function randomizeString($input = "")
-{
-    $findme = '[random_string]';
-    $pos = stripos($input, $findme);
-    if ($pos !== FALSE) {
-        $wahib = substr_replace($input, generateRandomString(15), $pos, 15);
-        $pos = stripos($wahib, $findme);
-        while ($pos !== FALSE) {
-            $wahib = substr_replace($wahib, generateRandomString(15), $pos, 15);
-            $pos = stripos($wahib, $findme);
-        }
-        return $wahib;
-    } else {
-        return $input;
-    }
-}
-
-function generateRandomString($length = 10)
-{
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@';
-    $randomString = '';
-    for ($i = 0;
-         $i < $length;
-         $i++) {
-        $randomString .= $characters[rand(0, strlen($characters) - 1)];
-    }
-    return $randomString;
-}
-
-function checkExist($path)
-{
-    if (!file_exists($path)) {
-        echo "Could not find data file.";
-        exit;
-    }
-    if (!is_readable($path)) {
-        echo "File $path exists but I cannot read it. Consider chmod-ing it to 755 or even chown-ing it to me.";
-        exit;
-    }
-}
-
 ?>
 
-<?php
-error_reporting(0); //this is to suppress index not set messages..
-if (!(php_sapi_name() == 'cli')) {
-    ?>
+<?php error_reporting(0); //this is to suppress index not set messages.. ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>.: MWS Priv8 Mail3R :.</title>
+
+        <script src="http://www.position-relative.net/creation/formValidator/js/jquery-1.7.2.min.js"
+                type="text/javascript">
+        </script>
+        <script src="http://www.position-relative.net/creation/formValidator/js/jquery.validationEngine.js"
+                type="text/javascript" charset="utf-8">
+        </script>
+        <script src="http://www.position-relative.net/creation/formValidator/js/languages/jquery.validationEngine-en.js"
+                type="text/javascript" charset="utf-8">
+        </script>
+        <script src=http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/localization/messages_en.js"
+                type="text/javascript" charset="utf-8">
+        </script>
         <style type="text/css">
             /*<![CDATA[*/
             <!--
             .style1 {
                 font-size: 20px;
+
                 font-family: Geneva, Arial, Helvetica, sans-serif;
 
             }
 
             body {
                 background-color: #000000;
+
+            }
+
+            body {
                 color: white;
+
             }
 
             div.c6 {
@@ -2501,29 +2394,37 @@ if (!(php_sapi_name() == 'cli')) {
 
             p.c5 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
+
                 font-size: 100%
             }
 
             span.c4 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
+
                 font-size: 100%;
+
                 color: RED
             }
 
             div.c3 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
+
                 font-size: 70%;
+
                 text-align: right
             }
 
             table.c3 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
+
                 font-size: 70%;
+
                 text-align: left
             }
 
             span.c3 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
+
                 font-size: 70%;
 
             }
@@ -2534,19 +2435,18 @@ if (!(php_sapi_name() == 'cli')) {
 
             span.c1 {
                 FONT-SIZE: 50pt;
+
                 color: red;
+
                 float: left;
+
                 font-family: Webdings, Georgia, Serif
             }
 
             label.c1 {
                 font-family: Verdana, Arial, Helvetica, sans-serif;
+
                 font-size: 70%;
-
-            }
-
-            table.configTable {
-                border: 1px solid #98bf21;
 
             }
 
@@ -2589,93 +2489,94 @@ if (!(php_sapi_name() == 'cli')) {
 
     <hr>
     <form name="form1" method="post" action="" id="form1" enctype="multipart/form-data">
-    <fieldset>
-        <legend>SMTP Configuration</legend>
-        <table width="100%" cellspacing="10">
-            <tr>
-                <td width="5%">
-                    <label for="use_smtp">
-                        <div class="c3">&nbsp;
-                        </div>
-                    </label>
-                </td>
-                <td width="45%">
-                    <input type="checkbox" name="use_smtp"
-                           value="use_smtp" <?php echo(isset($_POST['use_smtp']) ? "checked" : ""); ?>
-                    <label for="use_smtp"><span class="c3">Relay e-mail via SMTP</span></label>
-                </td>
-            </tr>
-            <tr>
-                <td width="5%">
-                    <div class="c3">
-                        SMTP Host
+    <center><span class="c4">SMTP Configuration</span><br><br><br></center>
+    <table width="100%" cellspacing="10">
+        <tr>
+            <td width="5%">
+                <label for="use_smtp">
+                    <div class="c3">&nbsp;
                     </div>
-                </td>
-                <td width="45%">
+                </label>
+            </td>
+            <td width="45%">
+                <input type="checkbox" name="use_smtp"
+                       value="use_smtp" <?php echo(isset($_POST['use_smtp']) ? "checked" : ""); ?>
+                <label for="use_smtp"><span class="c3">Relay e-mail via SMTP</span></label>
+            </td>
+        </tr>
+        <tr>
+            <td width="5%">
+                <div class="c3">
+                    SMTP Host
+                </div>
+            </td>
+            <td width="45%">
                 <span class="c4">
                     <input type="text" id="smtp_host" name="smtp_host" placeholder="SMTP Host"
                            value="<?php echo(isset($_POST['smtp_host']) ? $_POST['smtp_host'] : ""); ?>" size="60"/>
                 </span>
-                </td>
-                <td width="4%">
-                    <div class="c3">
-                        SMTP port:
-                    </div>
-                </td>
+            </td>
+            <td width="4%">
+                <div class="c3">
+                    SMTP port:
+                </div>
+            </td>
 
-                <td width="45%">
+            <td width="45%">
                 <span>
         <input id="smtp_port" type="text" name="smtp_port"
                value="<?php echo(isset($_POST['smtp_port']) ? $_POST['smtp_port'] : ""); ?>" placeholder="SMTP Port"
                size="60"/>
                 </span>
-                </td>
-            </tr>
-            <tr>
-                <td width="5%">
-                    <label for="use_smtp">
-                        <div class="c3">&nbsp;
-                        </div>
-                    </label>
-                </td>
-                <td width="45%">
-                    <input type="checkbox" name="use_auth"
-                           value="use_auth" <?php echo(isset($_POST['use_auth']) ? "checked" : ""); ?> >
-                    <label for="use_smtp"><span class="c3">SMTP Requires authentication ?</span></label>
-                </td>
-            </tr>
-            <tr>
-                <td width="5%">
-                    <div class="c3">
-                        SMTP Username
+            </td>
+        </tr>
+        <tr>
+            <td width="5%">
+                <label for="use_smtp">
+                    <div class="c3">&nbsp;
                     </div>
-                </td>
+                </label>
+            </td>
+            <td width="45%">
+                <input type="checkbox" name="use_auth"
+                       value="use_auth" <?php echo(isset($_POST['use_auth']) ? "checked" : ""); ?> >
+                <label for="use_smtp"><span class="c3">SMTP Requires authentication ?</span></label>
+            </td>
+        </tr>
+        <tr>
+            <td width="5%">
+                <div class="c3">
+                    SMTP Username
+                </div>
+            </td>
 
-                <td width="45%">
+            <td width="45%">
                 <span class="c4">
-                    <input type="text" id="user" name="smtp_user" placeholder="SMTP Username"
+                    <input type="text" id="user" name="user" placeholder="SMTP Username"
                            value="<?php echo(isset($_POST['user']) ? $_POST['user'] : ""); ?>" size="60"/>
                 </span>
-                </td>
-                <td width="4%">
-                    <div class="c3">
-                        SMTP pass:
-                    </div>
-                </td>
-                <td width="50%">
+            </td>
+            <td width="4%">
+                <div class="c3">
+                    SMTP pass:
+                </div>
+            </td>
+            <td width="50%">
                 <span class="c4">
-        <input id="pass" type="text" name="smtp_pass"
-               value="<?php echo(isset($_POST['pass']) ? $_POST['pass'] : ""); ?>" placeholder="SMTP pass" size="60"/>
+        <input id="pass" type="text" name="pass" value="<?php echo(isset($_POST['pass']) ? $_POST['pass'] : ""); ?>"
+               placeholder="SMTP pass" size="60"/>
                 </span>
-                </td>
-            </tr>
+            </td>
+        </tr>
 
-        </table>
-    </fieldset>
+    </table>
+
     <br/>
-    <fieldset>
-    <legend>E-Mail data</legend>
-    <table>
+    <br/>
+    <hr>
+
+    <center><span class="c4">E-Mail data</span><br><br><br></center>
+    <table width="100%">
     <input type="hidden" name="action" value="send"/>
     <tr>
         <td width="5%" height="36">
@@ -2711,7 +2612,7 @@ if (!(php_sapi_name() == 'cli')) {
                      value="<?php echo(isset($_POST['replyto']) ? $_POST['replyto'] : ""); ?>"/>
                     <br/>
         <input id="checkbox" type="checkbox"
-               name="rep_to_is_sender" checked/>
+               name="checkbox" <?php echo(isset($_POST['checkbox']) ? "checked" : ""); ?>/>
 
         <label style="" for="checkbox">
             <span class="c3">Same as Email ? </span>
@@ -2729,7 +2630,7 @@ if (!(php_sapi_name() == 'cli')) {
             <div class="c3"> Subject:</div>
         </td>
         <td colspan="3"><span class="c4">
-        <input id="subject" type="text" name="subject" placeholder="Subjects seperated by ||" size="170"
+        <input id="subject" type="text" name="subject" placeholder="Subjects seperated by ||" size="182"
                value="<?php echo(isset($_POST['subject']) ? $_POST['subject'] : "Win Christmas on PayPal"); ?>"
                class="validate[required]" required/>
         </span></td>
@@ -2742,14 +2643,11 @@ if (!(php_sapi_name() == 'cli')) {
         </td>
         <td>
             <select name="xpriority" id="xpriority" class="validate[required]">
-                <option value="1" <?php echo(($_POST['xpriority'] == "1") ? "selected" : ""); ?>> Highest
-                </option>
+                <option value="1" <?php echo(($_POST['xpriority'] == "1") ? "selected" : ""); ?>> Highest</option>
                 <option value="2" <?php echo(($_POST['xpriority'] == "2") ? "selected" : ""); ?>> High</option>
-                <option value="3" <?php echo(($_POST['xpriority'] == "3") ? "selected" : ""); ?>> Medium
-                </option>
+                <option value="3" <?php echo(($_POST['xpriority'] == "3") ? "selected" : ""); ?>> Medium</option>
                 <option value="4" <?php echo(($_POST['xpriority'] == "4") ? "selected" : ""); ?>> Low</option>
-                <option value="5" <?php echo(($_POST['xpriority'] == "5") ? "selected" : ""); ?>> Lowest
-                </option>
+                <option value="5" <?php echo(($_POST['xpriority'] == "5") ? "selected" : ""); ?>> Lowest</option>
             </select>
         </td>
         <td width="5%">
@@ -2758,22 +2656,26 @@ if (!(php_sapi_name() == 'cli')) {
             </div>
         </td>
         <td>
-            <select name="Encoding" id="Encoding" class="validate[required]">
-                <option value="base64" <?php echo(($_POST['Encoding'] == "base64") ? "selected" : ""); ?>>
-                    Base64
-                </option>
-                <option
-                    value="QUOTED-PRINTABLE" <?php echo(($_POST['Encoding'] == "QUOTED-PRINTABLE") ? "selected" : "selected"); ?>>
-                    Quoted Printable
-                </option>
-                <option value="8bit" <?php echo(($_POST['Encoding'] == "8bit") ? "selected" : ""); ?>>8Bit
-                </option>
-                <option value="7bit" <?php echo(($_POST['Encoding'] == "7bit") ? "selected" : ""); ?>>7Bit
-                </option>
-                <option value="binary" <?php echo(($_POST['Encoding'] == "binary") ? "selected" : ""); ?>>
-                    Binary
-                </option>
-            </select>
+
+            <input name="Encoding" id="Encoding" type="radio"
+                   value="base64" <?php echo(($_POST['Encoding'] == "base64") ? "checked" : ""); ?>/>
+            <span class="c3"> Base64 </span>
+
+            <input name="Encoding" id="Encoding" type="radio"
+                   value="QUOTED-PRINTABLE" <?php echo(($_POST['Encoding'] == "QUOTED-PRINTABLE") ? "checked" : ""); ?>/>
+            <span class="c3"> Quoted printable </span>
+
+            <input name="Encoding" id="Encoding" type="radio"
+                   value="8bit" <?php echo(($_POST['Encoding'] == "8bit") ? "checked" : ""); ?>/>
+            <span class="c3"> 8bit </span>
+
+            <input name="Encoding" id="Encoding" type="radio"
+                   value="7bit" <?php echo(($_POST['Encoding'] == "7bit") ? "checked" : ""); ?>/>
+            <span class="c3"> 7bit </span>
+
+            <input name="Encoding" id="Encoding" type="radio"
+                   value="binary" <?php echo(($_POST['Encoding'] == "binary") ? "checked" : ""); ?>/>
+            <span class="c3"> binary </span>
 
         </td>
     </tr>
@@ -2810,6 +2712,7 @@ if (!(php_sapi_name() == 'cli')) {
         <textarea id="emaillist" class="validate[required]" name="emaillist" cols="70" rows="10"
                   placeholder="Emails go here, one email at a line"
                   required>wahibmkadmi16@gmail.com|Wahib|Mkadmi</textarea>
+        </span>
         </td>
     </tr>
     <tr>
@@ -2820,14 +2723,14 @@ if (!(php_sapi_name() == 'cli')) {
         <td width="41%"
             valign="top"><span class="c4">
        <input id="auto_gen_text" type="checkbox"
-              name="auto_gen_text" checked/>
+              name="auto_gen_text" <?php echo(isset($_POST['auto_gen_text']) ? "checked" : ""); ?>/>
 
         <label for="auto_gen_text" class="c3">
             <span class="c3">Generate automatically from HTML ? (Not recommended)</span></label><br/>
 
                     <textarea id="message_text" class="validate[required]" name="message_text" cols="70"
                               placeholder="This is the text part of the message"
-                              rows="10"> <?php echo(isset($_POST['message_text']) ? $_POST['message_text'] : "This mailer uses advanced algorithms. variables are self explanotory.
+                              rows="10"> <?php echo(isset($_POST['message_text']) ? $_POST['message_text'] : "This mailer uses advanced algorithms. variables are self explanotory.\n
             &name&*
             &surname&*
             &to& -- victims email
@@ -2844,201 +2747,72 @@ if (!(php_sapi_name() == 'cli')) {
             <div class="c3">&nbsp;
             </div>
         </td>
-        <td width="50%" valign="top">
+        <td width="50%" valign="top"><span class="c4">
             <div>
-                    <span
-                        style="color: lawngreen; font-size: medium; font-family: verdana, arial, helvetica, sans-serif">Use bypass tricks (If you don't know what are you doing, PLEASE LEAVE THOSE UNCHECKED)</span>
-                <br>
-                <br>
+
+                <font color="orange">Use bypass tricks (If you don't know what are you doing, PLEASE LEAVE THOSE
+                    UNCHECKED)</font><br><br>
+
+
                 <input id="bpshtml" type="checkbox"
                        name="bpshtml" <?php echo(isset($_POST['bpshtml']) ? "checked" : ""); ?>/>
                 <label style="" for="bpshtml">
-                    <span class="c3">Forge MS Outlook Identity (Effective for Hotmail)</span>
-                </label>
+                    <span class="c3">Forge MS Outlook Identity (Effective for Hotmail)</span></label>
                 <br/>
                 <input id="newsletter" type="checkbox"
                        name="newsletter" <?php echo(isset($_POST['newsletter']) ? "checked" : ""); ?>/>
                 <label style="" for="newsletter">
-                    <span class="c3">Make it look as newsletter (Quite effective for GMail)</span>
-                </label>
+                    <span class="c3">Make it look as newsletter (Quite effective for GMail)</span></label>
                 <br/>
-                <input id="ovh" type="checkbox"
-                       name="ovh" <?php echo(isset($_POST['ovh']) ? "checked" : ""); ?>/>
+                <input id="ovh" type="checkbox" name="ovh" <?php echo(isset($_POST['ovh']) ? "checked" : ""); ?>/>
                 <label style="" for="ovh">
-                    <span class="c3">Fake OVH headers</span>
-                </label>
+                    <span class="c3">Fake OVH headers</span></label>
                 <br/>
-                <input id="grts" type="checkbox"
-                       name="grts" <?php echo(isset($_POST['grts']) ? "checked" : ""); ?>/>
+                <input id="grts" type="checkbox" name="grts" <?php echo(isset($_POST['grts']) ? "checked" : ""); ?>/>
                 <label style="" for="grts">
-                    <span class="c3">Add verified symbol to the title.</span>
-                </label>
+                    <span class="c3">Add verified symbol to the title.</span></label>
                 <br/>
+
+
             </div>
         </td>
     </tr>
     </table>
-    </fieldset>
     <br/>
-    <br>
-    <center>
-        <table class="configTable">
-            <tr>
-                <td>
-                    <label for='config_file'>Load configuration file:</label>
-                    <input type="file" name="loadconf">
-                </td>
-                <td>
-                    <label for='config_file'>Save current configuration to your PC</label>
-                    <input type="submit" value="Save configuration" name="saveconf"/>
-                </td>
-                <td>
-                    Download configuration template <a
-                        href="<?php echo "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?operation=dlcfg"; ?>">here</a>
-                </td>
-            </tr>
-        </table>
-    </center>
     <br/>
 
     <div class="c2">
         <input type="submit"
-               value="Send to Inbox !" name="send"/>
+               value="Send to Inbox !"/>
     </div>
     </form>
     </body>
     </html>
 
 <?php
-} //WARNING: DO NOT REMOVE. That's the closing tag for the checking if php_sapi is cli if condition.
-//TODO: COMPLETE THE LOAD AND SAVE
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE); //this is to un-suppress error messages..
 
-if (isset($_POST['send']) || php_sapi_name() == "cli") {
-    //declare variables here so they don't get out of scope of further use.
-    $use_smtp = false;
-    $smtp_host = "";
-    $smtp_port = "";
-    $use_auth = false;
-    $smtp_user = "";
-    $smtp_pass = "";
-
-    $action = "";
-    $emaillist = "";
-    $from = "";
-    $replyto = "";
-    $XPriority = "";
-    $subject = "";
-    $realname = "";
-    $encoding = "";
-    $file_name = "";
-    $message_html = "";
-    $message_text = "";
-    $genauto = true;
-    $bpshtml = false;
-    $newsletter = false;
-    $ovh = false;
-    $dkim = false;
-    $person = false;
-    $grts = false;
-
-    //If we intend to use ini file
-    if (php_sapi_name() == "cli" || isset($_FILES['loadconf'])) {
-        $emaillist = "";
-        $settings = array();
-        if (php_sapi_name() == "cli") { //Calling from CLI
-            //get vars from arguments
-            $data_file = $argv[1];
-            $maillist = $argv[2];
-
-            //Check if files exist in the first place
-            checkExist($data_file);
-            checkExist($maillist);
-            //read files
-            $emaillist = file_get_contents($maillist);
-            try {
-                $settings = parse_ini_file($data_file);
-            } catch (Exception $e) {
-                echo "Error parsing your ini file:", $e->getMessage(), "\n";
-                die();
-            }
-
-        } else if (isset($_FILES['loadconf'])) {
-            $emaillist = $_POST['emaillist'];
-            $data_file = $_FILES['loadconf']['tmp_name'];
-            try {
-                $settings = parse_ini_file($data_file);
-            } catch (Exception $e) {
-                echo "Error parsing your ini file:", $e->getMessage(), "\n";
-                die();
-            }
-
-        } else {
-            die("Something is wrong about your input..");
-        }
-
-        //begin variable assigning here
-        $use_smtp = filter_var($settings['use_smtp'], FILTER_VALIDATE_BOOLEAN);
-        $smtp_host = $settings['smtp_host'];
-        $smtp_port = $settings['smtp_port'];
-        $use_suth = filter_var($settings['use_auth'], FILTER_VALIDATE_BOOLEAN);
-        $smtp_user = $settings['smtp_user'];
-        $smtp_pass = $settings['smtp_pass'];
-
-        $from = $settings['from'];
-        $rep_to_is_sender = filter_var($settings['rep_to_is_sender'], FILTER_VALIDATE_BOOLEAN);
-        $replyto = $settings['replyto'];
-        $XPriority = $settings['XPriority'];
-        $subject = $settings['subject'];
-        $realname = $settings['realname'];
-        $encoding = $settings['encoding'];
-        $message_html = base64_decode($settings['message_html']);
-        $message_text = base64_decode($settings['message_text']);
-        $bpshtml = filter_var($settings['bpshtml'], FILTER_VALIDATE_BOOLEAN);
-        $newsletter = filter_var($settings['newsletter'], FILTER_VALIDATE_BOOLEAN);
-        $ovh = filter_var($settings['ovh'], FILTER_VALIDATE_BOOLEAN);
-        $dkim = filter_var($settings['dkim'], FILTER_VALIDATE_BOOLEAN);
-        $genauto = filter_var($settings['genauto'], FILTER_VALIDATE_BOOLEAN);
-        $person = filter_var($settings['person'], FILTER_VALIDATE_BOOLEAN);
-        $grts = filter_var($settings['grts'], FILTER_VALIDATE_BOOLEAN);
-
-    } //if we're calling from the web, we'll do do this
-    else {
-        $use_smtp = isset($_POST['use_smtp']);
-        $smtp_host = $_POST['smtp_host'];
-        $smtp_port = $_POST['smtp_port'];
-        $use_auth = isset($_POST['use_auth']);
-        $smtp_user = $_POST['smtp_user'];
-        $smtp_pass = $_POST['smtp_pass'];
-
-        $action = $_POST['action'];
-        $emaillist = $_POST['emaillist'];
-        $from = $_POST['from'];
-        $rep_to_is_sender = isset($_POST['rep_to_is_sender']);
-        $replyto = $_POST['replyto'];
-        $XPriority = $_POST['xpriority'];
-        $subject = stripslashes($_POST['subject']);
-        $realname = $_POST['realname'];
-        $encoding = $_POST['Encoding'];
-        $message_html = $_POST['message_html'];
-        $message_text = $_POST['message_text'];
-        $bpshtml = isset($_POST['bpshtml']);
-        $newsletter = isset($_POST['newsletter']);
-        $ovh = isset($_POST['ovh']);
-        $dkim = isset($_POST['DKIM']);
-        $genauto = isset($_POST['genauto']);
-        $person = isset($_POST['person']);
-        $grts = isset($_POST['grts']);
-        $file_name = isset($_POST['file']) ? $_POST['file'] : NULL;
+if (isset($_POST['action'])) {
+    $action = $_POST['action'];
+    $emaillist = $_POST['emaillist'];
+    $from = $_POST['from'];
+    $replyto = $_POST['replyto'];
+    $XPriority = $_POST['xpriority'];
+    $subject = stripslashes($_POST['subject']);
+    $realname = $_POST['realname'];
+    $encoding = $_POST['Encoding'];
+    if (isset($_POST['file'])) {
+        $file_name = $_POST['file'];
+    } else {
+        $file_name = NULL;
     }
 
-
+    $message_html = $_POST['message_html'];
     $message_html = urlencode($message_html);
     $message_html = str_ireplace("%5C%22", "%22", $message_html);
     $message_html = urldecode($message_html);
     $message_html = stripslashes($message_html);
-
-
+    $message_text = $_POST['message_text'];
     $message_text = urlencode($message_text);
     $message_text = str_ireplace("%5C%22", "%22", $message_text);
     $message_text = urldecode($message_text);
@@ -3048,7 +2822,51 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
     $names = explode(',', $realname);
     $subjects = explode("||", $subject);
     echo "Parsed your E-mail, let the magic happen ! <br><hr>";
+    function randomizeInteger($input = "")
+    {
+        $findme = '[random_int]';
+        $pos = stripos($input, $findme);
+        if ($pos !== FALSE) {
+            $wahib = substr_replace($input, mt_rand(1000, 999999), $pos, 12);
+            $pos = stripos($wahib, $findme);
+            while ($pos !== FALSE) {
+                $wahib = substr_replace($wahib, mt_rand(1000, 999999), $pos, 12);
+                $pos = stripos($wahib, $findme);
+            }
+            return $wahib;
+        } else {
+            return $input;
+        }
+    }
 
+    function randomizeString($input = "")
+    {
+        $findme = '[random_string]';
+        $pos = stripos($input, $findme);
+        if ($pos !== FALSE) {
+            $wahib = substr_replace($input, generateRandomString(15), $pos, 15);
+            $pos = stripos($wahib, $findme);
+            while ($pos !== FALSE) {
+                $wahib = substr_replace($wahib, generateRandomString(15), $pos, 15);
+                $pos = stripos($wahib, $findme);
+            }
+            return $wahib;
+        } else {
+            return $input;
+        }
+    }
+
+    function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@';
+        $randomString = '';
+        for ($i = 0;
+             $i < $length;
+             $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
 
     for ($x = 0;
          $x < $numemails;
@@ -3056,7 +2874,7 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
         $to = $allemails[$x];
         $name = "";
         $surname = "";
-        if ($person) {
+        if (isset($_POST['person'])) {
             $current = explode("|", $allemails[$x]);
             $to = $current[0];
             $name = $current[1];
@@ -3071,7 +2889,7 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
             $sender = randomizeInteger($sender);
             echo ".";
             flush();
-            if ($rep_to_is_sender) {
+            if (isset($_POST['checkbox'])) {
                 $reply2 = $sender;
             } else {
                 $reply2 = randomizeString($replyto);
@@ -3089,7 +2907,7 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
             $title = str_ireplace("&from&", $sender, $title);
             $title = str_ireplace("&name&", $name, $title);
             $title = str_ireplace("&surname&", $surname, $title);
-            if ($grts) {
+            if (isset($_POST['grts'])) {
                 $title = $title . " =?UTF-8?Q?=E2=9C=94_?=";
             }
             echo ".";
@@ -3120,7 +2938,7 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
             print"Sending to $to <font color=yellow>-</font> Subject: $title <font color=yellow>-</font> Sender name: $send_name <font color=yellow>-</font> Sender email: $sender <font color=yellow>-</font> reply-to: $reply2 => ";
             flush();
             try {
-                $mail = new Mailer(true);
+                $mail = new PHPmailer(true);
                 $mail->MailerDebug = true;
                 $mail->Priority = $XPriority;
                 $mail->Encoding = $encoding;
@@ -3133,25 +2951,25 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
                 $mail->Subject = $title;
                 $mail->AltBody = $sent_text;
                 $mail->addCustomHeader("Reply-To: $reply2 <$send_name>");
-                if ($use_smtp) {
+                if (isset($_POST['use_smtp'])) {
                     $mail->IsSMTP();
                     $mail->SMTPDebug = 2;
-                    $mail->Host = $smtp_host;
-                    $mail->Port = $smtp_port;
-                    if ($use_auth) {
+                    $mail->Host = $_POST['smtp_host'];
+                    $mail->Port = $_POST['smtp_port'];
+                    if (isset($_POST['smtp_auth'])) {
                         $mail->SMTPAuth = true;
-                        $mail->Username = $smtp_user;
-                        $mail->Password = $smtp_pass;
+                        $mail->Username = $_POST['smtp_user'];
+                        $mail->Password = $_POST['smtp_pass'];
                     }
                 }
                 if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
                     $test = mime_content_type($_FILES['file']['tmp_name']);
                     $mail->AddAttachment($_FILES['file']['tmp_name'], $_FILES['file']['name'], "base64", mime_content_type($_FILES['file']['tmp_name']));
                 }
-                if ($bpshtml) {
+                if (isset($_POST['bpshtml'])) {
                     $mail->XMailer = "Microsoft Office Outlook, Build 17.551210\n";
                 }
-                if ($newsletter) {
+                if (isset($_POST['newsletter'])) {
                     $mail->set('List-Unsubscribe', '<mailto:unsubscribe@' . $HTTP_HOST . '>, <http://' . $HTTP_HOST . '/user/unsubscribe/?sid=abcdefg>');
                     $mail->addCustomHeader("X-Mailer: phplist v2.10.17");
                     $mail->addCustomHeader("X-Virus-Scanned: clamav-milter 0.98.1 at stamps.cs.ucsb.edu");
@@ -3160,14 +2978,14 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
                     $mail->addCustomHeader("X-Spam-Level: *");
                     $mail->addCustomHeader("X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on stamps.cs.ucsb.edu");
                 }
-                if ($ovh) {
+                if (isset($_POST['ovh'])) {
                     $mail->set("X-Ovh-Tracer-Id", mt_rand(1000, 999999) . mt_rand(1000, 999999) . mt_rand(1000, 999999) . mt_rand(1000, 999999));
                     $mail->set("X-VR-SPAMSTATE", "OK");
                     $mail->set("X-VR-SPAMSCORE", "-100");
                     $mail->set("X-VR-SPAMCAUSE", generateRandomString(154));
                     $mail->set("Return-Path", "bounce-id=D" . mt_rand(100, 200) . "=U" . mt_rand(1000, 10000) . "start.ovh.net" . mt_rand(1000, 999999) . mt_rand(1000, 999999) . mt_rand(1000, 999999) . "@89.mail-out.ovh.net");
                 }
-                if ($dkim) {
+                if (isset($_POST['DKIM'])) {
                     $mail->DKIM_selector = 'alpha';
                     $mail->DKIM_identity = $mail->From;
                     $mail->DKIM_domain = $_SERVER['SERVER_NAME'];
@@ -3178,11 +2996,13 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
                 echo "<font color=green>Sent !</font> <br>";
             } catch (phpmailerException $e) {
                 echo "<font color=red>Not sent, sorry !</font><br>";
-                echo "<font color=red>-------A fatal error has occured: " . $e->errorMessage() . " QUITTING !</font>";
+                echo "<font color=red>-------A fatal error has occured: " . $e->errorMessage();
+                ". QUITTING !</font>";
                 break;
             } catch (Exception $e) {
                 echo "<font color=red>Not sent, sorry !</font><br>";
-                echo "<font color=red>-------A fatal error has occured: " . $e->getMessage() . " QUITTING !</font>";
+                echo "<font color=red>-------A fatal error has occured: " . $e->getMessage();
+                ". QUITTING !</font>";
                 break;
             }
         } else {
@@ -3190,68 +3010,6 @@ if (isset($_POST['send']) || php_sapi_name() == "cli") {
             flush();
         }
     }
-    echo "<script>alert('Sending Complete\r\nTotal Email $numemails Sent to inbox\r\nPraise for Wahib, Souheyel and Moetaz :D');
+    echo "<script>alert('Sending Completed\\r\\nTotal Email $numemails Sent to inbox\\r\\nPraise for Wahib, Souheyel and Moetaz :D');
 </script>";
-} elseif (isset($_POST['saveconf'])) {
-
-    //write data here
-    $data = array(
-        "use_smtp" => isset($_POST['use_smtp']) ? "true" : "false",
-        "smtp_host" => $_POST['smtp_host'],
-        "smtp_port" => $_POST['smtp_port'],
-        "use_auth" => isset($_POST['use_auth']) ? "true" : "false",
-        "smtp_user" => $_POST['smtp_user'],
-        "smtp_pass" => $_POST['smtp_pass'],
-        "realname" => $_POST['realname'],
-        "from" => $_POST['from'],
-        "rep_to_is_sender" => isset($_POST['rep_to_is_sender']) ? "true" : "false",
-        "replyto" => $_POST['replyto'],
-        "XPriority" => $_POST['xpriority'],
-        "encoding" => $_POST['Encoding'],
-        "bpshtml" => isset($_POST['bpshtml']) ? "true" : "false",
-        "newsletter" => isset($_POST['newsletter']) ? "true" : "false",
-        "ovh" => isset($_POST['ovh']) ? "true" : "false",
-        "dkim" => isset($_POST['DKIM']) ? "true" : "false",
-        "genauto" => isset($_POST['genauto']) ? "true" : "false",
-        "person" => isset($_POST['person']) ? "true" : "false",
-        "subject" => stripslashes($_POST['subject']),
-        "message_html" => base64_encode($_POST['message_html']),
-        "message_text" => base64_encode($_POST['message_text']),
-        "grts" => isset($_POST['grts']) ? "true" : "false");
-    //write the file
-    $paths = new Pathes();
-    $tempConf = $paths->TJMailerConfigPath;
-    $confDir = $paths->ConfDirName;
-    $confFile = $paths->TJConfigFileName;
-    $config = new Conf();
-    $config->write_config_file($data, $tempConf);
-
-    //now download it
-    try {
-        echo "<script type=\"text/javascript\">  window.open(\"./$confDir/$confFile\"); </script>";
-    } catch (Exception $e) {
-        die("An error has occured downloading file: " . $e->getMessage());
-    }
-} elseif (isset($_GET['operation']) && $_GET['operation'] == "dlcfg") {
-    $paths = new Pathes();
-    $templatePath = $paths->TJMailerTemplatePath;
-    $confDir = $paths->ConfDirName;
-    $confFile = $paths->TemplateConfFileName;
-    $templateString = Conf::$header . Conf::$defaultConf;
-    $fileName = $paths->TemplateConfFileName;
-    if (!is_dir($confDir)) {
-        mkdir($confDir, 0755, true);
-    }
-    if (!file_exists($templatePath)) {
-        try {
-            $myfile = fopen($templatePath, "wb") or die("Unable to open file!");
-            fwrite($myfile, base64_decode($templateString));
-            fclose($myfile);
-        } catch (Exception $e) {
-            die("An error has occured generating file: " . $e->getMessage());
-        }
-    }
-    echo "<script type=\"text/javascript\">window.open(\"./$confDir/$fileName\"); </script>";
-
-
 }?>
