@@ -1,173 +1,56 @@
-<?php
-if (isset($_POST['ajax'])) {
-$to = $_POST['to'];
-$subject = $_POST['sub'];
-$msg = $_POST['msg'];
-$headers = "MIME-Version: 1.0" . "\r\n";
-$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-$headers .= "From: ".$_POST['name']."<".$_POST['from'].">";
-
-$send = mail($to,$subject,$msg,$headers);
-
-if ($send) {
-	echo "<p id='success'>$to</p>";
-}else{
-	echo "<p id='error'>$to</p>";
-}
-exit();
-}
-?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link href="https://fonts.googleapis.com/css?family=Montserrat|Roboto" rel="stylesheet">
-	<link rel="icon" href="https://i.imgur.com/5ivJdmN.png">
-	<title>Mailer Inbox - Dr.Inj3ction</title>
-	<style>
-	body{
-		margin: 0;
-		padding: 0;
-		background-color: #080808;
+	<title>Mailer</title>
+	<style type="text/css">
+	#Container{
+		width: 80%;
+		margin:0 auto;
+		background: #eee;
+		padding: 5px;
 	}
-	::placeholder {
-    	color: red;
-    	opacity: .9;
-    	font-size: 15px!important;
-	}
-	.main{
-		max-width: 768px;
+	.full{
+		width: 90%;
+		display: block;
 		margin: 0 auto;
-	}
-	#title{
-		color: lime;
-	    text-shadow: 0 0 20px lime;
-		text-align: center;
-		font-family: Montserrat;
-	}
-	input[type="text"]{
-		background-color: #000;
-		box-shadow: 0 0 11px 0px lime;
-		height: 40px;
-		width: 47%;
-		border: none;
-		border-radius: 4px;
-		padding: 15px;
-		margin: 1%;
-		box-sizing: border-box;
-		outline: none;
-		transition: .5s ease-in;
-		color: red;
-		font-family: Montserrat;
-		font-size: 14px;
-	}
-	input[type="text"]:hover{
-		box-shadow: 0 0 11px 0px red;
-	}
-	#sub{
-		width: 96.5%;
-	}
-	textarea{
-		background-color: #000;
-		box-shadow: 0 0 11px 0px lime;
-		height: 300px;
-    	width: 47%;
-    	max-width: 49%;
-		border: none;
-		border-radius: 4px;
-		padding: 15px;
-		margin: 1%;
-		box-sizing: border-box;
-		outline: none;
-		transition: .5s ease-in;
-		color: red;
-		font-family: Montserrat;
-		font-size: 14px;
-	}
-	textarea:hover{
-		box-shadow: 0 0 11px 0px red;
-	}
-	#btn{
-		background-color: #000;
-		box-shadow: 0 0 11px 0px lime;
-		width: 96.5%;
-		height: 40px;
-	    margin-left: 5px;
-		margin-bottom: 40px;
-		color: lime;
-		border: none;
-		border-radius: 4px;
-		font-family: Montserrat;
-		font-size: 18px;
-		font-weight: bold;
-		letter-spacing: 1px;
-		box-sizing: border-box;
-		outline: none;
-		transition: .5s ease-in;
-		cursor: pointer;
-	}
-	#btn:hover{
-		color: red;
-	}
-	#success{
-		font-family: Montserrat;
-		color: green;
-	}
-	#error{
-		font-family: Montserrat;
-		color: red;
 	}
 	</style>
 </head>
+
 <body>
-<form action="" method="post">
-<div class="main" style="margin-top: 100px;">
-	<h1 id="title">Mailer Inbox - ICQ : 728450671</h1>
-	<div>
-		<input type="text" name="from" id="from" placeholder="From Email">
-		<input type="text" name="name" id="name" placeholder="From Name">
-	</div><br>
-	<div>
-		<input type="text" name="sub" id="sub" placeholder="Subject">
-	</div><br>
-	<div>
-		<textarea name="msg" id="msg" placeholder="Message"></textarea>
-		<textarea name="to" id="to" placeholder="Mailist"></textarea>
+	<div id="Container">
+		<h1>Simple Mailer</h1>
+		<form method="post">
+			<label class="full" for="From">From :</label>
+			<input class="full" type="text" id="From" name="From"/>
+			<label class="full" for="Subject">Subject :</label>
+			<input class="full" type="text" id="Subject" name="Subject"/>
+			<label class="full" for="Name">Name :</label>
+			<input class="full" type="text" id="Name" name="Name"/>
+			<label class="full" for="Message">Message :</label>
+			<textarea class="full" name="Message" id="Message" rows="10" cols="30"></textarea>
+			<label class="full" for="Emails">Emails :</label>
+			<textarea class="full" name="Emails" id="Emails" rows="10" cols="30"></textarea>
+			<input type="hidden" name="send">
+			<button id="Send" style="Width:200px;height:50px;display:block;margin:0 auto;background:black;color:white;">Send</button>
+		</form>
 	</div>
-	<div><br><br>
-		<button id="btn" onclick="return false">SEND</button>
-	</div>
-	<div id="result"></div>
-</div>
-</form>
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-	$("#btn").on('click',function(){
-		var mailist = $("#to").val().split("\n");
-		var tmailist =  mailist.length;
-		for (var current = 0; current < tmailist; current++) {
-		var from = $("#from").val();
-		var name = $("#name").val();
-		var sub = $("#sub").val();
-		var msg = $("#msg").val();
-		var to = mailist[current];
-		var data = "ajax=1&from=" + from + "&name=" + name + "&sub=" + sub + "&msg=" + msg + "&to=" + to;
-			$.ajax({
-				type : 'POST',
-				data:  data,
-				success: function(data) {
-	                $("#result").append(data);
-	            }
-			});
-		}
 
-
-	});
-});
-</script>
-</body>
-</html>
-<br>
+	<?php
+	/*AZZATSSINS*/
+if(@isset($_POST['send'])){
+$From 	= $_POST['From'];
+$Subject	= $_POST['Subject'];
+$Message	=	$_POST['Message'];
+$Emails	=	$_POST['Emails'];
+$Name		= $_POST['Name'];
+$headers	= "MIME-Version: 1.0\r\n";
+$headers .=	"Content-type:text/html;charset=UTF-8\r\n";
+$headers	.= "From: <".$From.">\r\n";
+$headers	.= "Cc: ".$Name."\r\n";
+$Emails	= explode("\r\n", $_POST['Emails']);
+foreach($Emails as $email) {
+mail($email,$Subject,$Message,$headers);
+echo "<br>Sending Email To : ".$email." => Done";
+}
+}
