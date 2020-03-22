@@ -9,7 +9,7 @@
 	padding:0;
 }
 body {
-	background:url(http://i39.tinypic.com/aonmfc.jpg);
+	background:url(http://getwallpapers.com/wallpaper/full/d/0/3/119608.jpg);
 }
 #dash {
 	margin:0 auto;
